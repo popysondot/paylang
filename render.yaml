@@ -1,0 +1,14 @@
+services:
+  # Backend API - Deploy as Web Service with server/ as root
+  - type: web
+    name: paylang-api
+    repo: https://github.com/yourusername/paylang
+    branch: main
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
