@@ -35,7 +35,14 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const baseUrl = import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
+            const rawUrl = import.meta.env.VITE_BACKEND_URL;
+            if (!rawUrl) {
+                console.error('VITE_BACKEND_URL is not defined');
+                setError('Backend URL is missing. Please set VITE_BACKEND_URL in your environment variables.');
+                setLoading(false);
+                return;
+            }
+            const baseUrl = rawUrl.replace(/\/$/, '');
             console.log('Dashboard connecting to:', baseUrl);
             try {
                 setError(null);
