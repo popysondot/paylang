@@ -58,9 +58,11 @@ const RefundPage = () => {
 
         try {
             const response = await axios.post(`${backendUrl.replace(/\/$/, '')}/api/refund-request`, {
-                paymentId: selectedPayment.id,
-                email: email,
-                reason: reason
+    reference: selectedPayment.reference,  // Use reference, not paymentId
+    email: email,
+    reason: reason
+});
+
             });
             if (response.data.status === 'success') {
                 setStatus({ type: 'success', message: 'Your refund appeal has been submitted successfully. Our compliance team will review it within 48 hours.' });
