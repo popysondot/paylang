@@ -24,8 +24,16 @@ const RefundPage = () => {
         e.preventDefault();
         setLoading(true);
         setStatus({ type: '', message: '' });
+        
+        const backendUrl = import.meta.env.VITE_BACKEND_URL;
+        if (!backendUrl) {
+            setStatus({ type: 'error', message: 'Backend configuration missing. Please set VITE_BACKEND_URL.' });
+            setLoading(false);
+            return;
+        }
+
         try {
-            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/payments/${email}`);
+            const response = await axios.get(`${backendUrl.replace(/\/$/, '')}/api/payments/${email}`);
             setPayments(response.data);
             if (response.data.length === 0) {
                 setStatus({ type: 'error', message: 'No payments found for this email address. Please check the spelling.' });
@@ -40,9 +48,17 @@ const RefundPage = () => {
         e.preventDefault();
         if (!selectedPayment) return;
         setLoading(true);
+
+        const backendUrl = import.meta.env.VITE_BACKEND_URL;
+        if (!backendUrl) {
+            setStatus({ type: 'error', message: 'Backend configuration missing.' });
+            setLoading(false);
+            return;
+        }
+
         try {
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/refund-request`, {
-                paymentId: selectedPayment._id,
+            const response = await axios.post(`${backendUrl.replace(/\/$/, '')}/api/refund-request`, {
+                paymentId: selectedPayment.id,
                 email: email,
                 reason: reason
             });
@@ -133,7 +149,7 @@ const RefundPage = () => {
                             <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-4">Found {payments.length} Transactions</p>
                             <div className="grid grid-cols-1 gap-4">
                                 {payments.map((p) => (
-                                    <div key={p._id} className="group flex flex-col sm:flex-row items-center justify-between p-6 bg-slate-50 rounded-[2rem] border-2 border-transparent hover:border-emerald-200 hover:bg-white transition-all shadow-hover cursor-pointer" onClick={() => setSelectedPayment(p)}>
+                                    <div key={p.id} className="group flex flex-col sm:flex-row items-center justify-between p-6 bg-slate-50 rounded-[2rem] border-2 border-transparent hover:border-emerald-200 hover:bg-white transition-all shadow-hover cursor-pointer" onClick={() => setSelectedPayment(p)}>
                                         <div className="flex items-center gap-6 mb-4 sm:mb-0">
                                             <div className="bg-emerald-100 text-emerald-600 p-4 rounded-2xl font-black">
                                                 ${p.amount}
