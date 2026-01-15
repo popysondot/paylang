@@ -1,14 +1,24 @@
-const express = require('express');
-const nodemailer = require('nodemailer');
-const cors = require('cors');
-const axios = require('axios');
-const Database = require('better-sqlite3');
-const path = require('path');
-require('dotenv').config();
+import express from 'express';
+import nodemailer from 'nodemailer';
+import cors from 'cors';
+import axios from 'axios';
+import Database from 'better-sqlite3';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Serve frontend static files
+app.use(express.static(path.join(__dirname, '../dist')));
 
 // SQLite Connection
 const db = new Database('tutorflow.db');
@@ -257,9 +267,9 @@ app.post('/api/refund-request', (req, res) => {
     }
 });
 
-// 404 Handler
-app.use((req, res) => {
-    res.status(404).json({ error: 'Route not found' });
+// Serve frontend for all other routes (SPA fallback)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
