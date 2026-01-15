@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePaystackPayment } from 'react-paystack';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -9,13 +9,36 @@ const PaymentPage = () => {
     const [amount, setAmount] = useState('');
     const [name, setName] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
+    const [envError, setEnvError] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const paystackKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+        const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+        console.log('Environment Variables Check:');
+        console.log('VITE_PAYSTACK_PUBLIC_KEY:', paystackKey ? 'SET' : 'MISSING');
+        console.log('VITE_BACKEND_URL:', backendUrl ? 'SET' : 'MISSING');
+
+        if (!paystackKey || !backendUrl) {
+            const missingVars = [];
+            if (!paystackKey) missingVars.push('VITE_PAYSTACK_PUBLIC_KEY');
+            if (!backendUrl) missingVars.push('VITE_BACKEND_URL');
+            
+            const errorMsg = `Missing environment variables: ${missingVars.join(', ')}. Please set them in your hosting provider's dashboard and redeploy.`;
+            setEnvError(errorMsg);
+            console.error(errorMsg);
+        }
+    }, []);
+
+    const paystackKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     const config = {
         reference: (new Date()).getTime().toString(),
         email: email,
-        amount: amount * 100, // Paystack expects amount in kobo/cents
-        publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+        amount: amount * 100,
+        publicKey: paystackKey,
         currency: 'USD',
     };
 
@@ -23,8 +46,14 @@ const PaymentPage = () => {
 
     const onSuccess = (reference) => {
         setIsProcessing(true);
-        // Verify payment on the backend
-        axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/verify-payment`, {
+        
+        if (!backendUrl) {
+            setIsProcessing(false);
+            alert('Backend URL is not configured. Please contact support.');
+            return;
+        }
+
+        axios.post(`${backendUrl.replace(/\/$/, '')}/api/verify-payment`, {
             reference: reference.reference,
             email: email,
             amount: amount,
@@ -34,7 +63,7 @@ const PaymentPage = () => {
                 setTimeout(() => {
                     setIsProcessing(false);
                     navigate('/thank-you', { state: { reference: reference.reference, amount, email, name } });
-                }, 2000); // Small delay to show the cool preloader
+                }, 2000);
             }
         }).catch(err => {
             setIsProcessing(false);
@@ -50,10 +79,14 @@ const PaymentPage = () => {
 
     const handlePayment = (e) => {
         e.preventDefault();
-        
-        if (!import.meta.env.VITE_PAYSTACK_PUBLIC_KEY) {
-            alert('Paystack Public Key is missing. Please set VITE_PAYSTACK_PUBLIC_KEY in your environment variables.');
-            console.error('VITE_PAYSTACK_PUBLIC_KEY is undefined. Check your .env file or hosting provider settings.');
+
+        if (!paystackKey) {
+            alert('Paystack Public Key is not configured. Please contact support.');
+            return;
+        }
+
+        if (!backendUrl) {
+            alert('Backend URL is not configured. Please contact support.');
             return;
         }
 
@@ -61,6 +94,12 @@ const PaymentPage = () => {
             alert('Please fill in all fields');
             return;
         }
+
+        if (amount <= 0) {
+            alert('Please enter a valid amount');
+            return;
+        }
+
         initializePayment(onSuccess, onClose);
     };
 
@@ -98,6 +137,16 @@ const PaymentPage = () => {
                     </div>
                 </div>
             </nav>
+
+            {/* Environment Error Alert */}
+            {envError && (
+                <div className="bg-red-50 border border-red-200 text-red-800 px-6 py-4">
+                    <div className="max-w-7xl mx-auto">
+                        <p className="font-bold">⚠️ Configuration Error</p>
+                        <p className="text-sm mt-1">{envError}</p>
+                    </div>
+                </div>
+            )}
 
             {/* Hero & Payment Section */}
             <section id="checkout" className="py-20 bg-slate-50">
@@ -140,6 +189,14 @@ const PaymentPage = () => {
                                 <p className="text-slate-500 mt-1">Submit your info to initiate secure payment</p>
                             </div>
 
+                            {envError && (
+                                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                                    <p className="text-sm text-red-800">
+                                        <strong>Payment unavailable:</strong> The system is not properly configured. Please contact support.
+                                    </p>
+                                </div>
+                            )}
+
                             <form onSubmit={handlePayment} className="space-y-6">
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-2">Full Name</label>
@@ -150,6 +207,7 @@ const PaymentPage = () => {
                                         className="w-full px-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all placeholder:text-slate-300"
                                         placeholder="Enter your legal name"
                                         required
+                                        disabled={!!envError}
                                     />
                                 </div>
                                 <div>
@@ -161,6 +219,7 @@ const PaymentPage = () => {
                                         className="w-full px-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all placeholder:text-slate-300"
                                         placeholder="university@example.com"
                                         required
+                                        disabled={!!envError}
                                     />
                                 </div>
                                 <div>
@@ -169,6 +228,7 @@ const PaymentPage = () => {
                                         type="text" 
                                         className="w-full px-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all placeholder:text-slate-300"
                                         placeholder="e.g. ASGN-9921"
+                                        disabled={!!envError}
                                     />
                                 </div>
                                 <div>
@@ -182,15 +242,23 @@ const PaymentPage = () => {
                                             className="w-full pl-8 pr-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all placeholder:text-slate-300"
                                             placeholder="0.00"
                                             required
+                                            disabled={!!envError}
+                                            step="0.01"
+                                            min="0"
                                         />
                                     </div>
                                 </div>
 
                                 <button 
                                     type="submit"
-                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-5 rounded-xl shadow-lg shadow-emerald-200 transition-all transform hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center gap-2 group"
+                                    disabled={!!envError}
+                                    className={`w-full font-black py-5 rounded-xl shadow-lg transition-all transform flex items-center justify-center gap-2 group ${
+                                        envError 
+                                            ? 'bg-slate-300 text-slate-500 cursor-not-allowed' 
+                                            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200 hover:-translate-y-1 active:scale-[0.98]'
+                                    }`}
                                 >
-                                    Proceed to Paystack
+                                    {envError ? 'Configuration Required' : 'Proceed to Paystack'}
                                     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                                 </button>
                             </form>
