@@ -15,7 +15,7 @@ const PaymentPage = () => {
         reference: (new Date()).getTime().toString(),
         email: email,
         amount: amount * 100, // Paystack expects amount in kobo/cents
-        publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || '',
+        publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
         currency: 'USD',
     };
 
