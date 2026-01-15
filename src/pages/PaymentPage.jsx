@@ -15,7 +15,7 @@ const PaymentPage = () => {
         reference: (new Date()).getTime().toString(),
         email: email,
         amount: amount * 100, // Paystack expects amount in kobo/cents
-        publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+        publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || '',
         currency: 'USD',
     };
 
@@ -50,6 +50,13 @@ const PaymentPage = () => {
 
     const handlePayment = (e) => {
         e.preventDefault();
+        
+        if (!import.meta.env.VITE_PAYSTACK_PUBLIC_KEY) {
+            alert('Paystack Public Key is missing. Please set VITE_PAYSTACK_PUBLIC_KEY in your environment variables.');
+            console.error('VITE_PAYSTACK_PUBLIC_KEY is undefined. Check your .env file or hosting provider settings.');
+            return;
+        }
+
         if (!email || !amount || !name) {
             alert('Please fill in all fields');
             return;
