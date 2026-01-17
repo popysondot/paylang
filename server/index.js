@@ -1005,10 +1005,7 @@ app.post('/api/refund-request', async (req, res) => {
     }
 });
 
-<<<<<<< HEAD
-=======
 // Serve frontend for all other routes (SPA fallback)
->>>>>>> f531cf328cecb98052588bf4187908604cf4f033
 app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
