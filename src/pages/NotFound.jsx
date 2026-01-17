@@ -1,12 +1,26 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { GraduationCap, Home, ArrowLeft, Gamepad2, Trophy, Play, RotateCcw, X } from 'lucide-react';
+import { ShieldCheck, Home, ArrowLeft, Gamepad2, Trophy, Play, RotateCcw, X } from 'lucide-react';
 
 const NotFound = () => {
     const [show404, setShow404] = useState(true);
     const [showGamePrompt, setShowGamePrompt] = useState(true);
     const [snakeStarted, setSnakeStarted] = useState(false);
-    
+    const [settings, setSettings] = useState({ company_name: 'Service Platform' });
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
+                const res = await axios.get(`${baseUrl}/api/settings`);
+                if (res.data.company_name) setSettings(prev => ({ ...prev, ...res.data }));
+            } catch (err) {
+                // Keep default
+            }
+        };
+        fetchSettings();
+    }, []);
+
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
             {/* Simple Header */}
@@ -14,9 +28,9 @@ const NotFound = () => {
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
                     <Link to="/" className="flex items-center gap-2 group">
                         <div className="bg-emerald-600 p-1.5 rounded-lg text-white">
-                            <GraduationCap size={20} />
+                            <ShieldCheck size={20} />
                         </div>
-                        <span className="text-xl font-bold text-slate-800">TutorFlow</span>
+                        <span className="text-xl font-bold text-slate-800">{settings.company_name}</span>
                     </Link>
                     <Link to="/" className="flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-all">
                         <ArrowLeft size={16} />
@@ -88,7 +102,7 @@ const NotFound = () => {
                         {/* Help Links */}
                         <div className="mt-12 text-center">
                             <p className="text-slate-400 text-sm">
-                                Need help? <Link to="/contact" className="text-emerald-600 hover:underline">Contact us</Link> or visit our <Link to="/about-tutors" className="text-emerald-600 hover:underline">About page</Link>
+                                Need help? <Link to="/" className="text-emerald-600 hover:underline">Contact us</Link> or visit our <Link to="/" className="text-emerald-600 hover:underline">About us</Link>
                             </p>
                         </div>
                     </div>
@@ -103,9 +117,9 @@ const NotFound = () => {
                     <div className="flex flex-col md:flex-row justify-between items-center gap-8 mb-8">
                         <div className="flex items-center gap-2">
                             <div className="bg-emerald-600 p-1 rounded-lg text-white">
-                                <GraduationCap size={16} />
+                                <ShieldCheck size={16} />
                             </div>
-                            <span className="font-bold text-slate-800">TutorFlow</span>
+                            <span className="font-bold text-slate-800">{settings.company_name}</span>
                         </div>
                         <div className="flex gap-6 text-sm font-medium text-slate-400">
                             <Link to="/admin" className="hover:text-emerald-600">Admin</Link>
@@ -114,7 +128,7 @@ const NotFound = () => {
                             <Link to="/terms-of-service" className="hover:text-emerald-600">Terms of Service</Link>
                         </div>
                     </div>
-                    <p className="text-center text-xs text-slate-400">© 2024 TutorFlow Academic Services. All rights reserved.</p>
+                    <p className="text-center text-xs text-slate-400">© {new Date().getFullYear()} {settings.company_name}. All rights reserved.</p>
                 </div>
             </footer>
         </div>

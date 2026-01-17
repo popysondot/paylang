@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import InfoLayout from '../components/InfoLayout';
 import axios from 'axios';
 import { 
@@ -19,13 +19,40 @@ const RefundPage = () => {
     const [selectedPayment, setSelectedPayment] = useState(null);
     const [reason, setReason] = useState('');
     const [status, setStatus] = useState({ type: '', message: '' });
+    const [settings, setSettings] = useState({
+        company_name: 'Service Platform',
+        support_email: 'support@yourdomain.com',
+        refund_policy_days: '14',
+        service_name: 'Professional Services'
+    });
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
+                const res = await axios.get(`${baseUrl}/api/settings`);
+                setSettings(prev => ({ ...prev, ...res.data }));
+            } catch (err) {
+                console.error('Failed to fetch settings:', err);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     const fetchPayments = async (e) => {
         e.preventDefault();
         setLoading(true);
         setStatus({ type: '', message: '' });
+        
+        const backendUrl = import.meta.env.VITE_BACKEND_URL;
+        if (!backendUrl) {
+            setStatus({ type: 'error', message: 'Backend configuration missing. Please set VITE_BACKEND_URL.' });
+            setLoading(false);
+            return;
+        }
+
         try {
-            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/payments/${email}`);
+            const response = await axios.get(`${backendUrl.replace(/\/$/, '')}/api/payments/${email}`);
             setPayments(response.data);
             if (response.data.length === 0) {
                 setStatus({ type: 'error', message: 'No payments found for this email address. Please check the spelling.' });
@@ -40,9 +67,17 @@ const RefundPage = () => {
         e.preventDefault();
         if (!selectedPayment) return;
         setLoading(true);
+
+        const backendUrl = import.meta.env.VITE_BACKEND_URL;
+        if (!backendUrl) {
+            setStatus({ type: 'error', message: 'Backend configuration missing.' });
+            setLoading(false);
+            return;
+        }
+
         try {
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/refund-request`, {
-                paymentId: selectedPayment._id,
+            const response = await axios.post(`${backendUrl.replace(/\/$/, '')}/api/refund-request`, {
+                reference: selectedPayment.reference,
                 email: email,
                 reason: reason
             });
@@ -69,7 +104,7 @@ const RefundPage = () => {
                     <div>
                         <h2 className="text-2xl font-black text-slate-900 mb-2">Our 100% Satisfaction Guarantee</h2>
                         <p className="text-slate-600 leading-relaxed max-w-2xl">
-                            At TutorFlow, we stand by the quality of our tutors. If you're not satisfied, our transparent refund process ensures you get your money back. Appeals are processed fairly by our independent audit team.
+                            At {settings.company_name}, we stand by the quality of our service. If you're not satisfied, our transparent refund process ensures you get your money back. Appeals are processed fairly by our independent audit team.
                         </p>
                     </div>
                 </div>
@@ -133,13 +168,13 @@ const RefundPage = () => {
                             <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-4">Found {payments.length} Transactions</p>
                             <div className="grid grid-cols-1 gap-4">
                                 {payments.map((p) => (
-                                    <div key={p._id} className="group flex flex-col sm:flex-row items-center justify-between p-6 bg-slate-50 rounded-[2rem] border-2 border-transparent hover:border-emerald-200 hover:bg-white transition-all shadow-hover cursor-pointer" onClick={() => setSelectedPayment(p)}>
+                                    <div key={p.id} className="group flex flex-col sm:flex-row items-center justify-between p-6 bg-slate-50 rounded-[2rem] border-2 border-transparent hover:border-emerald-200 hover:bg-white transition-all shadow-hover cursor-pointer" onClick={() => setSelectedPayment(p)}>
                                         <div className="flex items-center gap-6 mb-4 sm:mb-0">
                                             <div className="bg-emerald-100 text-emerald-600 p-4 rounded-2xl font-black">
                                                 ${p.amount}
                                             </div>
                                             <div>
-                                                <p className="font-black text-slate-800">Academic Support</p>
+                                                <p className="font-black text-slate-800">{settings.service_name}</p>
                                                 <p className="text-xs text-slate-400 font-mono">{p.reference}</p>
                                             </div>
                                         </div>
@@ -212,7 +247,7 @@ const RefundPage = () => {
                     </div>
                     <h4 className="text-xl font-black mb-4 relative z-10">Still need help?</h4>
                     <p className="text-slate-400 mb-8 max-w-lg mx-auto relative z-10">Our customer support team is available 24/7 to assist you with any payment or service related issues.</p>
-                    <a href="mailto:support@tutorflow.edu" className="inline-flex items-center gap-3 bg-white text-slate-900 font-black px-10 py-4 rounded-2xl hover:bg-emerald-400 transition-all relative z-10 shadow-xl">
+                    <a href={`mailto:${settings.support_email}`} className="inline-flex items-center gap-3 bg-white text-slate-900 font-black px-10 py-4 rounded-2xl hover:bg-emerald-400 transition-all relative z-10 shadow-xl">
                         Email Support
                     </a>
                 </div>

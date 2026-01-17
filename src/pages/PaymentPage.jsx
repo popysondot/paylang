@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePaystackPayment } from 'react-paystack';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -9,13 +9,56 @@ const PaymentPage = () => {
     const [amount, setAmount] = useState('');
     const [name, setName] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
+    const [envError, setEnvError] = useState('');
+    const [settings, setSettings] = useState({
+        company_name: 'Service Platform',
+        service_name: 'Professional Services',
+        service_description: 'High-quality professional support from industry experts.',
+        support_email: 'support@yourdomain.com',
+        support_phone: '',
+        landing_services: '[]',
+        landing_testimonials: '[]'
+    });
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
+                const res = await axios.get(`${baseUrl}/api/settings`);
+                setSettings(prev => ({ ...prev, ...res.data }));
+            } catch (err) {
+                console.error('Failed to fetch settings:', err);
+            }
+        };
+        fetchSettings();
+
+        const paystackKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+        const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+        console.log('Environment Variables Check:');
+        console.log('VITE_PAYSTACK_PUBLIC_KEY:', paystackKey ? 'SET' : 'MISSING');
+        console.log('VITE_BACKEND_URL:', backendUrl ? 'SET' : 'MISSING');
+
+        if (!paystackKey || !backendUrl) {
+            const missingVars = [];
+            if (!paystackKey) missingVars.push('VITE_PAYSTACK_PUBLIC_KEY');
+            if (!backendUrl) missingVars.push('VITE_BACKEND_URL');
+            
+            const errorMsg = `Missing environment variables: ${missingVars.join(', ')}. Please set them in your hosting provider's dashboard and redeploy.`;
+            setEnvError(errorMsg);
+            console.error(errorMsg);
+        }
+    }, []);
+
+    const paystackKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     const config = {
         reference: (new Date()).getTime().toString(),
         email: email,
-        amount: amount * 100, // Paystack expects amount in kobo/cents
-        publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+        amount: amount * 100,
+        publicKey: paystackKey,
         currency: 'USD',
     };
 
@@ -23,8 +66,14 @@ const PaymentPage = () => {
 
     const onSuccess = (reference) => {
         setIsProcessing(true);
-        // Verify payment on the backend
-        axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/verify-payment`, {
+        
+        if (!backendUrl) {
+            setIsProcessing(false);
+            alert('Backend URL is not configured. Please contact support.');
+            return;
+        }
+
+        axios.post(`${backendUrl.replace(/\/$/, '')}/api/verify-payment`, {
             reference: reference.reference,
             email: email,
             amount: amount,
@@ -32,9 +81,9 @@ const PaymentPage = () => {
         }).then(res => {
             if (res.data.status === 'success') {
                 setTimeout(() => {
-                    setIsProcessing(false);
                     navigate('/thank-you', { state: { reference: reference.reference, amount, email, name } });
-                }, 2000); // Small delay to show the cool preloader
+                    setIsProcessing(false);
+                }, 2000);
             }
         }).catch(err => {
             setIsProcessing(false);
@@ -50,10 +99,27 @@ const PaymentPage = () => {
 
     const handlePayment = (e) => {
         e.preventDefault();
+
+        if (!paystackKey) {
+            alert('Paystack Public Key is not configured. Please contact support.');
+            return;
+        }
+
+        if (!backendUrl) {
+            alert('Backend URL is not configured. Please contact support.');
+            return;
+        }
+
         if (!email || !amount || !name) {
             alert('Please fill in all fields');
             return;
         }
+
+        if (amount <= 0) {
+            alert('Please enter a valid amount');
+            return;
+        }
+
         initializePayment(onSuccess, onClose);
     };
 
@@ -79,9 +145,9 @@ const PaymentPage = () => {
                 <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-2">
                         <div className="bg-emerald-600 p-2 rounded-lg text-white">
-                            <GraduationCap size={24} />
+                            <ShieldCheck size={24} />
                         </div>
-                        <span className="text-xl font-bold text-slate-800 tracking-tight">TutorFlow</span>
+                        <span className="text-xl font-bold text-slate-800 tracking-tight">{settings.company_name}</span>
                     </div>
                     <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
                         <a href="#services" className="hover:text-emerald-600 transition-colors">Services</a>
@@ -92,27 +158,37 @@ const PaymentPage = () => {
                 </div>
             </nav>
 
+            {/* Environment Error Alert */}
+            {envError && (
+                <div className="bg-red-50 border border-red-200 text-red-800 px-6 py-4">
+                    <div className="max-w-7xl mx-auto">
+                        <p className="font-bold">⚠️ Configuration Error</p>
+                        <p className="text-sm mt-1">{envError}</p>
+                    </div>
+                </div>
+            )}
+
             {/* Hero & Payment Section */}
             <section id="checkout" className="py-20 bg-slate-50">
                 <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
                     <div className="space-y-8">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold uppercase tracking-wider">
                             <CheckCircle2 size={14} />
-                            Verified Academic Excellence
+                            Professional Business Excellence
                         </div>
                         <h1 className="text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.1]">
-                            The Secure Hub for <span className="text-emerald-600">Assignment Payments</span>
+                            The Secure Hub for <span className="text-emerald-600">{settings.service_name} Payments</span>
                         </h1>
                         <p className="text-xl text-slate-600 leading-relaxed max-w-xl">
-                            Fast, encrypted, and reliable. Complete your payment to initiate high-quality academic support from our PhD experts.
+                            {settings.service_description}
                         </p>
                         
                         <div className="grid sm:grid-cols-2 gap-6 pt-4">
                             {[
-                                { icon: <ShieldCheck className="text-emerald-600" />, title: "Secure Checkout", desc: "Paystack encrypted" },
+                                { icon: <ShieldCheck className="text-emerald-600" />, title: "Secure Checkout", desc: "Encrypted payments" },
                                 { icon: <Clock className="text-emerald-600" />, title: "24/7 Support", desc: "Always here to help" },
-                                { icon: <Award className="text-emerald-600" />, title: "Quality Work", desc: "Plagiarism free" },
-                                { icon: <BrainCircuit className="text-emerald-600" />, title: "Expert Tutors", desc: "Subject specialists" }
+                                { icon: <Award className="text-emerald-600" />, title: "Premium Service", desc: "Quality guaranteed" },
+                                { icon: <BrainCircuit className="text-emerald-600" />, title: "Industry Experts", desc: "Subject specialists" }
                             ].map((feature, i) => (
                                 <div key={i} className="flex gap-4">
                                     <div className="bg-white p-2 rounded-lg shadow-sm h-fit">{feature.icon}</div>
@@ -133,6 +209,14 @@ const PaymentPage = () => {
                                 <p className="text-slate-500 mt-1">Submit your info to initiate secure payment</p>
                             </div>
 
+                            {envError && (
+                                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                                    <p className="text-sm text-red-800">
+                                        <strong>Payment unavailable:</strong> The system is not properly configured. Please contact support.
+                                    </p>
+                                </div>
+                            )}
+
                             <form onSubmit={handlePayment} className="space-y-6">
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-2">Full Name</label>
@@ -143,6 +227,7 @@ const PaymentPage = () => {
                                         className="w-full px-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all placeholder:text-slate-300"
                                         placeholder="Enter your legal name"
                                         required
+                                        disabled={!!envError}
                                     />
                                 </div>
                                 <div>
@@ -152,16 +237,18 @@ const PaymentPage = () => {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         className="w-full px-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all placeholder:text-slate-300"
-                                        placeholder="university@example.com"
+                                        placeholder="client@example.com"
                                         required
+                                        disabled={!!envError}
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-slate-700 mb-2">Assignment Reference / ID</label>
+                                    <label className="block text-sm font-bold text-slate-700 mb-2">Service Reference / ID</label>
                                     <input 
                                         type="text" 
                                         className="w-full px-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all placeholder:text-slate-300"
-                                        placeholder="e.g. ASGN-9921"
+                                        placeholder="e.g. REF-1002"
+                                        disabled={!!envError}
                                     />
                                 </div>
                                 <div>
@@ -175,15 +262,23 @@ const PaymentPage = () => {
                                             className="w-full pl-8 pr-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all placeholder:text-slate-300"
                                             placeholder="0.00"
                                             required
+                                            disabled={!!envError}
+                                            step="0.01"
+                                            min="0"
                                         />
                                     </div>
                                 </div>
 
                                 <button 
                                     type="submit"
-                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-5 rounded-xl shadow-lg shadow-emerald-200 transition-all transform hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center gap-2 group"
+                                    disabled={!!envError}
+                                    className={`w-full font-black py-5 rounded-xl shadow-lg transition-all transform flex items-center justify-center gap-2 group ${
+                                        envError 
+                                            ? 'bg-slate-300 text-slate-500 cursor-not-allowed' 
+                                            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200 hover:-translate-y-1 active:scale-[0.98]'
+                                    }`}
                                 >
-                                    Proceed to Paystack
+                                    {envError ? 'Configuration Required' : 'Proceed to Paystack'}
                                     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                                 </button>
                             </form>
@@ -201,23 +296,26 @@ const PaymentPage = () => {
             <section id="services" className="py-24">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center max-w-3xl mx-auto mb-16">
-                        <h2 className="text-4xl font-bold text-slate-900 mb-4 font-serif">Tailored Academic Support</h2>
-                        <p className="text-lg text-slate-500 leading-relaxed">We specialize in various fields to ensure you get the specific help you need for your academic journey.</p>
+                        <h2 className="text-4xl font-bold text-slate-900 mb-4">{settings.service_name} Solutions</h2>
+                        <p className="text-lg text-slate-500 leading-relaxed">Expert solutions tailored to your professional and operational requirements.</p>
                     </div>
                     <div className="grid md:grid-cols-3 gap-8">
-                        {[
-                            { icon: <BookOpen className="text-emerald-600" size={32} />, title: "Dissertation Help", desc: "Full research support from proposal to final defense chapters." },
-                            { icon: <PenTool className="text-emerald-600" size={32} />, title: "Essay Writing", desc: "Custom, well-researched essays written to your specific university standards." },
-                            { icon: <BrainCircuit className="text-emerald-600" size={32} />, title: "STEM Assignments", desc: "Expert solutions for complex Mathematics, Coding, and Engineering tasks." }
-                        ].map((s, i) => (
-                            <div key={i} className="group p-8 rounded-3xl border border-slate-100 hover:border-emerald-100 hover:bg-emerald-50/30 transition-all duration-300">
-                                <div className="bg-emerald-50 p-4 rounded-2xl w-fit mb-6 group-hover:bg-white group-hover:shadow-md transition-all">
-                                    {s.icon}
-                                </div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-3">{s.title}</h3>
-                                <p className="text-slate-500 leading-relaxed">{s.desc}</p>
-                            </div>
-                        ))}
+                        {(() => {
+                            try {
+                                const services = JSON.parse(settings.landing_services || '[]');
+                                return services.map((s, i) => (
+                                    <div key={i} className="group p-8 rounded-3xl border border-slate-100 hover:border-emerald-100 hover:bg-emerald-50/30 transition-all duration-300">
+                                        <div className="bg-emerald-50 p-4 rounded-2xl w-fit mb-6 group-hover:bg-white group-hover:shadow-md transition-all">
+                                            <ShieldCheck className="text-emerald-600" size={32} />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-slate-900 mb-3">{s.title}</h3>
+                                        <p className="text-slate-500 leading-relaxed">{s.desc}</p>
+                                    </div>
+                                ));
+                            } catch (e) {
+                                return <p className="text-slate-400 italic">Configure services in Admin Settings</p>;
+                            }
+                        })()}
                     </div>
                 </div>
             </section>
@@ -228,8 +326,8 @@ const PaymentPage = () => {
                 <div className="max-w-7xl mx-auto px-6 relative z-10">
                     <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
                         <div className="max-w-2xl">
-                            <h2 className="text-4xl font-bold mb-4">Trusted by 5,000+ Students Worldwide</h2>
-                            <p className="text-emerald-100/60 text-lg">See why students from top universities choose TutorFlow for their academic needs.</p>
+                            <h2 className="text-4xl font-bold mb-4">Trusted by 5,000+ Clients Worldwide</h2>
+                            <p className="text-emerald-100/60 text-lg">See why clients from leading organizations choose {settings.company_name} for their professional needs.</p>
                         </div>
                         <div className="flex gap-2">
                             {[1, 2, 3, 4, 5].map(s => <Star key={s} size={20} fill="#10b981" className="text-emerald-500" />)}
@@ -237,24 +335,27 @@ const PaymentPage = () => {
                         </div>
                     </div>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {[
-                            { name: "Sarah J.", uni: "Stanford University", quote: "The level of detail in my statistics project was incredible. Got an A!" },
-                            { name: "Michael L.", uni: "LSE London", quote: "Fast turnaround and very professional communication. Highly recommended." },
-                            { name: "Elena R.", uni: "University of Toronto", quote: "Helped me structure my entire thesis. The research was top-notch." }
-                        ].map((t, i) => (
-                            <div key={i} className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
-                                <p className="text-lg text-emerald-50 italic mb-6">"{t.quote}"</p>
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-lg">
-                                        {t.name[0]}
+                        {(() => {
+                            try {
+                                const testimonials = JSON.parse(settings.landing_testimonials || '[]');
+                                return testimonials.map((t, i) => (
+                                    <div key={i} className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
+                                        <p className="text-lg text-emerald-50 italic mb-6">"{t.quote}"</p>
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-lg">
+                                                {t.name ? t.name[0] : 'C'}
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold">{t.name}</h4>
+                                                <p className="text-xs text-emerald-100/50">{t.uni}</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h4 className="font-bold">{t.name}</h4>
-                                        <p className="text-xs text-emerald-100/50">{t.uni}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                                ));
+                            } catch (e) {
+                                return <p className="text-slate-400 italic">Configure testimonials in Admin Settings</p>;
+                            }
+                        })()}
                     </div>
                 </div>
             </section>
@@ -266,11 +367,11 @@ const PaymentPage = () => {
                         <div className="space-y-6">
                             <div className="flex items-center gap-2">
                                 <div className="bg-emerald-600 p-1.5 rounded-lg text-white">
-                                    <GraduationCap size={20} />
+                                    <ShieldCheck size={20} />
                                 </div>
-                                <span className="text-xl font-bold text-slate-800">TutorFlow</span>
+                                <span className="text-xl font-bold text-slate-800">{settings.company_name}</span>
                             </div>
-                            <p className="text-slate-500 leading-relaxed">Empowering students through premium academic mentorship and support services. Available globally.</p>
+                            <p className="text-slate-500 leading-relaxed">{settings.service_description} Available globally.</p>
                             <div className="flex gap-4">
                                 {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
                                     <a key={i} href="#" className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white transition-all">
@@ -283,8 +384,8 @@ const PaymentPage = () => {
                         <div>
                             <h4 className="font-bold text-slate-900 mb-8">Quick Links</h4>
                             <ul className="space-y-4 text-slate-500">
-                                <li><Link to="/about-tutors" className="hover:text-emerald-600 transition-colors">About Our Tutors</Link></li>
-                                <li><Link to="/pricing" className="hover:text-emerald-600 transition-colors">Pricing Guide</Link></li>
+                                <li><Link to="/about-us" className="hover:text-emerald-600 transition-colors">About Our Experts</Link></li>
+                                <li><Link to="/pricing" className="hover:text-emerald-600 transition-colors">Service Pricing</Link></li>
                                 <li><Link to="/refund" className="hover:text-emerald-600 transition-colors">Refund Portal</Link></li>
                                 <li><Link to="/admin" className="hover:text-emerald-600 transition-colors">Admin Dashboard</Link></li>
                                 <li><Link to="/privacy-policy" className="hover:text-emerald-600 transition-colors">Privacy Policy</Link></li>
@@ -295,10 +396,10 @@ const PaymentPage = () => {
                         <div>
                             <h4 className="font-bold text-slate-900 mb-8">Our Services</h4>
                             <ul className="space-y-4 text-slate-500">
-                                <li><Link to="/law-assignments" className="hover:text-emerald-600 transition-colors">Law Assignments</Link></li>
-                                <li><Link to="/medical-research" className="hover:text-emerald-600 transition-colors">Medical Research</Link></li>
-                                <li><Link to="/business-case-studies" className="hover:text-emerald-600 transition-colors">Business Case Studies</Link></li>
-                                <li><Link to="/phd-consultation" className="hover:text-emerald-600 transition-colors">PhD Consultation</Link></li>
+                                <li><Link to="/consulting" className="hover:text-emerald-600 transition-colors">Business Consulting</Link></li>
+                                <li><Link to="/research" className="hover:text-emerald-600 transition-colors">Specialized Research</Link></li>
+                                <li><Link to="/support" className="hover:text-emerald-600 transition-colors">Operational Support</Link></li>
+                                <li><Link to="/solutions" className="hover:text-emerald-600 transition-colors">Industry Solutions</Link></li>
                             </ul>
                         </div>
 
@@ -307,22 +408,22 @@ const PaymentPage = () => {
                             <ul className="space-y-4">
                                 <li className="flex items-start gap-3 text-slate-500">
                                     <MapPin size={20} className="text-emerald-600 flex-shrink-0" />
-                                    <span>Level 24, Academic Tower, Education District</span>
+                                    <span>Level 24, Professional Plaza, Business District</span>
                                 </li>
                                 <li className="flex items-center gap-3 text-slate-500">
                                     <Phone size={20} className="text-emerald-600 flex-shrink-0" />
-                                    <span>+1 (555) 000-1234</span>
+                                    <span>{settings.support_phone || '+1 (555) 000-1234'}</span>
                                 </li>
                                 <li className="flex items-center gap-3 text-slate-500">
                                     <Mail size={20} className="text-emerald-600 flex-shrink-0" />
-                                    <span>support@tutorflow.edu</span>
+                                    <span>{settings.support_email}</span>
                                 </li>
                             </ul>
                         </div>
                     </div>
                     
                     <div className="pt-12 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-slate-400">
-                        <p>© 2024 TutorFlow Academic Services. All rights reserved.</p>
+                        <p>© {new Date().getFullYear()} {settings.company_name}. All rights reserved.</p>
                         <div className="flex gap-8">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4 opacity-30 grayscale hover:grayscale-0 transition-all cursor-pointer" />
                             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/MasterCard_Logo.svg" alt="Mastercard" className="h-4 opacity-30 grayscale hover:grayscale-0 transition-all cursor-pointer" />

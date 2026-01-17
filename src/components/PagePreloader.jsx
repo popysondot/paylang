@@ -1,10 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { ShieldCheck } from 'lucide-react';
 
 const PagePreloader = ({ children }) => {
     const [isLoading, setIsLoading] = useState(true);
+    const [companyName, setCompanyName] = useState('Service Platform');
 
     useEffect(() => {
+        const fetchBranding = async () => {
+            try {
+                const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
+                const res = await axios.get(`${baseUrl}/api/settings`);
+                if (res.data.company_name) setCompanyName(res.data.company_name);
+            } catch (err) {
+                // Keep default
+            }
+        };
+        fetchBranding();
+
         const timer = setTimeout(() => {
             setIsLoading(false);
         }, 1200); // Standard loading time for a premium feel
@@ -21,7 +34,7 @@ const PagePreloader = ({ children }) => {
                     </div>
                 </div>
                 <div className="mt-6 flex flex-col items-center">
-                    <h2 className="text-xl font-bold text-slate-800 tracking-tight">TutorFlow</h2>
+                    <h2 className="text-xl font-bold text-slate-800 tracking-tight">{companyName}</h2>
                     <p className="text-slate-400 text-sm mt-1 animate-pulse">Loading secure environment...</p>
                 </div>
             </div>

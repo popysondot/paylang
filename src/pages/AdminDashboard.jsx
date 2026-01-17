@@ -10,70 +10,152 @@ import {
     Users, 
     DollarSign, 
     ArrowUpRight, 
-    ArrowDownRight, 
+    ArrowDownRight,
+    ArrowRight,
     ShoppingBag, 
     RefreshCw, 
     Search,
+    History,
     Download,
     Filter,
-    AlertCircle
+    AlertCircle,
+    Settings,
+    CheckCircle,
+    XCircle,
+    LogOut,
+    ShieldCheck
 } from 'lucide-react';
+import AdminSettings from './AdminSettings';
 
 const AdminDashboard = () => {
     console.log('AdminDashboard Render initiated');
     const navigate = useNavigate();
     const [activeView, setActiveView] = useState('dashboard');
+    const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('adminToken'));
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [loginLoading, setLoginLoading] = useState(false);
     const [analytics, setAnalytics] = useState(null);
     const [transactions, setTransactions] = useState([]);
     const [refunds, setRefunds] = useState([]);
+    const [auditLogs, setAuditLogs] = useState([]);
     const [chartPeriod, setChartPeriod] = useState('days');
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(isAuthenticated);
     const [error, setError] = useState(null);
     const [filter, setFilter] = useState('');
+    const [processingRefund, setProcessingRefund] = useState(null);
+    const [brandingSettings, setBrandingSettings] = useState({ company_name: 'Service Platform' });
 
     const COLORS = ['#10b981', '#f59e0b', '#ef4444', '#3b82f6'];
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchBranding = async () => {
+            try {
+                const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
+                const res = await axios.get(`${baseUrl}/api/settings`);
+                if (res.data.company_name) setBrandingSettings(prev => ({ ...prev, ...res.data }));
+            } catch (err) {
+                // Keep default
+            }
+        };
+        fetchBranding();
+    }, []);
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setLoginLoading(true);
+        setError(null);
+        try {
             const baseUrl = import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
-            console.log('Dashboard connecting to:', baseUrl);
+            const res = await axios.post(`${baseUrl}/api/admin/login`, { username, password });
+            localStorage.setItem('adminToken', res.data.token);
+            setIsAuthenticated(true);
+            setUsername('');
+            setPassword('');
+            setLoading(true);
+        } catch (err) {
+            setError(err.response?.data?.error || 'Login failed');
+        } finally {
+            setLoginLoading(false);
+        }
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('adminToken');
+        setIsAuthenticated(false);
+        setAnalytics(null);
+    };
+
+    const handleApproveRefund = async (refundId) => {
+        const token = localStorage.getItem('adminToken');
+        setProcessingRefund(refundId);
+        try {
+            const baseUrl = import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
+            await axios.post(
+                `${baseUrl}/api/admin/refunds/${refundId}/approve`,
+                { refundAmount: null },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setRefunds(refunds.map(r => r.id === refundId ? { ...r, status: 'approved' } : r));
+            setProcessingRefund(null);
+        } catch (err) {
+            console.error('Approval error:', err);
+            setProcessingRefund(null);
+        }
+    };
+
+    const handleRejectRefund = async (refundId) => {
+        const token = localStorage.getItem('adminToken');
+        setProcessingRefund(refundId);
+        try {
+            const baseUrl = import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
+            await axios.post(
+                `${baseUrl}/api/admin/refunds/${refundId}/reject`,
+                { reason: 'After review, this refund cannot be processed.' },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setRefunds(refunds.map(r => r.id === refundId ? { ...r, status: 'rejected' } : r));
+            setProcessingRefund(null);
+        } catch (err) {
+            console.error('Rejection error:', err);
+            setProcessingRefund(null);
+        }
+    };
+
+    useEffect(() => {
+        if (!isAuthenticated) return;
+
+        const fetchData = async () => {
+            const rawUrl = import.meta.env.VITE_BACKEND_URL;
+            if (!rawUrl) {
+                console.error('VITE_BACKEND_URL is not defined');
+                setError('Backend URL is missing. Please set VITE_BACKEND_URL in your environment variables.');
+                setLoading(false);
+                return;
+            }
+            const baseUrl = rawUrl.replace(/\/$/, '');
+            const token = localStorage.getItem('adminToken');
+            const headers = { Authorization: `Bearer ${token}` };
+
             try {
                 setError(null);
                 setLoading(true);
                 
-                // Fetch separately to pinpoint failures
-                let analyticsData = null;
-                let transactionsData = [];
-                let refundsData = [];
+                const [analyticsRes, transactionsRes, refundsRes, auditRes] = await Promise.allSettled([
+                    axios.get(`${baseUrl}/api/admin/analytics?period=${chartPeriod}`, { headers }),
+                    axios.get(`${baseUrl}/api/admin/transactions`, { headers }),
+                    axios.get(`${baseUrl}/api/admin/refunds`, { headers }),
+                    axios.get(`${baseUrl}/api/admin/audit-logs`, { headers })
+                ]);
 
-                try {
-                    const res = await axios.get(`${baseUrl}/api/admin/analytics?period=${chartPeriod}`);
-                    analyticsData = res.data;
-                } catch (e) {
-                    console.error('Analytics API failed:', e);
+                if (analyticsRes.status === 'fulfilled') setAnalytics(analyticsRes.value.data);
+                if (transactionsRes.status === 'fulfilled') setTransactions(transactionsRes.value.data);
+                if (refundsRes.status === 'fulfilled') setRefunds(refundsRes.value.data);
+                if (auditRes.status === 'fulfilled') setAuditLogs(auditRes.value.data);
+
+                if (analyticsRes.status === 'rejected' && analyticsRes.reason.response?.status === 401) {
+                    handleLogout();
                 }
-
-                try {
-                    const res = await axios.get(`${baseUrl}/api/admin/transactions`);
-                    transactionsData = res.data;
-                } catch (e) {
-                    console.error('Transactions API failed:', e);
-                }
-
-                try {
-                    const res = await axios.get(`${baseUrl}/api/admin/refunds`);
-                    refundsData = res.data;
-                } catch (e) {
-                    console.error('Refunds API failed:', e);
-                }
-
-                if (!analyticsData && (!transactionsData || transactionsData.length === 0)) {
-                    throw new Error('Could not connect to the backend API. Please check if the server is running on ' + baseUrl);
-                }
-
-                setAnalytics(analyticsData);
-                setTransactions(transactionsData);
-                setRefunds(refundsData);
             } catch (error) {
                 console.error('Dashboard Error:', error);
                 setError(error.message);
@@ -82,7 +164,7 @@ const AdminDashboard = () => {
             }
         };
         fetchData();
-    }, [chartPeriod]);
+    }, [chartPeriod, isAuthenticated]);
 
     const filteredTransactions = Array.isArray(transactions) ? transactions.filter(t => 
         t.email.toLowerCase().includes(filter.toLowerCase()) || 
@@ -93,7 +175,7 @@ const AdminDashboard = () => {
     // Derive unique customers from transactions
     const customers = Array.from(new Set(transactions.map(t => t.email))).map(email => {
         const userTransactions = transactions.filter(t => t.email === email);
-        const totalSpent = userTransactions.reduce((sum, t) => sum + t.amount, 0);
+        const totalSpent = userTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
         return {
             name: userTransactions[0].name,
             email,
@@ -113,6 +195,64 @@ const AdminDashboard = () => {
         r.reason.toLowerCase().includes(filter.toLowerCase()) ||
         (r.paymentId && r.paymentId.reference.toLowerCase().includes(filter.toLowerCase()))
     );
+
+    if (!isAuthenticated) {
+        return (
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-2xl max-w-md w-full">
+                    <div className="flex justify-center mb-8">
+                        <div className="bg-emerald-600 p-4 rounded-2xl text-white shadow-xl shadow-emerald-200">
+                            <LayoutDashboard size={32} />
+                        </div>
+                    </div>
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl font-black text-slate-900 mb-2">Admin Access</h2>
+                        <p className="text-slate-500 font-medium">Enter your credentials to manage {brandingSettings.company_name}</p>
+                    </div>
+                    <form onSubmit={handleLogin} className="space-y-6">
+                        <div>
+                            <label className="block text-sm font-black text-slate-700 mb-2 uppercase tracking-widest">Username</label>
+                            <input 
+                                type="text"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all font-bold"
+                                placeholder="admin"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-black text-slate-700 mb-2 uppercase tracking-widest">Password</label>
+                            <input 
+                                type="password" 
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all font-bold"
+                                placeholder="••••••••"
+                                required
+                            />
+                        </div>
+                        {error && (
+                            <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-bold flex items-center gap-2">
+                                <AlertCircle size={18} /> {error}
+                            </div>
+                        )}
+                        <button 
+                            type="submit"
+                            disabled={loginLoading}
+                            className="w-full bg-slate-900 hover:bg-black text-white font-black py-5 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
+                        >
+                            {loginLoading ? 'Authenticating...' : 'Secure Login'}
+                            <ArrowRight size={20} />
+                        </button>
+                    </form>
+                    <p className="mt-8 text-center text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+                        <ShieldCheck size={14} /> End-to-End Encrypted
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     if (loading) {
         return (
@@ -151,7 +291,7 @@ const AdminDashboard = () => {
                     <div className="bg-emerald-600 p-2 rounded-xl">
                         <LayoutDashboard size={24} />
                     </div>
-                    <span className="text-xl font-black tracking-tight">TutorFlow <span className="text-emerald-500">Admin</span></span>
+                    <span className="text-xl font-black tracking-tight">{brandingSettings.company_name} <span className="text-emerald-500">Admin</span></span>
                 </div>
                 <nav className="flex-grow px-4 space-y-2">
                     <button 
@@ -178,6 +318,24 @@ const AdminDashboard = () => {
                     >
                         <RefreshCw size={20} /> Refunds
                     </button>
+                    <button 
+                        onClick={() => setActiveView('audit')}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${activeView === 'audit' ? 'bg-emerald-600' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
+                    >
+                        <History size={20} /> Activity Logs
+                    </button>
+                    <button 
+                        onClick={() => setActiveView('settings')}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${activeView === 'settings' ? 'bg-emerald-600' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
+                    >
+                        <Settings size={20} /> Settings
+                    </button>
+                    <button 
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all hover:bg-red-500/10 text-red-400 hover:text-red-500 mt-4"
+                    >
+                        <LogOut size={20} /> Logout
+                    </button>
                 </nav>
                 <div className="p-6 border-t border-white/5">
                     <div className="bg-white/5 p-4 rounded-2xl">
@@ -195,7 +353,7 @@ const AdminDashboard = () => {
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
                     <div>
                         <h1 className="text-4xl font-black text-slate-900 tracking-tight capitalize">{activeView} Overview</h1>
-                        <p className="text-slate-500 font-medium">Monitoring real-time academic transactions</p>
+                        <p className="text-slate-500 font-medium">Monitoring real-time platform transactions</p>
                     </div>
                     <div className="flex items-center gap-4">
                         <button className="bg-white p-3 rounded-xl border border-slate-200 text-slate-600 hover:border-emerald-500 transition-all">
@@ -394,7 +552,7 @@ const AdminDashboard = () => {
                                                 {new Date(t.createdAt).toLocaleDateString()}
                                             </td>
                                             <td className="py-6 px-8">
-                                                <span className="font-black text-slate-900">${t.amount}</span>
+                                                <span className="font-black text-slate-900">${Number(t.amount).toFixed(2)}</span>
                                             </td>
                                             <td className="py-6 px-8">
                                                 <span className="bg-emerald-100 text-emerald-700 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-tighter">
@@ -503,11 +661,12 @@ const AdminDashboard = () => {
                                         <th className="py-6 px-8">Reason</th>
                                         <th className="py-6 px-8">Status</th>
                                         <th className="py-6 px-8">Requested On</th>
+                                        <th className="py-6 px-8">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-50">
                                     {filteredRefunds.map((r) => (
-                                        <tr key={r._id} className="hover:bg-slate-50/50 transition-colors group">
+                                        <tr key={r.id} className="hover:bg-slate-50/50 transition-colors group">
                                             <td className="py-6 px-8 text-sm font-bold text-slate-800">
                                                 {r.email}
                                             </td>
@@ -519,13 +678,35 @@ const AdminDashboard = () => {
                                             </td>
                                             <td className="py-6 px-8">
                                                 <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-tighter ${
-                                                    r.status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
+                                                    r.status === 'pending' ? 'bg-amber-100 text-amber-700' : r.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
                                                 }`}>
                                                     {r.status}
                                                 </span>
                                             </td>
                                             <td className="py-6 px-8 text-sm font-bold text-slate-500">
                                                 {new Date(r.createdAt).toLocaleDateString()}
+                                            </td>
+                                            <td className="py-6 px-8">
+                                                {r.status === 'pending' && (
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={() => handleApproveRefund(r.id)}
+                                                            disabled={processingRefund === r.id}
+                                                            className="p-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-all disabled:opacity-50 flex items-center gap-1"
+                                                            title="Approve refund"
+                                                        >
+                                                            <CheckCircle size={16} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleRejectRefund(r.id)}
+                                                            disabled={processingRefund === r.id}
+                                                            className="p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-all disabled:opacity-50 flex items-center gap-1"
+                                                            title="Reject refund"
+                                                        >
+                                                            <XCircle size={16} />
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
@@ -542,6 +723,66 @@ const AdminDashboard = () => {
                             </div>
                         )}
                     </div>
+                )}
+
+                {activeView === 'audit' && (
+                    <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+                        <div className="p-8 border-b border-slate-50 flex justify-between items-center">
+                            <h3 className="text-2xl font-black text-slate-900">System Audit Trail</h3>
+                            <div className="bg-slate-50 px-4 py-2 rounded-xl text-xs font-black text-slate-400 uppercase tracking-widest">
+                                Last 100 Actions
+                            </div>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-50/50 text-slate-400 text-xs font-black uppercase tracking-widest">
+                                        <th className="py-6 px-8">Admin</th>
+                                        <th className="py-6 px-8">Action</th>
+                                        <th className="py-6 px-8">Target</th>
+                                        <th className="py-6 px-8">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-50">
+                                    {auditLogs.map((log) => (
+                                        <tr key={log.id} className="hover:bg-slate-50/50 transition-colors">
+                                            <td className="py-6 px-8">
+                                                <span className="font-black text-slate-800">{log.admin_username || 'System'}</span>
+                                            </td>
+                                            <td className="py-6 px-8">
+                                                <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter ${
+                                                    log.action.includes('APPROVED') ? 'bg-emerald-100 text-emerald-700' : 
+                                                    log.action.includes('REJECTED') ? 'bg-red-100 text-red-700' : 
+                                                    log.action.includes('LOGIN') ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'
+                                                }`}>
+                                                    {log.action.replace(/_/g, ' ')}
+                                                </span>
+                                            </td>
+                                            <td className="py-6 px-8 text-sm font-bold text-slate-500">
+                                                {log.entity_type} {log.entity_id ? `#${log.entity_id}` : ''}
+                                            </td>
+                                            <td className="py-6 px-8 text-sm font-bold text-slate-500">
+                                                {new Date(log.created_at).toLocaleString()}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        {auditLogs.length === 0 && (
+                            <div className="p-20 text-center">
+                                <h4 className="text-xl font-black text-slate-800">No logs found</h4>
+                                <p className="text-slate-500">System activity will appear here.</p>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {activeView === 'settings' && (
+                    <AdminSettings 
+                        token={localStorage.getItem('adminToken')} 
+                        onClose={() => setActiveView('dashboard')}
+                    />
                 )}
             </main>
         </div>

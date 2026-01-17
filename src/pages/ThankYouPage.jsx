@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
+import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import { 
     CheckCircle, 
@@ -17,13 +18,33 @@ import {
 const ThankYouPage = () => {
     const location = useLocation();
     const { reference, amount, email, name } = location.state || {};
+    const [settings, setSettings] = useState({
+        company_name: 'Service Platform',
+        support_email: 'support@yourdomain.com',
+        refund_policy_days: '14',
+        service_name: 'Professional Services'
+    });
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
+                const res = await axios.get(`${baseUrl}/api/settings`);
+                setSettings(prev => ({ ...prev, ...res.data }));
+            } catch (err) {
+                console.error('Failed to fetch settings:', err);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     const downloadReceipt = () => {
+        if (!reference || !name) return;
         const doc = new jsPDF();
         
         doc.setFontSize(22);
         doc.setTextColor(22, 163, 74); 
-        doc.text('TutorFlow Official Receipt', 20, 30);
+        doc.text(`${settings.company_name} Official Receipt`, 20, 30);
         
         doc.setFontSize(12);
         doc.setTextColor(100, 116, 139); 
@@ -40,7 +61,7 @@ const ThankYouPage = () => {
         doc.setFontSize(12);
         doc.text(`Customer Name: ${name}`, 20, 90);
         doc.text(`Customer Email: ${email}`, 20, 100);
-        doc.text(`Service: Academic Tutoring & Assignment Support`, 20, 110);
+        doc.text(`Service: ${settings.service_name}`, 20, 110);
         
         doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
@@ -49,9 +70,9 @@ const ThankYouPage = () => {
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
         doc.setTextColor(148, 163, 184); 
-        doc.text('Thank you for choosing TutorFlow. For any queries, contact support@tutorflow.edu', 20, 150);
+        doc.text(`Thank you for choosing ${settings.company_name}. For any queries, contact ${settings.support_email}`, 20, 150);
         
-        doc.save(`TutorFlow_Receipt_${reference}.pdf`);
+        doc.save(`${settings.company_name.replace(/\s+/g, '_')}_Receipt_${reference}.pdf`);
     };
 
     if (!reference) {
@@ -89,7 +110,7 @@ const ThankYouPage = () => {
                         </div>
                         <h1 className="text-5xl md:text-6xl font-black mb-4 tracking-tight">Payment Received!</h1>
                         <p className="text-emerald-100 text-xl md:text-2xl font-medium max-w-2xl mx-auto">
-                            Thank you, <span className="text-white font-bold">{name.split(' ')[0]}</span>. Your academic journey just got easier.
+                            Thank you, <span className="text-white font-bold">{name ? name.split(' ')[0] : 'Valued Customer'}</span>. Your {settings.service_name.toLowerCase()} request is being processed.
                         </p>
                     </div>
                 </div>
@@ -132,15 +153,15 @@ const ThankYouPage = () => {
                                 <div className="flex gap-6 items-start">
                                     <div className="bg-emerald-100 text-emerald-600 w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0">2</div>
                                     <div>
-                                        <p className="font-bold text-slate-800 text-lg">Tutor Assignment</p>
-                                        <p className="text-slate-500">Our team is reviewing your requirements. A specialized tutor will contact you via email within 2-4 hours.</p>
+                                        <p className="font-bold text-slate-800 text-lg">Service Activation</p>
+                                        <p className="text-slate-500">Our team is reviewing your requirements. We will contact you via email within 2-4 hours to begin.</p>
                                     </div>
                                 </div>
                                 <div className="flex gap-6 items-start">
                                     <div className="bg-emerald-100 text-emerald-600 w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0">3</div>
                                     <div>
                                         <p className="font-bold text-slate-800 text-lg">Work Commences</p>
-                                        <p className="text-slate-500">Once assigned, you can track progress and provide additional materials directly to your tutor.</p>
+                                        <p className="text-slate-500">Once confirmed, you can track progress and provide additional materials directly to your assigned expert.</p>
                                     </div>
                                 </div>
                             </div>
@@ -157,7 +178,7 @@ const ThankYouPage = () => {
                                     Refund & Guarantee
                                 </h3>
                                 <p className="text-slate-400 text-lg mb-8 max-w-xl">
-                                    Not satisfied with the service? We offer a 100% money-back guarantee. You can request a refund through our dedicated portal within 14 days.
+                                    Not satisfied with the service? We offer a 100% money-back guarantee. You can request a refund through our dedicated portal within {settings.refund_policy_days} days.
                                 </p>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <Link 
@@ -168,7 +189,7 @@ const ThankYouPage = () => {
                                         <ArrowRight size={20} />
                                     </Link>
                                     <a 
-                                        href="mailto:support@tutorflow.edu"
+                                        href={`mailto:${settings.support_email}`}
                                         className="flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 text-white font-bold py-5 rounded-2xl transition-all backdrop-blur-sm"
                                     >
                                         <Mail size={20} />
@@ -199,7 +220,7 @@ const ThankYouPage = () => {
                 </div>
 
                 <div className="text-center text-slate-400 font-medium">
-                    <p>© {new Date().getFullYear()} TutorFlow Platform. Secure Academic Payments.</p>
+                    <p>© {new Date().getFullYear()} {settings.company_name} Platform. Secure Payments.</p>
                 </div>
             </div>
         </div>
