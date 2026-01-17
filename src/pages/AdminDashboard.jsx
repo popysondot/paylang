@@ -236,7 +236,7 @@ const AdminDashboard = () => {
                             disabled={loginLoading}
                             className="w-full bg-slate-900 hover:bg-black text-white font-black py-5 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
                         >
-                            {loginLoading ? 'Authenticating... ' : ' '}
+                            {loginLoading ? 'In... ' : ' '}
                             <ArrowRight size={20} />
                         </button>
                     </form>
@@ -253,7 +253,7 @@ const AdminDashboard = () => {
             <div className="min-h-screen bg-slate-50 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-16 h-16 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin"></div>
-                    <p className="text-slate-500 font-bold animate-pulse">Loading Analytics Dashboard...</p>
+                    <p className="text-slate-500 font-bold animate-pulse">...</p>
                 </div>
             </div>
         );
@@ -346,7 +346,7 @@ const AdminDashboard = () => {
             <main className="flex-grow p-4 md:p-8 lg:p-12 overflow-y-auto max-h-screen">
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
                     <div>
-                        <h1 className="text-4xl font-black text-slate-900 tracking-tight capitalize">{activeView} Overview</h1>
+                        <h1 className="text-4xl font-black text-slate-900 tracking-tight capitalize">{activeView}</h1>
                         <p className="text-slate-500 font-medium">Monitoring real-time platform transactions</p>
                     </div>
                     <div className="flex items-center gap-4">
