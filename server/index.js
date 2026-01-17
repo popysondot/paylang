@@ -223,6 +223,7 @@ app.post('/api/admin/login', async (req, res) => {
     }
 
     try {
+        console.log('Login attempt for user:', username);
         // Check if admin user exists
         const adminRes = await pool.query(
             'SELECT id, username, password_hash, email, is_active, role FROM admin_users WHERE username = $1 AND is_active = true',
@@ -230,10 +231,12 @@ app.post('/api/admin/login', async (req, res) => {
         );
 
         if (adminRes.rows.length === 0) {
+            console.log('Admin user not found:', username);
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
         const admin = adminRes.rows[0];
+        console.log('User found, verifying password...');
         const isMatch = await bcrypt.compare(password, admin.password_hash);
 
         if (!isMatch) {
@@ -247,16 +250,26 @@ app.post('/api/admin/login', async (req, res) => {
             [admin.id]
         );
 
+        if (!process.env.JWT_SECRET) {
+            console.error('CRITICAL: JWT_SECRET environment variable is missing!');
+            return res.status(500).json({ error: 'Server configuration error: JWT_SECRET is missing' });
+        }
+
         const token = jwt.sign(
             { id: admin.id, username: admin.username, role: admin.role },
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
 
+        console.log('Login successful for:', username);
         res.json({ token, admin: { id: admin.id, username: admin.username, email: admin.email } });
     } catch (error) {
-        console.error('Login error details:', error);
-        res.status(500).json({ error: 'Server error', details: error.message });
+        console.error('Detailed Login Error:', error);
+        res.status(500).json({ 
+            error: 'Server error during login', 
+            details: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined 
+        });
     }
 });
 
