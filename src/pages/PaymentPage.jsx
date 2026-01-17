@@ -387,7 +387,6 @@ const PaymentPage = () => {
                                 <li><Link to="/about-us" className="hover:text-emerald-600 transition-colors">About Our Experts</Link></li>
                                 <li><Link to="/pricing" className="hover:text-emerald-600 transition-colors">Service Pricing</Link></li>
                                 <li><Link to="/refund" className="hover:text-emerald-600 transition-colors">Refund Portal</Link></li>
-                                <li><Link to="/admin" className="hover:text-emerald-600 transition-colors">Admin Dashboard</Link></li>
                                 <li><Link to="/privacy-policy" className="hover:text-emerald-600 transition-colors">Privacy Policy</Link></li>
                                 <li><Link to="/terms-of-service" className="hover:text-emerald-600 transition-colors">Terms of Service</Link></li>
                             </ul>
