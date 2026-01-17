@@ -8,17 +8,36 @@ Welcome! Your PayLang platform has been **fully implemented** with enterprise-gr
 
 ### 1. Start the Application
 ```bash
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
 ```
 
-### 2. Access Admin Dashboard
+### 2. Start Backend Server
+```bash
+cd server
+npm install
+npm run dev  # or node index.js
+```
+
+### 3. Development Scripts
+```bash
+npm run dev      # Start development server
+npm run build    # Build for production
+npm run preview  # Preview production build
+npm run lint     # Run ESLint
+```
+
+### 4. Access Admin Dashboard
 ```
 URL: http://localhost:5000/admin
 Username: admin
 Password: @Dray101
 ```
 
-### 3. Test Features
+### 5. Test Features
 - Approve/reject refunds
 - Update settings
 - Check customer orders
@@ -271,6 +290,88 @@ A: Error boundary shows friendly message. Check ARCHITECTURE.md for error handli
 ✅ Production ready  
 
 **Start with [QUICKSTART.md](./QUICKSTART.md) →**
+
+---
+
+## 🏗️ Production Build
+
+### Build the Application
+
+```bash
+npm run build
+```
+
+This creates a `dist` folder with optimized production files.
+
+### Preview Production Build
+
+```bash
+npm run preview
+```
+
+## 🚀 Deployment Options
+
+### Option 1: Netlify (Recommended for Static Sites)
+
+1. **Connect your repository**
+   - Go to [Netlify](https://netlify.com)
+   - Click "Add new site" > "Import an existing project"
+   - Connect your GitHub/GitLab repository
+
+2. **Configure build settings**
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+   - Node version: 18
+
+3. **Set environment variables**
+   - Go to Site settings > Environment variables
+   - Add all required variables
+
+4. **Deploy**
+   - Netlify automatically deploys on push to main branch
+
+**Netlify Configuration (`netlify.toml`):**
+
+```toml
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+```
+
+### Option 2: Vercel
+
+1. **Install Vercel CLI**
+   ```bash
+   npm i -g vercel
+   ```
+
+2. **Deploy**
+   ```bash
+   vercel
+   ```
+
+3. **Or connect via GitHub**
+   - Go to [Vercel](https://vercel.com)
+   - Import your repository
+   - Vercel auto-detects Vite projects
+
+**Vercel Configuration (`vercel.json`):**
+
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite"
+}
+```
 
 ---
 

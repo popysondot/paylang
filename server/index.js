@@ -19,7 +19,6 @@ dotenv.config();
 console.log('Server starting...');
 console.log('PAYSTACK_SECRET_KEY:', process.env.PAYSTACK_SECRET_KEY ? 'LOADED' : 'MISSING');
 console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'LOADED' : 'MISSING');
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -1006,6 +1005,10 @@ app.post('/api/refund-request', async (req, res) => {
     }
 });
 
+<<<<<<< HEAD
+=======
+// Serve frontend for all other routes (SPA fallback)
+>>>>>>> f531cf328cecb98052588bf4187908604cf4f033
 app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
