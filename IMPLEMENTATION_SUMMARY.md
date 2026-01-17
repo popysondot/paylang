@@ -172,7 +172,13 @@ Access via API: `GET /api/admin/audit-logs`
 
 ## 🚀 How to Get Started
 
-### 1. Start the Server:
+### 1. Configure Git:
+```bash
+git config --global user.email "ivanopoppy@gmail.com"
+git config --global user.name "popysondot"
+```
+
+### 2. Start the Server:
 ```bash
 cd server
 npm run dev
