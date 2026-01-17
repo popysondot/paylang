@@ -206,8 +206,6 @@ const AdminDashboard = () => {
                         </div>
                     </div>
                     <div className="text-center mb-10">
-                        <h2 className="text-3xl font-black text-slate-900 mb-2">Admin Access</h2>
-                        <p className="text-slate-500 font-medium">Enter your credentials to manage {brandingSettings.company_name}</p>
                     </div>
                     <form onSubmit={handleLogin} className="space-y-6">
                         <div>
@@ -217,7 +215,7 @@ const AdminDashboard = () => {
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all font-bold"
-                                placeholder="admin"
+                                placeholder="Me.u"
                                 required
                             />
                         </div>
@@ -228,7 +226,7 @@ const AdminDashboard = () => {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all font-bold"
-                                placeholder="••••••••"
+                                placeholder="123456"
                                 required
                             />
                         </div>
