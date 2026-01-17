@@ -236,7 +236,7 @@ const AdminDashboard = () => {
                             disabled={loginLoading}
                             className="w-full bg-slate-900 hover:bg-black text-white font-black py-5 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
                         >
-                            {loginLoading ? 'Authenticating...'}
+                            {loginLoading ? 'Authenticating... ' : ' '}
                             <ArrowRight size={20} />
                         </button>
                     </form>
