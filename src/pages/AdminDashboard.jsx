@@ -209,24 +209,20 @@ const AdminDashboard = () => {
                     </div>
                     <form onSubmit={handleLogin} className="space-y-6">
                         <div>
-                            <label className="block text-sm font-black text-slate-700 mb-2 uppercase tracking-widest">Username</label>
                             <input 
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all font-bold"
-                                placeholder="Me.u"
                                 required
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-black text-slate-700 mb-2 uppercase tracking-widest">Password</label>
                             <input 
                                 type="password" 
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all font-bold"
-                                placeholder="123456"
                                 required
                             />
                         </div>
@@ -240,12 +236,12 @@ const AdminDashboard = () => {
                             disabled={loginLoading}
                             className="w-full bg-slate-900 hover:bg-black text-white font-black py-5 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
                         >
-                            {loginLoading ? 'Authenticating...' : 'Secure Login'}
+                            {loginLoading ? 'Authenticating...'}
                             <ArrowRight size={20} />
                         </button>
                     </form>
                     <p className="mt-8 text-center text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center justify-center gap-2">
-                        <ShieldCheck size={14} /> End-to-End Encrypted
+                        <ShieldCheck size={14} />
                     </p>
                 </div>
             </div>
