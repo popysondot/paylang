@@ -2,6 +2,7 @@ import express from 'express';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import cron from 'node-cron';
+import cors from 'cors';
 import axios from 'axios';
 import pkg from 'pg';
 const { Pool } = pkg;
@@ -23,31 +24,32 @@ const __dirname = dirname(__filename);
 
 const app = express();
 
-// Security middleware - manual CORS implementation for maximum reliability
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    const allowedOrigins = [
-        'https://paylang.moonderiv.com',
-        'https://paylang-tusk.onrender.com',
-        'http://localhost:5173',
-        'http://localhost:3000'
-    ];
-    
-    if (origin && (allowedOrigins.includes(origin) || origin.endsWith('.moonderiv.com'))) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
-        res.setHeader('Vary', 'Origin');
-    }
-    
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Cache-Control, Pragma');
-    res.setHeader('Access-Control-Max-Age', '86400');
-    
-    if (req.method === 'OPTIONS') {
-        return res.status(204).end();
-    }
-    next();
-});
+const allowedOrigins = [
+    'https://paylang.moonderiv.com',
+    'https://paylang-tusk.onrender.com',
+    'http://localhost:5173',
+    'http://localhost:3000'
+];
+
+// Robust CORS configuration using the cors package
+app.use(cors({
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl)
+        if (!origin) return callback(null, true);
+        
+        const isAllowed = allowedOrigins.includes(origin) || origin.endsWith('.moonderiv.com');
+        
+        if (isAllowed) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control', 'Pragma'],
+    credentials: true,
+    optionsSuccessStatus: 204
+}));
 
 // Body parsing middleware
 app.use(express.json());
@@ -69,9 +71,6 @@ const limiter = rateLimit({
     skip: (req) => req.method === 'OPTIONS'
 });
 app.use('/api/', limiter);
-
-// Serve frontend static files
-app.use(express.static(path.join(__dirname, '../dist')));
 
 // PostgreSQL Connection
 const pool = new Pool({
@@ -1041,6 +1040,9 @@ app.post('/api/refund-request', async (req, res) => {
         res.status(500).json({ error: 'Failed to submit refund request' });
     }
 });
+
+// Serve frontend static files
+app.use(express.static(path.join(__dirname, '../dist')));
 
 // Serve frontend for all other routes (SPA fallback)
 app.get(/.*/, (req, res) => {
