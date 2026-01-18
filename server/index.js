@@ -2,7 +2,6 @@ import express from 'express';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import cron from 'node-cron';
-import cors from 'cors';
 import axios from 'axios';
 import pkg from 'pg';
 const { Pool } = pkg;
@@ -24,18 +23,35 @@ const __dirname = dirname(__filename);
 
 const app = express();
 
+// Security middleware - manual CORS implementation for maximum reliability
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    const allowedOrigins = [
+        'https://paylang.moonderiv.com',
+        'https://paylang-tusk.onrender.com',
+        'http://localhost:5173',
+        'http://localhost:3000'
+    ];
+    
+    if (origin && (allowedOrigins.includes(origin) || origin.endsWith('.moonderiv.com'))) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Vary', 'Origin');
+    }
+    
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Cache-Control, Pragma');
+    res.setHeader('Access-Control-Max-Age', '86400');
+    
+    if (req.method === 'OPTIONS') {
+        return res.status(204).end();
+    }
+    next();
+});
+
 // Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Security middleware
-app.use(cors({
-    origin: ['https://paylang.moonderiv.com', 'http://localhost:5173', 'http://localhost:3000'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-    credentials: true,
-    optionsSuccessStatus: 200
-}));
 
 app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -49,7 +65,8 @@ app.use((req, res, next) => {
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
-    message: 'Too many requests from this IP, please try again later.'
+    message: 'Too many requests from this IP, please try again later.',
+    skip: (req) => req.method === 'OPTIONS'
 });
 app.use('/api/', limiter);
 
