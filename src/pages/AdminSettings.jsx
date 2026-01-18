@@ -104,257 +104,254 @@ const AdminSettings = ({ token, onClose }) => {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-96">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
             </div>
         );
     }
 
-    return (
-        <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8">
-            <div className="flex items-center gap-3 mb-8">
-                <div className="bg-emerald-100 p-3 rounded-xl">
-                    <Settings className="text-emerald-600" size={24} />
-                </div>
-                <h2 className="text-3xl font-black text-slate-900">Admin Settings</h2>
-            </div>
+    const inputClasses = "w-full bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder:text-slate-700 outline-none focus:border-emerald-500 transition-all font-medium";
+    const labelClasses = "block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2";
+    const sectionClasses = "bg-slate-900/20 border border-slate-800/50 p-8 rounded-[2.5rem] space-y-6";
 
+    return (
+        <div className="space-y-12 animate-in fade-in duration-700">
             {message && (
-                <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-4 rounded-xl mb-6 flex items-center gap-2 font-bold">
+                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-6 rounded-2xl flex items-center gap-3 font-black uppercase tracking-widest text-xs">
                     <CheckCircle size={20} /> {message}
                 </div>
             )}
 
             {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6 flex items-center gap-2 font-bold">
+                <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-6 rounded-2xl flex items-center gap-3 font-black uppercase tracking-widest text-xs">
                     <AlertCircle size={20} /> {error}
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                 {/* Company Settings */}
-                <div className="bg-slate-50 p-6 rounded-2xl">
-                    <h3 className="text-lg font-black text-slate-900 mb-4">Company Information</h3>
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Company Name</label>
-                            <input
-                                type="text"
-                                value={settings.company_name || ''}
-                                onChange={(e) => handleChange('company_name', e.target.value)}
-                                className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
-                            />
+                <div className={sectionClasses}>
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-emerald-500">
+                            <Settings size={20} />
                         </div>
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Service Name</label>
-                            <input
-                                type="text"
-                                value={settings.service_name || ''}
-                                onChange={(e) => handleChange('service_name', e.target.value)}
-                                className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
-                                placeholder="e.g. Professional Consulting"
-                            />
+                        <h3 className="text-sm font-black text-white uppercase tracking-widest">Global Identity</h3>
+                    </div>
+                    
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className={labelClasses}>Company Name</label>
+                                <input
+                                    type="text"
+                                    value={settings.company_name || ''}
+                                    onChange={(e) => handleChange('company_name', e.target.value)}
+                                    className={inputClasses}
+                                />
+                            </div>
+                            <div>
+                                <label className={labelClasses}>Service Name</label>
+                                <input
+                                    type="text"
+                                    value={settings.service_name || ''}
+                                    onChange={(e) => handleChange('service_name', e.target.value)}
+                                    className={inputClasses}
+                                    placeholder="e.g. Professional Consulting"
+                                />
+                            </div>
                         </div>
+
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Service Description</label>
+                            <label className={labelClasses}>Service Description</label>
                             <textarea
                                 value={settings.service_description || ''}
                                 onChange={(e) => handleChange('service_description', e.target.value)}
-                                className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none h-24 resize-none"
+                                className={`${inputClasses} h-32 resize-none`}
                                 placeholder="Short description of what you offer..."
                             />
                         </div>
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Support Email</label>
-                            <input
-                                type="email"
-                                value={settings.support_email || ''}
-                                onChange={(e) => handleChange('support_email', e.target.value)}
-                                className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
-                            />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className={labelClasses}>Support Email</label>
+                                <input
+                                    type="email"
+                                    value={settings.support_email || ''}
+                                    onChange={(e) => handleChange('support_email', e.target.value)}
+                                    className={inputClasses}
+                                />
+                            </div>
+                            <div>
+                                <label className={labelClasses}>Support Phone</label>
+                                <input
+                                    type="tel"
+                                    value={settings.support_phone || ''}
+                                    onChange={(e) => handleChange('support_phone', e.target.value)}
+                                    className={inputClasses}
+                                />
+                            </div>
                         </div>
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Support Phone</label>
-                            <input
-                                type="tel"
-                                value={settings.support_phone || ''}
-                                onChange={(e) => handleChange('support_phone', e.target.value)}
-                                className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Admin Notification Email</label>
-                            <input
-                                type="email"
-                                value={settings.notification_email || ''}
-                                onChange={(e) => handleChange('notification_email', e.target.value)}
-                                className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
-                            />
-                            <p className="text-xs text-slate-500 mt-1">Email address to receive sale and refund alerts</p>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Weekly Analytics Report Email</label>
-                            <input
-                                type="email"
-                                value={settings.report_email || ''}
-                                onChange={(e) => handleChange('report_email', e.target.value)}
-                                className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
-                            />
-                            <p className="text-xs text-slate-500 mt-1">Email address to receive weekly revenue and invoice summaries</p>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Timezone</label>
-                            <select
-                                value={settings.timezone || 'UTC'}
-                                onChange={(e) => handleChange('timezone', e.target.value)}
-                                className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
-                            >
-                                <option>UTC</option>
-                                <option>EST</option>
-                                <option>CST</option>
-                                <option>MST</option>
-                                <option>PST</option>
-                            </select>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className={labelClasses}>Admin Alerts</label>
+                                <input
+                                    type="email"
+                                    value={settings.notification_email || ''}
+                                    onChange={(e) => handleChange('notification_email', e.target.value)}
+                                    className={inputClasses}
+                                />
+                                <p className="text-[9px] font-bold text-slate-600 uppercase mt-2">Sales & Refund notifications</p>
+                            </div>
+                            <div>
+                                <label className={labelClasses}>System Timezone</label>
+                                <select
+                                    value={settings.timezone || 'UTC'}
+                                    onChange={(e) => handleChange('timezone', e.target.value)}
+                                    className={inputClasses}
+                                >
+                                    <option className="bg-[#0f172a]">UTC</option>
+                                    <option className="bg-[#0f172a]">EST</option>
+                                    <option className="bg-[#0f172a]">CST</option>
+                                    <option className="bg-[#0f172a]">MST</option>
+                                    <option className="bg-[#0f172a]">PST</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Refund Policy Settings */}
-                <div className="bg-slate-50 p-6 rounded-2xl">
-                    <h3 className="text-lg font-black text-slate-900 mb-4">Refund Policy</h3>
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Refund Window (Days)</label>
-                            <input
-                                type="number"
-                                value={settings.refund_policy_days || '14'}
-                                onChange={(e) => handleChange('refund_policy_days', e.target.value)}
-                                min="1"
-                                className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
-                            />
-                            <p className="text-xs text-slate-500 mt-1">Number of days customers can request refunds</p>
+                {/* Policies & Content */}
+                <div className="space-y-8">
+                    <div className={sectionClasses}>
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-amber-500">
+                                <AlertCircle size={20} />
+                            </div>
+                            <h3 className="text-sm font-black text-white uppercase tracking-widest">Refund Parameters</h3>
                         </div>
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Max Refund Percentage (%)</label>
-                            <input
-                                type="number"
-                                value={settings.max_refund_percentage || '100'}
-                                onChange={(e) => handleChange('max_refund_percentage', e.target.value)}
-                                min="0"
-                                max="100"
-                                className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
-                            />
-                            <p className="text-xs text-slate-500 mt-1">Maximum percentage of order value that can be refunded</p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className={labelClasses}>Policy Window (Days)</label>
+                                <input
+                                    type="number"
+                                    value={settings.refund_policy_days || '14'}
+                                    onChange={(e) => handleChange('refund_policy_days', e.target.value)}
+                                    className={inputClasses}
+                                />
+                            </div>
+                            <div>
+                                <label className={labelClasses}>Max Percentage (%)</label>
+                                <input
+                                    type="number"
+                                    value={settings.max_refund_percentage || '100'}
+                                    onChange={(e) => handleChange('max_refund_percentage', e.target.value)}
+                                    className={inputClasses}
+                                />
+                            </div>
                         </div>
+                    </div>
+
+                    <div className={sectionClasses}>
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-purple-500">
+                                <Save size={20} />
+                            </div>
+                            <h3 className="text-sm font-black text-white uppercase tracking-widest">Security Update</h3>
+                        </div>
+
+                        {passwordMessage && (
+                            <div className="bg-emerald-500/10 text-emerald-400 p-4 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                                <CheckCircle size={14} /> {passwordMessage}
+                            </div>
+                        )}
+                        {passwordError && (
+                            <div className="bg-red-500/10 text-red-400 p-4 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                                <AlertCircle size={14} /> {passwordError}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleChangePassword} className="space-y-4">
+                            <div>
+                                <label className={labelClasses}>Current Password</label>
+                                <input
+                                    type="password"
+                                    value={passwordData.currentPassword}
+                                    onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                                    className={inputClasses}
+                                    required
+                                />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className={labelClasses}>New Secret</label>
+                                    <input
+                                        type="password"
+                                        value={passwordData.newPassword}
+                                        onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                                        className={inputClasses}
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className={labelClasses}>Confirm Secret</label>
+                                    <input
+                                        type="password"
+                                        value={passwordData.confirmPassword}
+                                        onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                                        className={inputClasses}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full bg-white text-[#0f172a] py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-emerald-500 transition-all mt-2"
+                            >
+                                Authenticate & Update
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
 
-            {/* Landing Page Content Section */}
-            <div className="mt-12 border-t border-slate-100 pt-12">
-                <h3 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
-                    <Settings className="text-purple-600" size={24} /> Landing Page Content
-                </h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="bg-slate-50 p-6 rounded-2xl">
-                        <label className="block text-sm font-bold text-slate-700 mb-2">Services JSON</label>
+            {/* Landing Content JSONs */}
+            <div className={sectionClasses}>
+                <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-blue-500">
+                        <Settings size={20} />
+                    </div>
+                    <h3 className="text-sm font-black text-white uppercase tracking-widest">Dynamic Landing Content</h3>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <label className={labelClasses}>Services Config (JSON)</label>
                         <textarea
                             value={settings.landing_services || '[]'}
                             onChange={(e) => handleChange('landing_services', e.target.value)}
-                            className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none h-48 font-mono text-sm"
-                            placeholder='[{"title": "Service Name", "desc": "Description"}]'
+                            className={`${inputClasses} h-64 font-mono text-xs`}
                         />
-                        <p className="text-xs text-slate-500 mt-2">JSON array of objects with "title" and "desc" properties.</p>
                     </div>
-                    <div className="bg-slate-50 p-6 rounded-2xl">
-                        <label className="block text-sm font-bold text-slate-700 mb-2">Testimonials JSON</label>
+                    <div>
+                        <label className={labelClasses}>Testimonials Config (JSON)</label>
                         <textarea
                             value={settings.landing_testimonials || '[]'}
                             onChange={(e) => handleChange('landing_testimonials', e.target.value)}
-                            className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none h-48 font-mono text-sm"
-                            placeholder='[{"name": "User Name", "uni": "Title/Role", "quote": "Quote text"}]'
+                            className={`${inputClasses} h-64 font-mono text-xs`}
                         />
-                        <p className="text-xs text-slate-500 mt-2">JSON array of objects with "name", "uni", and "quote" properties.</p>
                     </div>
                 </div>
             </div>
 
-            {/* Security Section */}
-            <div className="mt-12 border-t border-slate-100 pt-12">
-                <h3 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
-                    <Save className="text-blue-600" size={24} /> Security & Access
-                </h3>
-                
-                <div className="max-w-xl bg-slate-50 p-8 rounded-3xl border border-slate-100">
-                    <h4 className="font-bold text-slate-800 mb-6">Change Administrative Password</h4>
-                    
-                    {passwordMessage && (
-                        <div className="bg-emerald-50 text-emerald-700 p-4 rounded-xl mb-6 text-sm font-bold flex items-center gap-2">
-                            <CheckCircle size={18} /> {passwordMessage}
-                        </div>
-                    )}
-                    {passwordError && (
-                        <div className="bg-red-50 text-red-700 p-4 rounded-xl mb-6 text-sm font-bold flex items-center gap-2">
-                            <AlertCircle size={18} /> {passwordError}
-                        </div>
-                    )}
-
-                    <form onSubmit={handleChangePassword} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-bold text-slate-600 mb-2">Current Password</label>
-                            <input
-                                type="password"
-                                value={passwordData.currentPassword}
-                                onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-                                required
-                            />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-bold text-slate-600 mb-2">New Password</label>
-                                <input
-                                    type="password"
-                                    value={passwordData.newPassword}
-                                    onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-                                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-bold text-slate-600 mb-2">Confirm New Password</label>
-                                <input
-                                    type="password"
-                                    value={passwordData.confirmPassword}
-                                    onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <button
-                            type="submit"
-                            className="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition-all mt-4"
-                        >
-                            Update Credentials
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <div className="mt-12 flex gap-4 justify-end">
-                <button
-                    onClick={onClose}
-                    className="px-6 py-3 border border-slate-200 rounded-xl font-bold text-slate-700 hover:bg-slate-50 transition-all"
-                >
-                    Cancel
-                </button>
+            <div className="flex justify-end pt-12">
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="px-6 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-all flex items-center gap-2 disabled:opacity-50"
+                    className="group bg-emerald-500 text-[#0f172a] px-12 py-6 rounded-full font-black uppercase tracking-widest text-xs flex items-center gap-4 hover:bg-white transition-all disabled:opacity-50 shadow-xl shadow-emerald-500/10"
                 >
-                    <Save size={18} /> {saving ? 'Saving...' : 'Save Settings'}
+                    {saving ? 'Synchronizing...' : 'Commit Changes'}
+                    <Save size={18} className="group-hover:rotate-12 transition-transform" />
                 </button>
             </div>
         </div>

@@ -23,12 +23,13 @@ import {
     CheckCircle,
     XCircle,
     LogOut,
-    ShieldCheck
+    ShieldCheck,
+    ChevronRight,
+    Search as SearchIcon
 } from 'lucide-react';
 import AdminSettings from './AdminSettings';
 
 const AdminDashboard = () => {
-    console.log('AdminDashboard Render initiated');
     const navigate = useNavigate();
     const [activeView, setActiveView] = useState('dashboard');
     const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('adminToken'));
@@ -44,7 +45,7 @@ const AdminDashboard = () => {
     const [error, setError] = useState(null);
     const [filter, setFilter] = useState('');
     const [processingRefund, setProcessingRefund] = useState(null);
-    const [brandingSettings, setBrandingSettings] = useState({ company_name: 'Service Platform' });
+    const [brandingSettings, setBrandingSettings] = useState({ company_name: 'Payment Hub' });
 
     const COLORS = ['#10b981', '#f59e0b', '#ef4444', '#3b82f6'];
 
@@ -128,8 +129,7 @@ const AdminDashboard = () => {
         const fetchData = async () => {
             const rawUrl = import.meta.env.VITE_BACKEND_URL;
             if (!rawUrl) {
-                console.error('VITE_BACKEND_URL is not defined');
-                setError('Backend URL is missing. Please set VITE_BACKEND_URL in your environment variables.');
+                setError('Backend URL is missing.');
                 setLoading(false);
                 return;
             }
@@ -157,7 +157,6 @@ const AdminDashboard = () => {
                     handleLogout();
                 }
             } catch (error) {
-                console.error('Dashboard Error:', error);
                 setError(error.message);
             } finally {
                 setLoading(false);
@@ -172,7 +171,6 @@ const AdminDashboard = () => {
         t.name.toLowerCase().includes(filter.toLowerCase())
     ) : [];
 
-    // Derive unique customers from transactions
     const customers = Array.from(new Set(transactions.map(t => t.email))).map(email => {
         const userTransactions = transactions.filter(t => t.email === email);
         const totalSpent = userTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
@@ -198,51 +196,57 @@ const AdminDashboard = () => {
 
     if (!isAuthenticated) {
         return (
-            <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-                <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-2xl max-w-md w-full">
-                    <div className="flex justify-center mb-8">
-                        <div className="bg-emerald-600 p-4 rounded-2xl text-white shadow-xl shadow-emerald-200">
-                            <LayoutDashboard size={32} />
+            <div className="min-h-screen bg-[#0f172a] text-slate-100 flex flex-col items-center justify-center p-6 selection:bg-emerald-500/30">
+                <div className="w-full max-w-md space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                    <div className="flex flex-col items-center text-center space-y-4">
+                        <div className="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                            <ShieldCheck className="text-[#0f172a]" size={32} />
                         </div>
+                        <h1 className="text-4xl font-black tracking-tighter uppercase text-white">System Access</h1>
+                        <p className="text-slate-500 font-medium tracking-wide">Enter administrative credentials to proceed.</p>
                     </div>
-                    <div className="text-center mb-10">
-                    </div>
-                    <form onSubmit={handleLogin} className="space-y-6">
-                        <div>
-                            <input 
-                                type="text"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all font-bold"
-                                required
-                            />
+
+                    <form onSubmit={handleLogin} className="space-y-10">
+                        <div className="space-y-8">
+                            <div className="group relative">
+                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest block mb-2 transition-colors group-focus-within:text-emerald-400">Identity</label>
+                                <input 
+                                    type="text"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    placeholder="Username"
+                                    className="w-full bg-transparent border-b-2 border-slate-800 focus:border-emerald-500 py-3 outline-none text-2xl font-black transition-all placeholder:text-slate-800"
+                                    required
+                                />
+                            </div>
+                            <div className="group relative">
+                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest block mb-2 transition-colors group-focus-within:text-emerald-400">Passcode</label>
+                                <input 
+                                    type="password" 
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full bg-transparent border-b-2 border-slate-800 focus:border-emerald-500 py-3 outline-none text-2xl font-black transition-all placeholder:text-slate-800"
+                                    required
+                                />
+                            </div>
                         </div>
-                        <div>
-                            <input 
-                                type="password" 
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all font-bold"
-                                required
-                            />
-                        </div>
+
                         {error && (
-                            <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-bold flex items-center gap-2">
-                                <AlertCircle size={18} /> {error}
+                            <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-3">
+                                <AlertCircle size={16} /> {error}
                             </div>
                         )}
+
                         <button 
                             type="submit"
                             disabled={loginLoading}
-                            className="w-full bg-slate-900 hover:bg-black text-white font-black py-5 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
+                            className="group w-full flex items-center justify-between bg-emerald-500 text-[#0f172a] px-8 py-6 rounded-full font-black uppercase tracking-widest text-sm hover:bg-white transition-all duration-500 disabled:opacity-50"
                         >
-                            {loginLoading ? 'In... ' : ' '}
-                            <ArrowRight size={20} />
+                            <span>{loginLoading ? 'Authenticating...' : 'Authorize Session'}</span>
+                            <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
                         </button>
                     </form>
-                    <p className="mt-8 text-center text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center justify-center gap-2">
-                        <ShieldCheck size={14} />
-                    </p>
                 </div>
             </div>
         );
@@ -250,535 +254,316 @@ const AdminDashboard = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-16 h-16 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin"></div>
-                    <p className="text-slate-500 font-bold animate-pulse">...</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
-                <div className="bg-red-50 p-6 rounded-full mb-6 text-red-500">
-                    <AlertCircle size={48} />
-                </div>
-                <h2 className="text-2xl font-black text-slate-900 mb-2">Dashboard Error</h2>
-                <p className="text-slate-500 mb-8 max-w-md">{error}</p>
-                <button 
-                    onClick={() => window.location.reload()}
-                    className="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition-all"
-                >
-                    Retry Connection
-                </button>
+            <div className="min-h-screen bg-[#0f172a] flex flex-col items-center justify-center p-6">
+                <div className="w-12 h-12 border-2 border-slate-800 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
+                <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Loading Analytics</p>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 flex">
+        <div className="min-h-screen bg-[#0f172a] text-slate-100 flex flex-col lg:flex-row selection:bg-emerald-500/30">
             {/* Sidebar */}
-            <aside className="w-64 bg-slate-900 text-white hidden lg:flex flex-col">
+            <aside className="w-full lg:w-72 bg-slate-900 border-r border-slate-800/50 flex flex-col shrink-0">
                 <div className="p-8 flex items-center gap-3">
-                    <div className="bg-emerald-600 p-2 rounded-xl">
-                        <LayoutDashboard size={24} />
+                    <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                        <ShieldCheck className="text-[#0f172a]" size={24} />
                     </div>
-                    <span className="text-xl font-black tracking-tight">{brandingSettings.company_name} <span className="text-emerald-500">Admin</span></span>
+                    <div>
+                        <p className="text-xs font-black uppercase tracking-widest text-white leading-none">{brandingSettings.company_name}</p>
+                        <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-[0.2em] mt-1">Console</p>
+                    </div>
                 </div>
-                <nav className="flex-grow px-4 space-y-2">
-                    <button 
-                        onClick={() => setActiveView('dashboard')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${activeView === 'dashboard' ? 'bg-emerald-600' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
-                    >
-                        <LayoutDashboard size={20} /> Dashboard
-                    </button>
-                    <button 
-                        onClick={() => setActiveView('transactions')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${activeView === 'transactions' ? 'bg-emerald-600' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
-                    >
-                        <ShoppingBag size={20} /> Transactions
-                    </button>
-                    <button 
-                        onClick={() => setActiveView('customers')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${activeView === 'customers' ? 'bg-emerald-600' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
-                    >
-                        <Users size={20} /> Customers
-                    </button>
-                    <button 
-                        onClick={() => setActiveView('refunds')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${activeView === 'refunds' ? 'bg-emerald-600' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
-                    >
-                        <RefreshCw size={20} /> Refunds
-                    </button>
-                    <button 
-                        onClick={() => setActiveView('audit')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${activeView === 'audit' ? 'bg-emerald-600' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
-                    >
-                        <History size={20} /> Activity Logs
-                    </button>
-                    <button 
-                        onClick={() => setActiveView('settings')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${activeView === 'settings' ? 'bg-emerald-600' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
-                    >
-                        <Settings size={20} /> Settings
-                    </button>
+
+                <nav className="flex-grow px-4 pb-8 space-y-1">
+                    {[
+                        { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
+                        { id: 'transactions', label: 'Payments', icon: ShoppingBag },
+                        { id: 'customers', label: 'Clients', icon: Users },
+                        { id: 'refunds', label: 'Refunds', icon: RefreshCw },
+                        { id: 'audit', label: 'Logs', icon: History },
+                        { id: 'settings', label: 'Config', icon: Settings },
+                    ].map((item) => (
+                        <button 
+                            key={item.id}
+                            onClick={() => setActiveView(item.id)}
+                            className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${activeView === item.id ? 'bg-emerald-500 text-[#0f172a]' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
+                        >
+                            <item.icon size={18} /> {item.label}
+                        </button>
+                    ))}
+                    
                     <button 
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all hover:bg-red-500/10 text-red-400 hover:text-red-500 mt-4"
+                        className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500/10 transition-all mt-8"
                     >
-                        <LogOut size={20} /> Logout
+                        <LogOut size={18} /> Terminate
                     </button>
                 </nav>
-                <div className="p-6 border-t border-white/5">
-                    <div className="bg-white/5 p-4 rounded-2xl">
-                        <p className="text-xs text-slate-500 font-bold uppercase mb-2">System Status</p>
+
+                <div className="p-6 border-t border-slate-800/50">
+                    <div className="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl space-y-2">
                         <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
-                            <span className="text-sm font-bold text-emerald-500">Live & Secure</span>
+                            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Network Live</span>
                         </div>
+                        <p className="text-[9px] font-bold text-slate-600 uppercase tracking-tight break-all">ID: {localStorage.getItem('adminToken')?.slice(0, 16)}...</p>
                     </div>
                 </div>
             </aside>
 
-            {/* Main Content */}
-            <main className="flex-grow p-4 md:p-8 lg:p-12 overflow-y-auto max-h-screen">
-                <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
-                    <div>
-                        <h1 className="text-4xl font-black text-slate-900 tracking-tight capitalize">{activeView}</h1>
-                        <p className="text-slate-500 font-medium">Monitoring real-time platform transactions</p>
+            {/* Main Content Area */}
+            <main className="flex-grow overflow-y-auto">
+                <header className="p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 sticky top-0 bg-[#0f172a]/80 backdrop-blur-xl z-20">
+                    <div className="space-y-1">
+                        <p className="text-emerald-400 text-[10px] font-black uppercase tracking-[0.3em]">Administrator</p>
+                        <h2 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">
+                            {activeView === 'dashboard' ? 'Real-time Metrics' : 
+                             activeView === 'transactions' ? 'Payment Ledger' :
+                             activeView === 'customers' ? 'Client Directory' :
+                             activeView === 'refunds' ? 'Refund Manager' :
+                             activeView === 'audit' ? 'System Logs' : 'Global Settings'}
+                        </h2>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <button className="bg-white p-3 rounded-xl border border-slate-200 text-slate-600 hover:border-emerald-500 transition-all">
-                            <Download size={20} />
-                        </button>
-                        <button className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-black transition-all">
-                            <Filter size={20} /> Generate Report
-                        </button>
+
+                    <div className="flex items-center gap-4 w-full md:w-auto">
+                        <div className="relative flex-grow md:w-64">
+                            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" size={16} />
+                            <input 
+                                type="text"
+                                placeholder="SEARCH INDEX..."
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
+                                className="w-full bg-slate-900 border border-slate-800 px-12 py-3 rounded-full text-[10px] font-black uppercase tracking-widest outline-none focus:border-emerald-500 transition-all placeholder:text-slate-700"
+                            />
+                        </div>
+                        {activeView === 'dashboard' && (
+                            <select 
+                                value={chartPeriod}
+                                onChange={(e) => setChartPeriod(e.target.value)}
+                                className="bg-slate-900 border border-slate-800 text-[10px] font-black uppercase tracking-widest px-6 py-3 rounded-full outline-none focus:border-emerald-500 transition-all"
+                            >
+                                <option value="days">7 Days</option>
+                                <option value="weeks">4 Weeks</option>
+                                <option value="months">6 Months</option>
+                            </select>
+                        )}
                     </div>
                 </header>
 
-                {activeView === 'dashboard' && (
-                    <>
-                        {/* Stats Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 relative overflow-hidden group hover:border-emerald-500 transition-all">
-                                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                                    <DollarSign size={80} className="text-emerald-600" />
-                                </div>
-                                <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-2">Total Revenue</p>
-                                <div className="flex items-baseline gap-2">
-                                    <h2 className="text-4xl font-black text-slate-900">${analytics?.summary?.totalRevenue?.toFixed(2) || '0.00'}</h2>
-                                    <span className="text-emerald-500 text-sm font-bold flex items-center gap-1">
-                                        <ArrowUpRight size={14} /> +12%
-                                    </span>
-                                </div>
+                <div className="px-8 pb-12">
+                    {activeView === 'dashboard' && (
+                        <div className="space-y-12 animate-in fade-in duration-700">
+                            {/* Stats Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                                {[
+                                    { label: 'Gross Revenue', value: `$${analytics?.totalRevenue?.toLocaleString()}`, icon: DollarSign, trend: '+12.5%' },
+                                    { label: 'Settlements', value: analytics?.transactionCount, icon: ShoppingBag, trend: '+8.2%' },
+                                    { label: 'Active Clients', value: analytics?.uniqueCustomers, icon: Users, trend: '+4.1%' },
+                                    { label: 'Refund Ratio', value: `${analytics?.refundRate}%`, icon: RefreshCw, trend: '-2.4%' },
+                                ].map((stat, i) => (
+                                    <div key={i} className="bg-slate-900/30 border border-slate-800 p-8 rounded-[2rem] space-y-4 hover:border-emerald-500/50 transition-all">
+                                        <div className="flex justify-between items-start">
+                                            <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center text-emerald-500">
+                                                <stat.icon size={24} />
+                                            </div>
+                                            <span className={`text-[10px] font-black uppercase tracking-widest ${stat.trend.startsWith('+') ? 'text-emerald-500' : 'text-red-500'}`}>{stat.trend}</span>
+                                        </div>
+                                        <div>
+                                            <p className="text-4xl font-black text-white tracking-tighter">{stat.value}</p>
+                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mt-1">{stat.label}</p>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                            <div 
-                                onClick={() => setActiveView('transactions')}
-                                className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 relative overflow-hidden group hover:border-blue-500 transition-all cursor-pointer"
-                            >
-                                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                                    <ShoppingBag size={80} className="text-blue-600" />
-                                </div>
-                                <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-2">Total Sales</p>
-                                <div className="flex items-baseline gap-2">
-                                    <h2 className="text-4xl font-black text-slate-900">{analytics?.summary?.totalTransactions || 0}</h2>
-                                    <span className="text-blue-500 text-sm font-bold flex items-center gap-1">
-                                        <ArrowUpRight size={14} /> +5%
-                                    </span>
-                                </div>
-                            </div>
-                            <div 
-                                onClick={() => setActiveView('refunds')}
-                                className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 relative overflow-hidden group hover:border-amber-500 transition-all cursor-pointer"
-                            >
-                                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                                    <RefreshCw size={80} className="text-amber-600" />
-                                </div>
-                                <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-2">Refund Appeals</p>
-                                <div className="flex items-baseline gap-2">
-                                    <h2 className="text-4xl font-black text-slate-900">{analytics?.summary?.totalRefundRequests || 0}</h2>
-                                    <span className="text-amber-500 text-sm font-bold flex items-center gap-1">
-                                        <ArrowDownRight size={14} /> -2%
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
 
-                        {/* Charts Section */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-                            <div 
-                                className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 hover:border-emerald-500 transition-all"
-                            >
-                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                                    <h3 className="text-xl font-black text-slate-900 flex items-center gap-3">
-                                        <div className="w-2 h-6 bg-emerald-600 rounded-full"></div>
-                                        Revenue Trends
-                                    </h3>
-                                    <div className="flex bg-slate-100 p-1 rounded-xl">
-                                        {['days', 'weeks', 'months', 'years'].map((p) => (
-                                            <button
-                                                key={p}
-                                                onClick={() => setChartPeriod(p)}
-                                                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all capitalize ${
-                                                    chartPeriod === p ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'
-                                                }`}
-                                            >
-                                                {p}
-                                            </button>
-                                        ))}
+                            {/* Chart Area */}
+                            <div className="bg-slate-900/30 border border-slate-800 p-8 md:p-12 rounded-[3rem] space-y-8">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="text-sm font-black uppercase tracking-widest text-white">Revenue Trajectory</h3>
+                                    <div className="flex gap-4">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Growth</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div 
-                                    onClick={() => setActiveView('transactions')}
-                                    className="h-[300px] w-full cursor-pointer"
-                                >
+                                <div className="h-[400px] w-full">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={analytics?.dailyData || []}>
-                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                        <LineChart data={analytics?.chartData}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
                                             <XAxis 
-                                                dataKey="label" 
-                                                axisLine={false} 
-                                                tickLine={false} 
-                                                tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 700}}
+                                                dataKey="name" 
+                                                stroke="#475569" 
+                                                fontSize={10} 
+                                                fontWeight={900} 
+                                                tick={{ fill: '#475569' }}
+                                                axisLine={false}
+                                                tickLine={false}
                                                 dy={10}
                                             />
                                             <YAxis 
-                                                axisLine={false} 
-                                                tickLine={false} 
-                                                tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 700}}
+                                                stroke="#475569" 
+                                                fontSize={10} 
+                                                fontWeight={900} 
+                                                tick={{ fill: '#475569' }}
+                                                axisLine={false}
+                                                tickLine={false}
+                                                tickFormatter={(value) => `$${value}`}
                                             />
                                             <Tooltip 
-                                                cursor={{fill: '#f8fafc'}}
-                                                contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)'}}
+                                                contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '1rem' }}
+                                                itemStyle={{ color: '#10b981', fontWeight: 900, fontSize: '12px' }}
+                                                labelStyle={{ color: '#64748b', fontWeight: 900, fontSize: '10px', textTransform: 'uppercase', marginBottom: '4px' }}
                                             />
-                                            <Bar dataKey="amount" fill="#10b981" radius={[8, 8, 0, 0]} barSize={40} />
-                                        </BarChart>
+                                            <Line type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={4} dot={{ fill: '#10b981', r: 4 }} activeDot={{ r: 8 }} />
+                                        </LineChart>
                                     </ResponsiveContainer>
                                 </div>
                             </div>
+                        </div>
+                    )}
 
-                            <div 
-                                onClick={() => setActiveView('transactions')}
-                                className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 cursor-pointer hover:border-blue-500 transition-all"
-                            >
-                                <h3 className="text-xl font-black text-slate-900 mb-8 flex items-center gap-3">
-                                    <div className="w-2 h-6 bg-blue-600 rounded-full"></div>
-                                    Transaction Distribution
-                                </h3>
-                                <div className="h-[300px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <PieChart>
-                                            <Pie
-                                                data={analytics?.statusData || []}
-                                                cx="50%"
-                                                cy="50%"
-                                                innerRadius={80}
-                                                outerRadius={100}
-                                                paddingAngle={8}
-                                                dataKey="value"
+                    {activeView === 'transactions' && (
+                        <div className="space-y-4 animate-in fade-in duration-700">
+                            <div className="bg-slate-900/30 border border-slate-800 rounded-[2rem] overflow-hidden">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="bg-slate-900 border-b border-slate-800">
+                                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Timestamp</th>
+                                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Identity</th>
+                                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Value</th>
+                                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Reference</th>
+                                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-800/50">
+                                        {filteredTransactions.map((t, i) => (
+                                            <tr key={i} className="hover:bg-white/5 transition-colors">
+                                                <td className="px-8 py-6 text-[10px] font-black text-slate-400">{new Date(t.createdAt).toLocaleString()}</td>
+                                                <td className="px-8 py-6">
+                                                    <p className="text-sm font-black text-white leading-none">{t.name}</p>
+                                                    <p className="text-[10px] font-bold text-slate-500 uppercase mt-1 tracking-tight">{t.email}</p>
+                                                </td>
+                                                <td className="px-8 py-6 text-lg font-black text-emerald-500">${Number(t.amount).toFixed(2)}</td>
+                                                <td className="px-8 py-6 text-[10px] font-mono font-bold text-slate-500 uppercase">{t.reference}</td>
+                                                <td className="px-8 py-6 text-right">
+                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${t.status === 'success' ? 'text-emerald-500' : 'text-red-500'}`}>{t.status}</span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeView === 'customers' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-in fade-in duration-700">
+                            {filteredCustomers.map((c, i) => (
+                                <div key={i} className="bg-slate-900/30 border border-slate-800 p-8 rounded-[2rem] space-y-6 hover:border-emerald-500/50 transition-all">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center text-emerald-500 font-black text-lg">
+                                            {c.name[0]}
+                                        </div>
+                                        <div>
+                                            <p className="text-lg font-black text-white leading-none">{c.name}</p>
+                                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mt-1">{c.email}</p>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-800">
+                                        <div>
+                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Total LTV</p>
+                                            <p className="text-xl font-black text-white">${c.totalSpent.toFixed(2)}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Orders</p>
+                                            <p className="text-xl font-black text-white">{c.transactionCount}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-700">
+                                        <span>Last Activity</span>
+                                        <span>{new Date(c.lastTransaction).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {activeView === 'refunds' && (
+                        <div className="space-y-6 animate-in fade-in duration-700">
+                            {filteredRefunds.map((r, i) => (
+                                <div key={i} className="bg-slate-900/30 border border-slate-800 p-8 rounded-[2rem] flex flex-col md:flex-row justify-between items-start md:items-center gap-8 group">
+                                    <div className="space-y-4 flex-grow">
+                                        <div className="flex items-center gap-4">
+                                            <div className={`w-3 h-3 rounded-full ${r.status === 'pending' ? 'bg-amber-500 animate-pulse' : r.status === 'approved' ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
+                                            <h4 className="text-sm font-black text-white uppercase tracking-widest">{r.status} REQUEST</h4>
+                                            <span className="text-[10px] font-black text-slate-600 uppercase">{new Date(r.createdAt).toLocaleString()}</span>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-xl font-black text-white">{r.email}</p>
+                                            <p className="text-sm font-medium text-slate-400 italic">"{r.reason}"</p>
+                                        </div>
+                                        <p className="text-[10px] font-mono font-bold text-slate-600 uppercase">Parent Ref: {r.paymentId?.reference || 'Unknown'}</p>
+                                    </div>
+                                    {r.status === 'pending' && (
+                                        <div className="flex gap-4">
+                                            <button 
+                                                onClick={() => handleRejectRefund(r.id)}
+                                                disabled={processingRefund === r.id}
+                                                className="bg-red-500/10 text-red-500 px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-500/20 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50"
                                             >
-                                                {(analytics?.statusData || []).map((entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                                ))}
-                                            </Pie>
-                                            <Tooltip 
-                                                contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)'}}
-                                            />
-                                            <Legend 
-                                                verticalAlign="bottom" 
-                                                height={36}
-                                                iconType="circle"
-                                                formatter={(value) => <span className="text-slate-600 font-bold text-sm px-2">{value}</span>}
-                                            />
-                                        </PieChart>
-                                    </ResponsiveContainer>
+                                                Decline
+                                            </button>
+                                            <button 
+                                                onClick={() => handleApproveRefund(r.id)}
+                                                disabled={processingRefund === r.id}
+                                                className="bg-emerald-500 text-[#0f172a] px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-white transition-all disabled:opacity-50"
+                                            >
+                                                Authorize
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
-                        </div>
-                    </>
-                )}
-
-                {(activeView === 'dashboard' || activeView === 'transactions') && (
-                    /* Transactions Table */
-                    <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-                        <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <h3 className="text-2xl font-black text-slate-900">
-                                {activeView === 'dashboard' ? 'Recent Transactions' : 'All Transactions'}
-                            </h3>
-                            <div className="relative w-full md:w-96">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                                <input 
-                                    type="text" 
-                                    placeholder="Search by name, email or reference..."
-                                    value={filter}
-                                    onChange={(e) => setFilter(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none font-medium transition-all"
-                                />
-                            </div>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-slate-50/50 text-slate-400 text-xs font-black uppercase tracking-widest">
-                                        <th className="py-6 px-8">Customer</th>
-                                        <th className="py-6 px-8">Reference</th>
-                                        <th className="py-6 px-8">Date</th>
-                                        <th className="py-6 px-8">Amount</th>
-                                        <th className="py-6 px-8">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-50">
-                                    {(activeView === 'dashboard' ? filteredTransactions.slice(0, 5) : filteredTransactions).map((t) => (
-                                        <tr key={t._id} className="hover:bg-slate-50/50 transition-colors group">
-                                            <td className="py-6 px-8">
-                                                <div>
-                                                    <p className="font-black text-slate-800">{t.name}</p>
-                                                    <p className="text-sm text-slate-500">{t.email}</p>
-                                                </div>
-                                            </td>
-                                            <td className="py-6 px-8 font-mono text-xs font-bold text-slate-400 group-hover:text-emerald-600 transition-colors">
-                                                {t.reference}
-                                            </td>
-                                            <td className="py-6 px-8 text-sm font-bold text-slate-500">
-                                                {new Date(t.createdAt).toLocaleDateString()}
-                                            </td>
-                                            <td className="py-6 px-8">
-                                                <span className="font-black text-slate-900">${Number(t.amount).toFixed(2)}</span>
-                                            </td>
-                                            <td className="py-6 px-8">
-                                                <span className="bg-emerald-100 text-emerald-700 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-tighter">
-                                                    {t.status}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        {filteredTransactions.length === 0 && (
-                            <div className="p-20 text-center">
-                                <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Search size={32} className="text-slate-300" />
+                            ))}
+                            {filteredRefunds.length === 0 && (
+                                <div className="py-20 text-center">
+                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">No action items pending</p>
                                 </div>
-                                <h4 className="text-xl font-black text-slate-800">No transactions found</h4>
-                                <p className="text-slate-500">Try adjusting your search filters.</p>
-                            </div>
-                        )}
-                        {activeView === 'dashboard' && filteredTransactions.length > 5 && (
-                            <div className="p-6 text-center border-t border-slate-50">
-                                <button 
-                                    onClick={() => setActiveView('transactions')}
-                                    className="text-emerald-600 font-bold text-sm hover:underline"
-                                >
-                                    View All Transactions
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                )}
+                            )}
+                        </div>
+                    )}
 
-                {activeView === 'customers' && (
-                    <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-                        <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <h3 className="text-2xl font-black text-slate-900">Customer Directory</h3>
-                            <div className="relative w-full md:w-96">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                                <input 
-                                    type="text" 
-                                    placeholder="Search by name or email..."
-                                    value={filter}
-                                    onChange={(e) => setFilter(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none font-medium transition-all"
-                                />
-                            </div>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-slate-50/50 text-slate-400 text-xs font-black uppercase tracking-widest">
-                                        <th className="py-6 px-8">Customer</th>
-                                        <th className="py-6 px-8">Transactions</th>
-                                        <th className="py-6 px-8">Total Spent</th>
-                                        <th className="py-6 px-8">Last Activity</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-50">
-                                    {filteredCustomers.map((c, idx) => (
-                                        <tr key={idx} className="hover:bg-slate-50/50 transition-colors group">
-                                            <td className="py-6 px-8">
-                                                <div>
-                                                    <p className="font-black text-slate-800">{c.name}</p>
-                                                    <p className="text-sm text-slate-500">{c.email}</p>
-                                                </div>
-                                            </td>
-                                            <td className="py-6 px-8 text-sm font-bold text-slate-500">
-                                                {c.transactionCount} payments
-                                            </td>
-                                            <td className="py-6 px-8">
-                                                <span className="font-black text-slate-900">${c.totalSpent.toFixed(2)}</span>
-                                            </td>
-                                            <td className="py-6 px-8 text-sm font-bold text-slate-500">
-                                                {new Date(c.lastTransaction).toLocaleDateString()}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
-
-                {activeView === 'refunds' && (
-                    <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-                        <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <h3 className="text-2xl font-black text-slate-900">Refund Requests</h3>
-                            <div className="relative w-full md:w-96">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                                <input 
-                                    type="text" 
-                                    placeholder="Search refunds..."
-                                    value={filter}
-                                    onChange={(e) => setFilter(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none font-medium transition-all"
-                                />
-                            </div>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-slate-50/50 text-slate-400 text-xs font-black uppercase tracking-widest">
-                                        <th className="py-6 px-8">Customer</th>
-                                        <th className="py-6 px-8">Reference</th>
-                                        <th className="py-6 px-8">Reason</th>
-                                        <th className="py-6 px-8">Status</th>
-                                        <th className="py-6 px-8">Requested On</th>
-                                        <th className="py-6 px-8">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-50">
-                                    {filteredRefunds.map((r) => (
-                                        <tr key={r.id} className="hover:bg-slate-50/50 transition-colors group">
-                                            <td className="py-6 px-8 text-sm font-bold text-slate-800">
-                                                {r.email}
-                                            </td>
-                                            <td className="py-6 px-8 font-mono text-xs font-bold text-slate-400">
-                                                {r.paymentId?.reference || 'N/A'}
-                                            </td>
-                                            <td className="py-6 px-8 text-sm text-slate-500 max-w-xs truncate">
-                                                {r.reason}
-                                            </td>
-                                            <td className="py-6 px-8">
-                                                <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-tighter ${
-                                                    r.status === 'pending' ? 'bg-amber-100 text-amber-700' : r.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
-                                                }`}>
-                                                    {r.status}
-                                                </span>
-                                            </td>
-                                            <td className="py-6 px-8 text-sm font-bold text-slate-500">
-                                                {new Date(r.createdAt).toLocaleDateString()}
-                                            </td>
-                                            <td className="py-6 px-8">
-                                                {r.status === 'pending' && (
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            onClick={() => handleApproveRefund(r.id)}
-                                                            disabled={processingRefund === r.id}
-                                                            className="p-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-all disabled:opacity-50 flex items-center gap-1"
-                                                            title="Approve refund"
-                                                        >
-                                                            <CheckCircle size={16} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleRejectRefund(r.id)}
-                                                            disabled={processingRefund === r.id}
-                                                            className="p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-all disabled:opacity-50 flex items-center gap-1"
-                                                            title="Reject refund"
-                                                        >
-                                                            <XCircle size={16} />
-                                                        </button>
-                                                    </div>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        {filteredRefunds.length === 0 && (
-                            <div className="p-20 text-center">
-                                <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <RefreshCw size={32} className="text-slate-300" />
+                    {activeView === 'audit' && (
+                        <div className="space-y-2 animate-in fade-in duration-700">
+                            {auditLogs.map((log, i) => (
+                                <div key={i} className="flex items-center gap-6 px-8 py-6 border-b border-slate-800 hover:bg-white/5 transition-colors group">
+                                    <span className="text-[10px] font-black text-slate-700 w-40 shrink-0">{new Date(log.createdAt).toLocaleString()}</span>
+                                    <div className="w-2 h-2 rounded-full bg-slate-800 group-hover:bg-emerald-500 transition-colors"></div>
+                                    <div className="flex-grow">
+                                        <p className="text-[10px] font-black text-white uppercase tracking-widest mb-1">{log.action}</p>
+                                        <p className="text-xs font-bold text-slate-500">{log.details}</p>
+                                    </div>
+                                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">User: {log.adminId?.username || 'System'}</span>
                                 </div>
-                                <h4 className="text-xl font-black text-slate-800">No refund requests</h4>
-                                <p className="text-slate-500">There are no refund claims at this time.</p>
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {activeView === 'audit' && (
-                    <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-                        <div className="p-8 border-b border-slate-50 flex justify-between items-center">
-                            <h3 className="text-2xl font-black text-slate-900">System Audit Trail</h3>
-                            <div className="bg-slate-50 px-4 py-2 rounded-xl text-xs font-black text-slate-400 uppercase tracking-widest">
-                                Last 100 Actions
-                            </div>
+                            ))}
                         </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-slate-50/50 text-slate-400 text-xs font-black uppercase tracking-widest">
-                                        <th className="py-6 px-8">Admin</th>
-                                        <th className="py-6 px-8">Action</th>
-                                        <th className="py-6 px-8">Target</th>
-                                        <th className="py-6 px-8">Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-50">
-                                    {auditLogs.map((log) => (
-                                        <tr key={log.id} className="hover:bg-slate-50/50 transition-colors">
-                                            <td className="py-6 px-8">
-                                                <span className="font-black text-slate-800">{log.admin_username || 'System'}</span>
-                                            </td>
-                                            <td className="py-6 px-8">
-                                                <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter ${
-                                                    log.action.includes('APPROVED') ? 'bg-emerald-100 text-emerald-700' : 
-                                                    log.action.includes('REJECTED') ? 'bg-red-100 text-red-700' : 
-                                                    log.action.includes('LOGIN') ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'
-                                                }`}>
-                                                    {log.action.replace(/_/g, ' ')}
-                                                </span>
-                                            </td>
-                                            <td className="py-6 px-8 text-sm font-bold text-slate-500">
-                                                {log.entity_type} {log.entity_id ? `#${log.entity_id}` : ''}
-                                            </td>
-                                            <td className="py-6 px-8 text-sm font-bold text-slate-500">
-                                                {new Date(log.created_at).toLocaleString()}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        {auditLogs.length === 0 && (
-                            <div className="p-20 text-center">
-                                <h4 className="text-xl font-black text-slate-800">No logs found</h4>
-                                <p className="text-slate-500">System activity will appear here.</p>
-                            </div>
-                        )}
-                    </div>
-                )}
+                    )}
 
-                {activeView === 'settings' && (
-                    <AdminSettings 
-                        token={localStorage.getItem('adminToken')} 
-                        onClose={() => setActiveView('dashboard')}
-                    />
-                )}
+                    {activeView === 'settings' && (
+                        <div className="animate-in fade-in duration-700 max-w-4xl">
+                            <AdminSettings token={localStorage.getItem('adminToken')} />
+                        </div>
+                    )}
+                </div>
             </main>
+
+            <style jsx>{`
+                .outline-text {
+                    -webkit-text-stroke: 1px #334155;
+                    color: transparent;
+                }
+            `}</style>
         </div>
     );
 };

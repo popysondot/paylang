@@ -30,17 +30,14 @@ app.use(express.urlencoded({ extended: true }));
 
 // Security middleware
 app.use(cors({
-    origin: ['https://paylang.moonderiv.com', 'http://localhost:5173', 'http://localhost:3000'],
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
 
 app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (['https://paylang.moonderiv.com', 'http://localhost:5173', 'http://localhost:3000'].includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-XSS-Protection', '1; mode=block');
