@@ -31,18 +31,22 @@ const allowedOrigins = [
     'http://localhost:3000'
 ];
 
-// Robust CORS configuration using the cors package
+// Robust CORS configuration
 app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps or curl)
         if (!origin) return callback(null, true);
         
-        const isAllowed = allowedOrigins.includes(origin) || origin.endsWith('.moonderiv.com');
+        const cleanOrigin = origin.replace(/\/$/, '');
+        const isAllowed = allowedOrigins.includes(cleanOrigin) || 
+                         cleanOrigin.endsWith('.moonderiv.com') ||
+                         cleanOrigin.endsWith('.onrender.com');
         
         if (isAllowed) {
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'));
+            console.log('CORS blocked for origin:', origin);
+            callback(null, false);
         }
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -70,7 +74,7 @@ const limiter = rateLimit({
     message: 'Too many requests from this IP, please try again later.',
     skip: (req) => req.method === 'OPTIONS'
 });
-app.use('/api/', limiter);
+app.use('/api', limiter);
 
 // PostgreSQL Connection
 const pool = new Pool({
