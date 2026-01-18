@@ -4,7 +4,7 @@
 
 @layer utilities {
   .animate-in {
-    animation-duration: 500ms;
+    animation-duration: 800ms;
     animation-fill-mode: both;
   }
   
@@ -12,12 +12,20 @@
     animation-name: fade-in;
   }
   
-  .zoom-in-95 {
-    animation-name: zoom-in-95;
+  .slide-in-from-left-8 {
+    animation-name: slide-in-from-left-8;
+  }
+  
+  .slide-in-from-right-8 {
+    animation-name: slide-in-from-right-8;
   }
   
   .slide-in-from-bottom-4 {
     animation-name: slide-in-from-bottom-4;
+  }
+
+  .delay-200 {
+    animation-delay: 200ms;
   }
 }
 
@@ -26,9 +34,14 @@
   to { opacity: 1; }
 }
 
-@keyframes zoom-in-95 {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+@keyframes slide-in-from-left-8 {
+  from { opacity: 0; transform: translateX(-2rem); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-in-from-right-8 {
+  from { opacity: 0; transform: translateX(2rem); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes slide-in-from-bottom-4 {
@@ -36,20 +49,22 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+/* Typography Overrides */
+h1 {
+  letter-spacing: -0.05em !important;
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
+input::placeholder {
+  color: #f1f5f9;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
+/* Hide Spinners on Input Number */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+input[type=number] {
+  -moz-appearance: textfield;
 }

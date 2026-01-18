@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { usePaystackPayment } from 'react-paystack';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { ShieldCheck, ArrowRight, CreditCard, Mail, User, DollarSign, AlertCircle } from 'lucide-react';
+import { ShieldCheck, ArrowRight, CreditCard, Mail, User, DollarSign, AlertCircle, Lock } from 'lucide-react';
 
 const PaymentPage = () => {
     const [email, setEmail] = useState('');
@@ -19,7 +19,6 @@ const PaymentPage = () => {
     const location = useLocation();
 
     useEffect(() => {
-        // Handle URL Parameters
         const params = new URLSearchParams(location.search);
         if (params.get('email')) setEmail(params.get('email'));
         if (params.get('name')) setName(params.get('name'));
@@ -70,7 +69,7 @@ const PaymentPage = () => {
             }
         }).catch(err => {
             setIsProcessing(false);
-            alert('Payment successful, but verification pending. Please contact support.');
+            alert('Payment successful, but verification pending.');
         });
     };
 
@@ -86,120 +85,133 @@ const PaymentPage = () => {
 
     if (isProcessing) {
         return (
-            <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center p-6">
-                <div className="w-16 h-16 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin mb-4"></div>
-                <h2 className="text-xl font-bold text-slate-800">Securing Transaction...</h2>
+            <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
+                <div className="w-12 h-12 border-2 border-slate-100 border-t-emerald-600 rounded-full animate-spin mb-4"></div>
+                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Processing Transaction</p>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#f1f5f9] flex items-center justify-center p-4 sm:p-6 md:p-8 font-sans selection:bg-emerald-100">
-            {/* Background Decorative Elements */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-emerald-400/10 blur-[120px]"></div>
-                <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] rounded-full bg-blue-400/10 blur-[120px]"></div>
-            </div>
-
-            <div className="relative w-full max-w-[440px]">
-                {/* Logo/Brand Area */}
-                <div className="flex flex-col items-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-200 mb-4 transition-transform hover:scale-110 duration-300">
-                        <ShieldCheck className="text-white" size={28} />
+        <div className="min-h-screen bg-white text-slate-900 selection:bg-emerald-100 overflow-x-hidden">
+            <div className="max-w-[1200px] mx-auto px-6 py-12 md:py-24 grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+                
+                {/* Left Side: Brand & Message */}
+                <div className="space-y-8 animate-in fade-in slide-in-from-left-8 duration-1000">
+                    <div className="inline-flex items-center gap-2 text-emerald-600">
+                        <ShieldCheck size={24} />
+                        <span className="text-sm font-black uppercase tracking-widest">{settings.company_name}</span>
                     </div>
-                    <h1 className="text-2xl font-black text-slate-900 tracking-tight">{settings.company_name}</h1>
-                    <p className="text-slate-500 font-medium text-sm mt-1">{settings.service_name}</p>
+                    
+                    <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9]">
+                        Secure <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-emerald-400">Payment</span> <br />
+                        Portal
+                    </h1>
+                    
+                    <p className="text-lg text-slate-400 font-medium max-w-md leading-relaxed">
+                        Complete your transaction for <span className="text-slate-900">{settings.service_name}</span> using our encrypted payment system.
+                    </p>
+
+                    <div className="flex items-center gap-6 pt-4">
+                        <div className="flex flex-col">
+                            <span className="text-2xl font-black">256-bit</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">SSL Encryption</span>
+                        </div>
+                        <div className="w-px h-8 bg-slate-100"></div>
+                        <div className="flex flex-col">
+                            <span className="text-2xl font-black">PCI DSS</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Security Level 1</span>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Main Payment Card */}
-                <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/50 p-8 sm:p-10 animate-in fade-in zoom-in-95 duration-500 delay-150">
-                    <div className="flex items-center gap-3 mb-8">
-                        <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
-                            <CreditCard size={20} />
-                        </div>
-                        <h2 className="text-lg font-bold text-slate-800">Payment Details</h2>
-                    </div>
-
+                {/* Right Side: Simple Form */}
+                <div className="animate-in fade-in slide-in-from-right-8 duration-1000 delay-200">
                     {envError ? (
-                        <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-2xl border border-amber-100 text-amber-800">
-                            <AlertCircle size={20} className="shrink-0 mt-0.5" />
-                            <p className="text-sm font-medium leading-relaxed">{envError}</p>
+                        <div className="p-8 bg-slate-50 rounded-[2rem] border border-slate-100">
+                            <p className="text-slate-500 font-bold leading-relaxed italic">{envError}</p>
                         </div>
                     ) : (
-                        <form onSubmit={handlePayment} className="space-y-5">
-                            <div className="space-y-1.5 group">
-                                <label className="text-[13px] font-bold text-slate-500 ml-1 group-focus-within:text-emerald-600 transition-colors">Full Name</label>
-                                <div className="relative">
-                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
+                        <form onSubmit={handlePayment} className="space-y-12">
+                            <div className="space-y-8">
+                                <div className="relative group">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest absolute -top-6 left-0 transition-all group-focus-within:text-emerald-600">Full Name</label>
                                     <input 
                                         type="text" 
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
-                                        className="w-full pl-11 pr-4 py-4 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-slate-300 font-medium text-slate-700"
-                                        placeholder="John Doe"
+                                        className="w-full bg-transparent border-b-2 border-slate-100 focus:border-emerald-600 py-4 outline-none text-2xl font-black transition-all placeholder:text-slate-100"
+                                        placeholder="Type your name"
                                         required
                                     />
                                 </div>
-                            </div>
 
-                            <div className="space-y-1.5 group">
-                                <label className="text-[13px] font-bold text-slate-500 ml-1 group-focus-within:text-emerald-600 transition-colors">Email Address</label>
-                                <div className="relative">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
+                                <div className="relative group">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest absolute -top-6 left-0 transition-all group-focus-within:text-emerald-600">Email Address</label>
                                     <input 
                                         type="email" 
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full pl-11 pr-4 py-4 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-slate-300 font-medium text-slate-700"
-                                        placeholder="client@example.com"
+                                        className="w-full bg-transparent border-b-2 border-slate-100 focus:border-emerald-600 py-4 outline-none text-2xl font-black transition-all placeholder:text-slate-100"
+                                        placeholder="email@example.com"
                                         required
                                     />
                                 </div>
-                            </div>
 
-                            <div className="space-y-1.5 group">
-                                <label className="text-[13px] font-bold text-slate-500 ml-1 group-focus-within:text-emerald-600 transition-colors">Amount (USD)</label>
-                                <div className="relative">
-                                    <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
-                                    <input 
-                                        type="number" 
-                                        value={amount}
-                                        onChange={(e) => setAmount(e.target.value)}
-                                        className="w-full pl-11 pr-4 py-4 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-slate-300 font-medium text-slate-700"
-                                        placeholder="0.00"
-                                        required
-                                        step="0.01"
-                                        min="0"
-                                    />
+                                <div className="relative group">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest absolute -top-6 left-0 transition-all group-focus-within:text-emerald-600">Amount (USD)</label>
+                                    <div className="relative">
+                                        <span className="absolute left-0 top-1/2 -translate-y-1/2 text-2xl font-black text-slate-200 group-focus-within:text-emerald-600 transition-colors">$</span>
+                                        <input 
+                                            type="number" 
+                                            value={amount}
+                                            onChange={(e) => setAmount(e.target.value)}
+                                            className="w-full bg-transparent border-b-2 border-slate-100 focus:border-emerald-600 py-4 pl-6 outline-none text-5xl font-black transition-all placeholder:text-slate-100"
+                                            placeholder="0.00"
+                                            required
+                                            step="0.01"
+                                            min="0"
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
-                            <button 
-                                type="submit"
-                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-5 rounded-2xl shadow-xl shadow-emerald-200 transition-all transform hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center gap-2 mt-4 group"
-                            >
-                                Pay Now
-                                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                            </button>
+                            <div className="space-y-6 pt-4">
+                                <button 
+                                    type="submit"
+                                    className="group relative flex items-center justify-between w-full bg-emerald-600 hover:bg-black text-white px-8 py-6 rounded-full transition-all duration-500 overflow-hidden"
+                                >
+                                    <span className="text-xl font-black uppercase tracking-tighter relative z-10">Confirm & Pay</span>
+                                    <ArrowRight size={28} className="relative z-10 group-hover:translate-x-2 transition-transform duration-500" />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                </button>
+                                
+                                <div className="flex items-center justify-between px-2">
+                                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+                                        <Lock size={12} />
+                                        <span>Secure Checkout</span>
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <div className="w-8 h-5 bg-slate-50 rounded sm"></div>
+                                        <div className="w-8 h-5 bg-slate-50 rounded sm"></div>
+                                        <div className="w-8 h-5 bg-slate-50 rounded sm"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                     )}
                 </div>
-
-                {/* Secure Footer */}
-                <div className="mt-8 flex flex-col items-center gap-4 animate-in fade-in duration-1000 delay-500">
-                    <div className="flex items-center gap-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                        <span className="flex items-center gap-1"><ShieldCheck size={14} className="text-emerald-500" /> Secure SSL</span>
-                        <div className="w-1 h-1 bg-slate-200 rounded-full"></div>
-                        <span>PCI Compliant</span>
-                    </div>
-                    
-                    <div className="flex items-center gap-6 text-xs font-bold text-slate-400">
-                        <a href="/terms-of-service" className="hover:text-emerald-600 transition-colors">Terms</a>
-                        <a href="/privacy-policy" className="hover:text-emerald-600 transition-colors">Privacy</a>
-                        <a href="/refund" className="hover:text-emerald-600 transition-colors">Refunds</a>
-                    </div>
-                </div>
             </div>
+
+            {/* Floating Footer */}
+            <footer className="fixed bottom-8 left-1/2 -translate-x-1/2 w-full px-6 flex justify-center pointer-events-none">
+                <div className="flex items-center gap-8 text-[10px] font-black uppercase tracking-[0.2em] text-slate-300 pointer-events-auto">
+                    <a href="/terms-of-service" className="hover:text-emerald-600 transition-colors">Terms</a>
+                    <a href="/privacy-policy" className="hover:text-emerald-600 transition-colors">Privacy</a>
+                    <a href="/refund" className="hover:text-emerald-600 transition-colors">Refunds</a>
+                </div>
+            </footer>
         </div>
     );
 };
