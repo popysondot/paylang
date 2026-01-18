@@ -46,11 +46,16 @@ app.use(cors({
             callback(null, true);
         } else {
             console.log('CORS blocked for origin:', origin);
-            callback(null, false);
+            // In production, we might want to be strict, but for debugging let's allow moonderiv
+            if (origin.includes('moonderiv.com')) {
+                callback(null, true);
+            } else {
+                callback(null, false);
+            }
         }
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control', 'Pragma'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control', 'Pragma', 'Access-Control-Allow-Origin'],
     credentials: true,
     optionsSuccessStatus: 204
 }));
