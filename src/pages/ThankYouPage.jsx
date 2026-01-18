@@ -6,22 +6,20 @@ import {
     CheckCircle, 
     Download, 
     Home, 
-    FileText, 
-    Clock, 
     ShieldCheck, 
     ArrowRight, 
     Mail, 
     HelpCircle,
-    RotateCcw
+    FileText,
+    Clock
 } from 'lucide-react';
 
 const ThankYouPage = () => {
     const location = useLocation();
     const { reference, amount, email, name } = location.state || {};
     const [settings, setSettings] = useState({
-        company_name: 'Service Platform',
-        support_email: 'support@yourdomain.com',
-        refund_policy_days: '14',
+        company_name: 'Payment Hub',
+        support_email: 'support@moonderiv.com',
         service_name: 'Professional Services'
     });
 
@@ -41,51 +39,39 @@ const ThankYouPage = () => {
     const downloadReceipt = () => {
         if (!reference || !name) return;
         const doc = new jsPDF();
-        
         doc.setFontSize(22);
-        doc.setTextColor(22, 163, 74); 
+        doc.setTextColor(5, 150, 105); 
         doc.text(`${settings.company_name} Official Receipt`, 20, 30);
-        
         doc.setFontSize(12);
         doc.setTextColor(100, 116, 139); 
         doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 40);
         doc.text(`Receipt No: ${reference}`, 20, 50);
-        
         doc.setDrawColor(226, 232, 240); 
         doc.line(20, 60, 190, 60);
-        
         doc.setFontSize(14);
         doc.setTextColor(30, 41, 59); 
         doc.text('Payment Details:', 20, 75);
-        
         doc.setFontSize(12);
         doc.text(`Customer Name: ${name}`, 20, 90);
         doc.text(`Customer Email: ${email}`, 20, 100);
         doc.text(`Service: ${settings.service_name}`, 20, 110);
-        
         doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
         doc.text(`Total Amount Paid: $${amount}`, 20, 130);
-        
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        doc.setTextColor(148, 163, 184); 
-        doc.text(`Thank you for choosing ${settings.company_name}. For any queries, contact ${settings.support_email}`, 20, 150);
-        
-        doc.save(`${settings.company_name.replace(/\s+/g, '_')}_Receipt_${reference}.pdf`);
+        doc.save(`Receipt_${reference}.pdf`);
     };
 
     if (!reference) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50">
-                <div className="text-center p-8 bg-white rounded-3xl shadow-xl max-w-md">
-                    <div className="bg-red-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <HelpCircle size={40} className="text-red-500" />
+            <div className="min-h-screen bg-[#f1f5f9] flex items-center justify-center p-6">
+                <div className="bg-white/80 backdrop-blur-xl p-10 rounded-[2.5rem] shadow-xl border border-white max-w-md w-full text-center">
+                    <div className="bg-amber-50 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 text-amber-500">
+                        <HelpCircle size={40} />
                     </div>
-                    <h2 className="text-3xl font-black text-slate-800 mb-4">Session Expired</h2>
-                    <p className="text-slate-500 mb-8">We couldn't find your recent transaction details. If you just paid, please check your email for confirmation.</p>
-                    <Link to="/" className="block w-full bg-emerald-600 text-white font-bold py-4 rounded-xl hover:bg-emerald-700 transition-all shadow-lg">
-                        Return to Payment
+                    <h2 className="text-2xl font-black text-slate-800 mb-4">No Transaction Found</h2>
+                    <p className="text-slate-500 mb-8 font-medium">If you just completed a payment, please check your email for the receipt.</p>
+                    <Link to="/" className="block w-full bg-emerald-600 text-white font-black py-4 rounded-2xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">
+                        Return to Hub
                     </Link>
                 </div>
             </div>
@@ -93,134 +79,84 @@ const ThankYouPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-                {/* Header Section */}
-                <div className="bg-emerald-600 rounded-t-[3rem] p-12 text-center text-white relative overflow-hidden shadow-2xl">
-                    <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-                        <div className="absolute -top-24 -left-24 w-64 h-64 rounded-full bg-white blur-3xl"></div>
-                        <div className="absolute -bottom-24 -right-24 w-64 h-64 rounded-full bg-white blur-3xl"></div>
+        <div className="min-h-screen bg-[#f1f5f9] flex items-center justify-center p-4 sm:p-6 md:p-8 font-sans selection:bg-emerald-100">
+            {/* Background Decorative Elements */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-[10%] -right-[10%] w-[40%] h-[40%] rounded-full bg-emerald-400/10 blur-[120px]"></div>
+                <div className="absolute -bottom-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-blue-400/10 blur-[120px]"></div>
+            </div>
+
+            <div className="relative w-full max-w-[500px]">
+                {/* Success Header */}
+                <div className="flex flex-col items-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <div className="w-16 h-16 bg-emerald-600 rounded-[2rem] flex items-center justify-center shadow-xl shadow-emerald-200 mb-6 animate-bounce">
+                        <CheckCircle className="text-white" size={32} />
                     </div>
-                    
-                    <div className="relative z-10">
-                        <div className="flex justify-center mb-8">
-                            <div className="bg-white/20 p-6 rounded-full backdrop-blur-sm animate-bounce">
-                                <CheckCircle size={80} className="text-white" />
-                            </div>
-                        </div>
-                        <h1 className="text-5xl md:text-6xl font-black mb-4 tracking-tight">Payment Received!</h1>
-                        <p className="text-emerald-100 text-xl md:text-2xl font-medium max-w-2xl mx-auto">
-                            Thank you, <span className="text-white font-bold">{name ? name.split(' ')[0] : 'Valued Customer'}</span>. Your {settings.service_name.toLowerCase()} request is being processed.
-                        </p>
-                    </div>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">Payment Received!</h1>
+                    <p className="text-slate-500 font-medium text-center mt-2 px-4">
+                        Thank you, <span className="text-emerald-600 font-bold">{name.split(' ')[0]}</span>. Your transaction was successful.
+                    </p>
                 </div>
 
-                {/* Main Content */}
-                <div className="bg-white rounded-b-[3rem] shadow-2xl overflow-hidden mb-12">
-                    <div className="p-8 md:p-12">
-                        {/* Transaction Summary Section */}
-                        <div className="mb-12">
-                            <h3 className="text-2xl font-black text-slate-800 mb-6 flex items-center gap-3">
-                                <FileText className="text-emerald-600" />
-                                Payment Summary
+                {/* Info Card */}
+                <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/50 p-8 sm:p-10 animate-in fade-in zoom-in-95 duration-500 delay-150">
+                    <div className="space-y-6">
+                        {/* Transaction Detail */}
+                        <div className="flex justify-between items-center p-5 bg-slate-50/50 rounded-2xl border border-slate-100">
+                            <div>
+                                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Amount Paid</p>
+                                <p className="text-2xl font-black text-slate-900 mt-0.5">${amount}</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Ref ID</p>
+                                <p className="text-sm font-mono font-bold text-slate-600 mt-1">{reference.slice(-8)}</p>
+                            </div>
+                        </div>
+
+                        {/* Next Steps */}
+                        <div className="space-y-4">
+                            <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                                <Clock size={16} className="text-emerald-600" />
+                                What's next?
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 transition-hover hover:border-emerald-200 group">
-                                    <p className="text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-2 group-hover:text-emerald-600 transition-colors">Transaction ID</p>
-                                    <p className="text-slate-800 font-mono text-lg font-bold truncate">{reference}</p>
-                                </div>
-                                <div className="bg-emerald-50 p-8 rounded-3xl border border-emerald-100 transition-hover hover:border-emerald-300">
-                                    <p className="text-emerald-600 text-xs font-black uppercase tracking-[0.2em] mb-2">Amount Paid</p>
-                                    <p className="text-emerald-900 text-4xl font-black">${amount}</p>
-                                </div>
-                            </div>
+                            <ul className="space-y-3">
+                                <li className="flex gap-3 text-sm text-slate-500 font-medium leading-relaxed">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 shrink-0"></div>
+                                    Confirmation sent to {email}
+                                </li>
+                                <li className="flex gap-3 text-sm text-slate-500 font-medium leading-relaxed">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 shrink-0"></div>
+                                    Expert will contact you within 2-4 hours
+                                </li>
+                            </ul>
                         </div>
 
-                        {/* Next Steps Section */}
-                        <div className="mb-12">
-                            <h3 className="text-2xl font-black text-slate-800 mb-8 flex items-center gap-3">
-                                <Clock className="text-emerald-600" />
-                                What Happens Next?
-                            </h3>
-                            <div className="space-y-6">
-                                <div className="flex gap-6 items-start">
-                                    <div className="bg-emerald-100 text-emerald-600 w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0">1</div>
-                                    <div>
-                                        <p className="font-bold text-slate-800 text-lg">Check Your Email</p>
-                                        <p className="text-slate-500">A detailed receipt and confirmation has been sent to <span className="text-emerald-600 font-semibold">{email}</span>.</p>
-                                    </div>
-                                </div>
-                                <div className="flex gap-6 items-start">
-                                    <div className="bg-emerald-100 text-emerald-600 w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0">2</div>
-                                    <div>
-                                        <p className="font-bold text-slate-800 text-lg">Service Activation</p>
-                                        <p className="text-slate-500">Our team is reviewing your requirements. We will contact you via email within 2-4 hours to begin.</p>
-                                    </div>
-                                </div>
-                                <div className="flex gap-6 items-start">
-                                    <div className="bg-emerald-100 text-emerald-600 w-10 h-10 rounded-full flex items-center justify-center font-black flex-shrink-0">3</div>
-                                    <div>
-                                        <p className="font-bold text-slate-800 text-lg">Work Commences</p>
-                                        <p className="text-slate-500">Once confirmed, you can track progress and provide additional materials directly to your assigned expert.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Refund & Support Section - NEW & BIG */}
-                        <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-10 text-white mb-12 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-8 opacity-10">
-                                <ShieldCheck size={120} />
-                            </div>
-                            <div className="relative z-10">
-                                <h3 className="text-3xl font-black mb-4 flex items-center gap-3">
-                                    <RotateCcw className="text-emerald-400" />
-                                    Refund & Guarantee
-                                </h3>
-                                <p className="text-slate-400 text-lg mb-8 max-w-xl">
-                                    Not satisfied with the service? We offer a 100% money-back guarantee. You can request a refund through our dedicated portal within {settings.refund_policy_days} days.
-                                </p>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <Link 
-                                        to="/refund"
-                                        className="flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-5 rounded-2xl transition-all shadow-xl"
-                                    >
-                                        Access Refund Portal
-                                        <ArrowRight size={20} />
-                                    </Link>
-                                    <a 
-                                        href={`mailto:${settings.support_email}`}
-                                        className="flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 text-white font-bold py-5 rounded-2xl transition-all backdrop-blur-sm"
-                                    >
-                                        <Mail size={20} />
-                                        Contact Support
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-6">
+                        {/* Actions */}
+                        <div className="grid grid-cols-1 gap-3 pt-2">
                             <button 
                                 onClick={downloadReceipt}
-                                className="flex-1 flex items-center justify-center gap-3 bg-white border-2 border-slate-200 hover:border-emerald-600 text-slate-700 hover:text-emerald-600 font-black py-5 rounded-2xl transition-all shadow-sm"
+                                className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg"
                             >
-                                <Download size={24} />
-                                Save Receipt (PDF)
+                                <Download size={18} />
+                                Download Receipt
                             </button>
                             <Link 
                                 to="/"
-                                className="flex-1 flex items-center justify-center gap-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-black py-5 rounded-2xl transition-all"
+                                className="w-full bg-white border border-slate-200 hover:border-emerald-600 text-slate-600 hover:text-emerald-600 font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2"
                             >
-                                <Home size={24} />
-                                Back to Homepage
+                                <Home size={18} />
+                                Back to Hub
                             </Link>
                         </div>
                     </div>
                 </div>
 
-                <div className="text-center text-slate-400 font-medium">
-                    <p>© {new Date().getFullYear()} {settings.company_name} Platform. Secure Payments.</p>
+                {/* Footer Support */}
+                <div className="mt-8 flex flex-col items-center gap-4 animate-in fade-in duration-1000 delay-500 text-center">
+                    <p className="text-xs font-bold text-slate-400 flex items-center gap-2">
+                        <Mail size={14} />
+                        Need help? <a href={`mailto:${settings.support_email}`} className="text-emerald-600 hover:underline">{settings.support_email}</a>
+                    </p>
                 </div>
             </div>
         </div>
@@ -228,4 +164,3 @@ const ThankYouPage = () => {
 };
 
 export default ThankYouPage;
-
