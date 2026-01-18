@@ -371,7 +371,7 @@ const AdminDashboard = () => {
                                         </div>
                                         <div>
                                             <p className="text-4xl font-black text-white tracking-tighter">{stat.value}</p>
-                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mt-1">{stat.label}</p>
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{stat.label}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -384,7 +384,7 @@ const AdminDashboard = () => {
                                     <div className="flex gap-4">
                                         <div className="flex items-center gap-2">
                                             <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Growth</span>
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Growth</span>
                                         </div>
                                     </div>
                                 </div>
@@ -394,19 +394,19 @@ const AdminDashboard = () => {
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
                                             <XAxis 
                                                 dataKey="name" 
-                                                stroke="#475569" 
+                                                stroke="#64748b" 
                                                 fontSize={10} 
                                                 fontWeight={900} 
-                                                tick={{ fill: '#475569' }}
+                                                tick={{ fill: '#94a3b8' }}
                                                 axisLine={false}
                                                 tickLine={false}
                                                 dy={10}
                                             />
                                             <YAxis 
-                                                stroke="#475569" 
+                                                stroke="#64748b" 
                                                 fontSize={10} 
                                                 fontWeight={900} 
-                                                tick={{ fill: '#475569' }}
+                                                tick={{ fill: '#94a3b8' }}
                                                 axisLine={false}
                                                 tickLine={false}
                                                 tickFormatter={(value) => `$${value}`}
@@ -430,11 +430,11 @@ const AdminDashboard = () => {
                                 <table className="w-full text-left border-collapse">
                                     <thead>
                                         <tr className="bg-slate-900 border-b border-slate-800">
-                                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Timestamp</th>
-                                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Identity</th>
-                                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Value</th>
-                                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Reference</th>
-                                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">Status</th>
+                                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Timestamp</th>
+                                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Identity</th>
+                                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Value</th>
+                                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Reference</th>
+                                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-800/50">
@@ -443,10 +443,10 @@ const AdminDashboard = () => {
                                                 <td className="px-8 py-6 text-[10px] font-black text-slate-400">{new Date(t.createdAt).toLocaleString()}</td>
                                                 <td className="px-8 py-6">
                                                     <p className="text-sm font-black text-white leading-none">{t.name}</p>
-                                                    <p className="text-[10px] font-bold text-slate-500 uppercase mt-1 tracking-tight">{t.email}</p>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase mt-1 tracking-tight">{t.email}</p>
                                                 </td>
                                                 <td className="px-8 py-6 text-lg font-black text-emerald-500">${Number(t.amount).toFixed(2)}</td>
-                                                <td className="px-8 py-6 text-[10px] font-mono font-bold text-slate-500 uppercase">{t.reference}</td>
+                                                <td className="px-8 py-6 text-[10px] font-mono font-bold text-slate-400 uppercase">{t.reference}</td>
                                                 <td className="px-8 py-6 text-right">
                                                     <span className={`text-[10px] font-black uppercase tracking-widest ${t.status === 'success' ? 'text-emerald-500' : 'text-red-500'}`}>{t.status}</span>
                                                 </td>
@@ -468,20 +468,20 @@ const AdminDashboard = () => {
                                         </div>
                                         <div>
                                             <p className="text-lg font-black text-white leading-none">{c.name}</p>
-                                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mt-1">{c.email}</p>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mt-1">{c.email}</p>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-800">
                                         <div>
-                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Total LTV</p>
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total LTV</p>
                                             <p className="text-xl font-black text-white">${c.totalSpent.toFixed(2)}</p>
                                         </div>
                                         <div>
-                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Orders</p>
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Orders</p>
                                             <p className="text-xl font-black text-white">{c.transactionCount}</p>
                                         </div>
                                     </div>
-                                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-700">
+                                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-500">
                                         <span>Last Activity</span>
                                         <span>{new Date(c.lastTransaction).toLocaleDateString()}</span>
                                     </div>
@@ -498,13 +498,13 @@ const AdminDashboard = () => {
                                         <div className="flex items-center gap-4">
                                             <div className={`w-3 h-3 rounded-full ${r.status === 'pending' ? 'bg-amber-500 animate-pulse' : r.status === 'approved' ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
                                             <h4 className="text-sm font-black text-white uppercase tracking-widest">{r.status} REQUEST</h4>
-                                            <span className="text-[10px] font-black text-slate-600 uppercase">{new Date(r.createdAt).toLocaleString()}</span>
+                                            <span className="text-[10px] font-black text-slate-400 uppercase">{new Date(r.createdAt).toLocaleString()}</span>
                                         </div>
                                         <div className="space-y-1">
                                             <p className="text-xl font-black text-white">{r.email}</p>
                                             <p className="text-sm font-medium text-slate-400 italic">"{r.reason}"</p>
                                         </div>
-                                        <p className="text-[10px] font-mono font-bold text-slate-600 uppercase">Parent Ref: {r.paymentId?.reference || 'Unknown'}</p>
+                                        <p className="text-[10px] font-mono font-bold text-slate-400 uppercase">Parent Ref: {r.paymentId?.reference || 'Unknown'}</p>
                                     </div>
                                     {r.status === 'pending' && (
                                         <div className="flex gap-4">
@@ -528,7 +528,7 @@ const AdminDashboard = () => {
                             ))}
                             {filteredRefunds.length === 0 && (
                                 <div className="py-20 text-center">
-                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">No action items pending</p>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No action items pending</p>
                                 </div>
                             )}
                         </div>
@@ -538,13 +538,13 @@ const AdminDashboard = () => {
                         <div className="space-y-2 animate-in fade-in duration-700">
                             {auditLogs.map((log, i) => (
                                 <div key={i} className="flex items-center gap-6 px-8 py-6 border-b border-slate-800 hover:bg-white/5 transition-colors group">
-                                    <span className="text-[10px] font-black text-slate-700 w-40 shrink-0">{new Date(log.createdAt).toLocaleString()}</span>
+                                    <span className="text-[10px] font-black text-slate-500 w-40 shrink-0">{new Date(log.createdAt).toLocaleString()}</span>
                                     <div className="w-2 h-2 rounded-full bg-slate-800 group-hover:bg-emerald-500 transition-colors"></div>
                                     <div className="flex-grow">
                                         <p className="text-[10px] font-black text-white uppercase tracking-widest mb-1">{log.action}</p>
-                                        <p className="text-xs font-bold text-slate-500">{log.details}</p>
+                                        <p className="text-xs font-bold text-slate-400">{log.details}</p>
                                     </div>
-                                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">User: {log.adminId?.username || 'System'}</span>
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">User: {log.adminId?.username || 'System'}</span>
                                 </div>
                             ))}
                         </div>

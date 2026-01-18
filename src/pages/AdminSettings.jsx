@@ -4,7 +4,7 @@ import { Settings, Save, AlertCircle, CheckCircle } from 'lucide-react';
 
 const AdminSettings = ({ token, onClose }) => {
     const [settings, setSettings] = useState({
-        company_name: 'Service Platform',
+        company_name: 'Payment Hub',
         support_email: '',
         support_phone: '',
         notification_email: '',
@@ -109,8 +109,8 @@ const AdminSettings = ({ token, onClose }) => {
         );
     }
 
-    const inputClasses = "w-full bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder:text-slate-700 outline-none focus:border-emerald-500 transition-all font-medium";
-    const labelClasses = "block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2";
+    const inputClasses = "w-full bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 outline-none focus:border-emerald-500 transition-all font-medium";
+    const labelClasses = "block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2";
     const sectionClasses = "bg-slate-900/20 border border-slate-800/50 p-8 rounded-[2.5rem] space-y-6";
 
     return (

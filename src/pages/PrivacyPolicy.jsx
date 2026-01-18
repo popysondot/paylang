@@ -4,8 +4,8 @@ import axios from 'axios';
 
 const PrivacyPolicy = () => {
     const [settings, setSettings] = useState({
-        company_name: 'Service Platform',
-        support_email: 'support@yourdomain.com'
+        company_name: 'Payment Hub',
+        support_email: 'support@moonderiv.com'
     });
 
     useEffect(() => {
