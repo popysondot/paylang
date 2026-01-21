@@ -12,7 +12,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: VITE_BACKEND_URL
-        value: ""
+        value: "https://paylang-tusk.onrender.com"
       - key: SKIP_PREFLIGHT_CHECK
         value: true
       - key: DATABASE_URL

@@ -18,8 +18,9 @@ const PaymentPage = () => {
     });
     
     const getBaseUrl = () => {
+        if (import.meta.env.VITE_BACKEND_URL) return import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
         return window.location.hostname === 'localhost' 
-            ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+            ? 'http://localhost:5000'
             : '';
     };
 

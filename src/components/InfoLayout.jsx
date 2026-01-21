@@ -11,9 +11,9 @@ const InfoLayout = ({ title, children }) => {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const baseUrl = window.location.hostname === 'localhost' 
-                    ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
-                    : '';
+                const baseUrl = import.meta.env.VITE_BACKEND_URL 
+                    ? import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '')
+                    : (window.location.hostname === 'localhost' ? 'http://localhost:5000' : '');
                 const res = await axios.get(`${baseUrl}/api/settings`);
                 if (res.data) setSettings(prev => ({ ...prev, ...res.data }));
             } catch (err) {

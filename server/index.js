@@ -22,6 +22,14 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(express.json());
 
+// Request Logger
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
+app.get('/ping', (req, res) => res.send('pong'));
+
 const allowedOrigins = [
   'https://paylang.moonderiv.com',
   'https://paylang-tusk.onrender.com',
@@ -48,7 +56,7 @@ const limiter = rateLimit({
   max: 100,
   message: 'Too many requests, please try again later.'
 });
-app.use('/api/', limiter);
+app.use('/api', limiter);
 
 // Database Pool
 const pool = new Pool({
@@ -388,17 +396,37 @@ app.post('/api/admin/change-password', authenticateToken, async (req, res) => {
 });
 
 // Serve Static Files (Vite build output)
-const distPath = path.join(__dirname, '../dist');
+const distPath = path.resolve(__dirname, '../dist');
+console.log(`Serving static files from: ${distPath}`);
 app.use(express.static(distPath));
 
 // SPA Routing: Redirect all non-API requests to index.html
 app.use((req, res, next) => {
   // If it's an API request that didn't match any route, return 404
   if (req.path.startsWith('/api')) {
-    return res.status(404).json({ error: 'API route not found' });
+    console.log(`Unmatched API request: ${req.method} ${req.path}`);
+    return res.status(404).json({ 
+      error: `API route not found: ${req.method} ${req.path}`,
+      availableRoutes: [
+        'GET /api/settings',
+        'POST /api/verify-payment',
+        'GET /api/customer/orders/:email',
+        'GET /api/payments/:email',
+        'POST /api/refund-request',
+        'POST /api/admin/login',
+        'GET /api/admin/settings',
+        'POST /api/admin/settings',
+        'GET /api/admin/analytics',
+        'GET /api/admin/transactions',
+        'GET /api/admin/refunds',
+        'GET /api/admin/users',
+        'GET /api/admin/audit-logs'
+      ]
+    });
   }
   // Otherwise, serve the frontend
-  res.sendFile(path.join(distPath, 'index.html'));
+  const indexPath = path.join(distPath, 'index.html');
+  res.sendFile(indexPath);
 });
 
 app.listen(PORT, () => {
