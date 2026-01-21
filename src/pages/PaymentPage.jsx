@@ -156,7 +156,7 @@ const PaymentPage = () => {
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                         className="w-full bg-transparent faded-line-b py-6 outline-none text-xl font-black transition-all placeholder:text-white/20 uppercase text-white focus:border-[#10b981]"
-                                        placeholder="UID"
+                                        placeholder="Name"
                                         required
                                     />
                                 </div>

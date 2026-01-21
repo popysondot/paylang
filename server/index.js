@@ -8,8 +8,13 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { rateLimit } from 'express-rate-limit';
 import nodemailer from 'nodemailer';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -320,6 +325,15 @@ app.post('/api/admin/change-password', authenticateToken, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Update failed' });
   }
+});
+
+// Serve Static Files (Vite build output)
+const distPath = path.join(__dirname, '../dist');
+app.use(express.static(distPath));
+
+// SPA Routing: Redirect all non-API requests to index.html
+app.get(/^(?!\/api).+/, (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 app.listen(PORT, () => {
