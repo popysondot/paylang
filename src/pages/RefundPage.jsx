@@ -15,6 +15,13 @@ import {
 
 const RefundPage = () => {
     const { addToast } = useToast();
+
+    const getBaseUrl = () => {
+        return window.location.hostname === 'localhost' 
+            ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+            : '';
+    };
+
     const [email, setEmail] = useState('');
     const [payments, setPayments] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -31,8 +38,7 @@ const RefundPage = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
-                const res = await axios.get(`${baseUrl}/api/settings`);
+                const res = await axios.get(`${getBaseUrl()}/api/settings`);
                 if (res.data) setSettings(prev => ({ ...prev, ...res.data }));
             } catch (err) {
                 console.error('Failed to fetch settings:', err);
@@ -46,16 +52,8 @@ const RefundPage = () => {
         setLoading(true);
         setStatus({ type: '', message: '' });
         
-        const backendUrl = import.meta.env.VITE_BACKEND_URL;
-        if (!backendUrl) {
-            setStatus({ type: 'error', message: 'Backend configuration missing.' });
-            setLoading(false);
-            return;
-        }
-
         try {
-            const cleanBackendUrl = (backendUrl || '').replace(/\/$/, '');
-            const response = await axios.get(`${cleanBackendUrl}/api/payments/${email}`);
+            const response = await axios.get(`${getBaseUrl()}/api/payments/${email}`);
             setPayments(response.data);
             if (response.data.length === 0) {
                 addToast('No payments found for this email', 'error');
@@ -71,16 +69,8 @@ const RefundPage = () => {
         if (!selectedPayment) return;
         setLoading(true);
 
-        const backendUrl = import.meta.env.VITE_BACKEND_URL;
-        if (!backendUrl) {
-            setStatus({ type: 'error', message: 'Backend configuration missing.' });
-            setLoading(false);
-            return;
-        }
-
         try {
-            const cleanBackendUrl = (backendUrl || '').replace(/\/$/, '');
-            const response = await axios.post(`${cleanBackendUrl}/api/refund-request`, {
+            const response = await axios.post(`${getBaseUrl()}/api/refund-request`, {
                 reference: selectedPayment.reference,
                 email: email,
                 reason: reason

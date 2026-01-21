@@ -58,6 +58,13 @@ const DiffViewer = ({ data }) => {
 const AdminDashboard = () => {
     const { addToast } = useToast();
     const navigate = useNavigate();
+
+    const getBaseUrl = () => {
+        return window.location.hostname === 'localhost' 
+            ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+            : '';
+    };
+
     const [activeView, setActiveView] = useState('dashboard');
     const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('adminToken'));
     const [username, setUsername] = useState('');
@@ -95,8 +102,7 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchBranding = async () => {
             try {
-                const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
-                const res = await axios.get(`${baseUrl}/api/settings`);
+                const res = await axios.get(`${getBaseUrl()}/api/settings`);
                 if (res.data.company_name) setBrandingSettings(prev => ({ ...prev, ...res.data }));
             } catch (err) {
                 // Keep default
@@ -110,8 +116,7 @@ const AdminDashboard = () => {
         setLoginLoading(true);
         setError(null);
         try {
-            const baseUrl = import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
-            const res = await axios.post(`${baseUrl}/api/admin/login`, { username, password });
+            const res = await axios.post(`${getBaseUrl()}/api/admin/login`, { username, password });
             localStorage.setItem('adminToken', res.data.token);
             setIsAuthenticated(true);
             addToast('Access Granted', 'success');
@@ -135,9 +140,8 @@ const AdminDashboard = () => {
         const token = localStorage.getItem('adminToken');
         setProcessingRefund(refundId);
         try {
-            const baseUrl = import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
             await axios.post(
-                `${baseUrl}/api/admin/refunds/${refundId}/approve`,
+                `${getBaseUrl()}/api/admin/refunds/${refundId}/approve`,
                 { refundAmount: null },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -154,9 +158,8 @@ const AdminDashboard = () => {
         const token = localStorage.getItem('adminToken');
         setProcessingRefund(refundId);
         try {
-            const baseUrl = import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
             await axios.post(
-                `${baseUrl}/api/admin/refunds/${refundId}/reject`,
+                `${getBaseUrl()}/api/admin/refunds/${refundId}/reject`,
                 { reason: 'After review, this refund cannot be processed.' },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -172,9 +175,8 @@ const AdminDashboard = () => {
     const handleToggleAdmin = async (userId) => {
         const token = localStorage.getItem('adminToken');
         try {
-            const baseUrl = import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
             const res = await axios.post(
-                `${baseUrl}/api/admin/users/${userId}/toggle`,
+                `${getBaseUrl()}/api/admin/users/${userId}/toggle`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -188,16 +190,15 @@ const AdminDashboard = () => {
     const handleCreateAdmin = async (userData) => {
         const token = localStorage.getItem('adminToken');
         try {
-            const baseUrl = import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
             await axios.post(
-                `${baseUrl}/api/admin/users`,
+                `${getBaseUrl()}/api/admin/users`,
                 userData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             addToast('New admin created successfully', 'success');
             setShowAddUserModal(false);
             // Refresh users
-            const res = await axios.get(`${baseUrl}/api/admin/users`, { headers: { Authorization: `Bearer ${token}` } });
+            const res = await axios.get(`${getBaseUrl()}/api/admin/users`, { headers: { Authorization: `Bearer ${token}` } });
             setUsers(res.data);
         } catch (err) {
             addToast(err.response?.data?.error || 'Failed to create admin', 'error');
@@ -208,13 +209,6 @@ const AdminDashboard = () => {
         if (!isAuthenticated) return;
 
         const fetchData = async () => {
-            const rawUrl = import.meta.env.VITE_BACKEND_URL;
-            if (!rawUrl) {
-                setError('Backend URL is missing.');
-                setLoading(false);
-                return;
-            }
-            const baseUrl = rawUrl.replace(/\/$/, '');
             const token = localStorage.getItem('adminToken');
             const headers = { Authorization: `Bearer ${token}` };
 
@@ -223,11 +217,11 @@ const AdminDashboard = () => {
                 setLoading(true);
                 
                 const [analyticsRes, transactionsRes, refundsRes, auditRes, usersRes] = await Promise.allSettled([
-                    axios.get(`${baseUrl}/api/admin/analytics?period=${chartPeriod}`, { headers }),
-                    axios.get(`${baseUrl}/api/admin/transactions`, { headers }),
-                    axios.get(`${baseUrl}/api/admin/refunds`, { headers }),
-                    axios.get(`${baseUrl}/api/admin/audit-logs`, { headers }),
-                    axios.get(`${baseUrl}/api/admin/users`, { headers })
+                    axios.get(`${getBaseUrl()}/api/admin/analytics?period=${chartPeriod}`, { headers }),
+                    axios.get(`${getBaseUrl()}/api/admin/transactions`, { headers }),
+                    axios.get(`${getBaseUrl()}/api/admin/refunds`, { headers }),
+                    axios.get(`${getBaseUrl()}/api/admin/audit-logs`, { headers }),
+                    axios.get(`${getBaseUrl()}/api/admin/users`, { headers })
                 ]);
 
                 if (analyticsRes.status === 'fulfilled') setAnalytics(analyticsRes.value.data);

@@ -3,6 +3,12 @@ import axios from 'axios';
 import { Settings, Save, AlertCircle, CheckCircle } from 'lucide-react';
 
 const AdminSettings = ({ token, onClose }) => {
+    const getBaseUrl = () => {
+        return window.location.hostname === 'localhost' 
+            ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+            : '';
+    };
+
     const [settings, setSettings] = useState({
         company_name: 'Payment Hub',
         support_email: '',
@@ -28,8 +34,7 @@ const AdminSettings = ({ token, onClose }) => {
 
     const fetchSettings = async () => {
         try {
-            const baseUrl = import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
-            const res = await axios.get(`${baseUrl}/api/admin/settings`, {
+            const res = await axios.get(`${getBaseUrl()}/api/admin/settings`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setSettings(prev => ({ ...prev, ...res.data }));
@@ -50,11 +55,9 @@ const AdminSettings = ({ token, onClose }) => {
         setError('');
 
         try {
-            const baseUrl = import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
-            
             for (const [key, value] of Object.entries(settings)) {
                 await axios.post(
-                    `${baseUrl}/api/admin/settings`,
+                    `${getBaseUrl()}/api/admin/settings`,
                     { key, value },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -80,9 +83,8 @@ const AdminSettings = ({ token, onClose }) => {
         }
 
         try {
-            const baseUrl = import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
             await axios.post(
-                `${baseUrl}/api/admin/change-password`,
+                `${getBaseUrl()}/api/admin/change-password`,
                 { 
                     currentPassword: passwordData.currentPassword, 
                     newPassword: passwordData.newPassword 

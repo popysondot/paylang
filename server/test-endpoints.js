@@ -45,6 +45,11 @@ async function runTests() {
         });
         console.log(`✅ Audit logs retrieved. Found ${auditRes.data.length} events.`);
 
+        // 6. Test Customer Orders
+        console.log('\n📦 Testing Customer Orders Endpoint...');
+        const customerRes = await axios.get(`${BASE_URL}/api/customer/orders/test@example.com`);
+        console.log(`✅ Customer orders retrieved. Payments: ${customerRes.data.payments.length}, Refunds: ${customerRes.data.refunds.length}`);
+
         console.log('\n✨ ALL BACKEND TESTS PASSED SUCCESSFULLY! ✨');
     } catch (error) {
         console.error('\n❌ Test Failed:');

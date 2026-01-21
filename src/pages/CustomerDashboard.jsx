@@ -4,6 +4,12 @@ import { Package, DollarSign, Clock, AlertCircle, CheckCircle, Eye, ArrowLeft, A
 import { useNavigate, Link } from 'react-router-dom';
 
 const CustomerDashboard = () => {
+    const getBaseUrl = () => {
+        return window.location.hostname === 'localhost' 
+            ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+            : '';
+    };
+
     const [email, setEmail] = useState('');
     const [orders, setOrders] = useState([]);
     const [refunds, setRefunds] = useState([]);
@@ -17,8 +23,7 @@ const CustomerDashboard = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
-                const res = await axios.get(`${baseUrl}/api/settings`);
+                const res = await axios.get(`${getBaseUrl()}/api/settings`);
                 if (res.data) setSettings(prev => ({ ...prev, ...res.data }));
             } catch (err) {
                 console.error('Failed to fetch settings:', err);
@@ -39,9 +44,7 @@ const CustomerDashboard = () => {
         setSearched(true);
 
         try {
-            const rawUrl = import.meta.env.VITE_BACKEND_URL;
-            const baseUrl = rawUrl.replace(/\/$/, '');
-            const res = await axios.get(`${baseUrl}/api/customer/orders/${email}`);
+            const res = await axios.get(`${getBaseUrl()}/api/customer/orders/${email}`);
             setOrders(res.data.payments || []);
             setRefunds(res.data.refunds || []);
             setLoading(false);

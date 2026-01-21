@@ -129,6 +129,56 @@ app.post('/api/verify-payment', async (req, res) => {
   }
 });
 
+// Customer Orders & Refunds
+app.get('/api/customer/orders/:email', async (req, res) => {
+  const { email } = req.params;
+  try {
+    const payments = await pool.query('SELECT * FROM payments WHERE email = $1 ORDER BY "createdAt" DESC', [email]);
+    const refunds = await pool.query('SELECT * FROM refunds WHERE email = $1 ORDER BY "createdAt" DESC', [email]);
+    res.json({
+      payments: payments.rows,
+      refunds: refunds.rows
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Fetch failed' });
+  }
+});
+
+// Get Payments for Refund Search
+app.get('/api/payments/:email', async (req, res) => {
+  const { email } = req.params;
+  try {
+    const result = await pool.query('SELECT * FROM payments WHERE email = $1 ORDER BY "createdAt" DESC', [email]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Fetch failed' });
+  }
+});
+
+// Submit Refund Request
+app.post('/api/refund-request', async (req, res) => {
+  const { reference, email, reason } = req.body;
+  try {
+    // Find payment id from reference
+    const paymentRes = await pool.query('SELECT id FROM payments WHERE reference = $1', [reference]);
+    if (paymentRes.rows.length === 0) return res.status(404).json({ error: 'Payment not found' });
+    
+    const paymentId = paymentRes.rows[0].id;
+
+    await pool.query(
+      'INSERT INTO refunds ("paymentId", email, reason, status, "createdAt") VALUES ($1, $2, $3, $4, NOW())',
+      [paymentId, email, reason, 'pending']
+    );
+
+    res.json({ status: 'success', message: 'Refund request submitted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Submission failed' });
+  }
+});
+
 // --- ADMIN ROUTES ---
 
 // Admin Login
@@ -332,7 +382,12 @@ const distPath = path.join(__dirname, '../dist');
 app.use(express.static(distPath));
 
 // SPA Routing: Redirect all non-API requests to index.html
-app.get(/^(?!\/api).+/, (req, res) => {
+app.use((req, res, next) => {
+  // If it's an API request that didn't match any route, return 404
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'API route not found' });
+  }
+  // Otherwise, serve the frontend
   res.sendFile(path.join(distPath, 'index.html'));
 });
 

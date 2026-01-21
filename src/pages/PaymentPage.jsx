@@ -28,7 +28,10 @@ const PaymentPage = () => {
 
         const fetchSettings = async () => {
             try {
-                const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
+                // Force relative path in production to stop CORS issues
+                const baseUrl = window.location.hostname === 'localhost' 
+                    ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+                    : '';
                 const res = await axios.get(`${baseUrl}/api/settings`);
                 if (res.data) setSettings(prev => ({ ...prev, ...res.data }));
             } catch (err) {
@@ -71,8 +74,10 @@ const PaymentPage = () => {
         setIsProcessing(true);
         navigate('/thank-you', { state: { reference: reference.reference, amount, email, name } });
 
-        const cleanBackendUrl = (backendUrl || '').replace(/\/$/, '');
-        axios.post(`${cleanBackendUrl}/api/verify-payment`, {
+        const baseUrl = window.location.hostname === 'localhost' 
+            ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+            : '';
+        axios.post(`${baseUrl}/api/verify-payment`, {
             reference: reference.reference,
             email: email,
             amount: amount,
