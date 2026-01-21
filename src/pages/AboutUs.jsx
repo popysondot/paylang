@@ -22,55 +22,49 @@ const AboutUs = () => {
     }, []);
 
     return (
-        <InfoLayout title={`About Our Elite Experts`}>
-            <div className="space-y-12">
-                <p className="text-2xl text-slate-400 font-medium leading-relaxed max-w-3xl">
-                    At <span className="text-white font-black">{settings.company_name}</span>, we believe that excellence starts with exceptional partnership. Our network is composed of world-class professionals.
+        <InfoLayout title={`Service Infrastructure`}>
+            <div className="space-y-32">
+                <p className="text-3xl md:text-6xl text-white/40 font-black leading-tight max-w-5xl tracking-tighter uppercase">
+                    <span className="text-white">{settings.company_name}</span> operates a high-availability direct settlement network designed for <span className="text-[#10b981]">professional service</span> transactions.
                 </p>
 
-                <div className="grid md:grid-cols-3 gap-8 my-16">
-                    <div className="group p-8 bg-slate-900/50 border border-slate-800 rounded-[2rem] hover:border-emerald-500 transition-all duration-500">
-                        <UserCheck className="text-emerald-500 mb-6" size={40} />
-                        <h3 className="text-xl font-black text-white uppercase tracking-tight mb-4">Vetted Experts</h3>
-                        <p className="text-slate-500 text-sm font-medium leading-relaxed">
-                            Every expert undergoes a rigorous multi-stage verification process including background checks and professional testing.
+                <div className="grid md:grid-cols-3 gap-16 py-20 faded-line-y">
+                    <div className="space-y-8">
+                        <div className="w-12 h-1 bg-[#10b981]"></div>
+                        <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Secure Ledger</h3>
+                        <p className="text-white/40 text-lg font-medium leading-relaxed uppercase tracking-tight">
+                            Every transaction is recorded on an encrypted, immutable ledger ensuring complete auditability and financial transparency.
                         </p>
                     </div>
-                    <div className="group p-8 bg-slate-900/50 border border-slate-800 rounded-[2rem] hover:border-emerald-500 transition-all duration-500">
-                        <Globe className="text-emerald-500 mb-6" size={40} />
-                        <h3 className="text-xl font-black text-white uppercase tracking-tight mb-4">Global Presence</h3>
-                        <p className="text-slate-500 text-sm font-medium leading-relaxed">
-                            Our experts are located in top professional hubs worldwide, ensuring mastery of local standards and requirements.
+                    <div className="space-y-8 md:faded-line-l md:pl-16">
+                        <div className="w-12 h-1 bg-[#10b981]"></div>
+                        <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Global Settlement</h3>
+                        <p className="text-white/40 text-lg font-medium leading-relaxed uppercase tracking-tight">
+                            Our cross-border payment infrastructure supports multi-currency settlements with localized compliance verification.
                         </p>
                     </div>
-                    <div className="group p-8 bg-slate-900/50 border border-slate-800 rounded-[2rem] hover:border-emerald-500 transition-all duration-500">
-                        <Shield className="text-emerald-500 mb-6" size={40} />
-                        <h3 className="text-xl font-black text-white uppercase tracking-tight mb-4">Top Tier</h3>
-                        <p className="text-slate-500 text-sm font-medium leading-relaxed">
-                            Over 85% of our experts hold advanced professional certifications and degrees from world-renowned institutions.
-                        </p>
-                    </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-12 pt-12 border-t border-slate-900">
-                    <div className="space-y-6">
-                        <h2 className="text-xl font-black uppercase tracking-widest text-emerald-400">Selection Process</h2>
-                        <p className="text-lg text-slate-400 leading-relaxed">
-                            We only select the top 3% of applicants. Our criteria focus on subject matter expertise, communication skills, and a passion for success. When you work with a <span className="text-white font-bold">{settings.company_name}</span> expert, you're working with a proven leader in their field.
-                        </p>
-                    </div>
-                    <div className="space-y-6">
-                        <h2 className="text-xl font-black uppercase tracking-widest text-emerald-400">Our Commitment</h2>
-                        <p className="text-lg text-slate-400 leading-relaxed">
-                            Integrity is the cornerstone of our service. Our experts provide original research, guidance, and high-quality deliverables that serve as powerful tools to help you master your goals.
+                    <div className="space-y-8 md:faded-line-l md:pl-16">
+                        <div className="w-12 h-1 bg-[#10b981]"></div>
+                        <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Verified Entities</h3>
+                        <p className="text-white/40 text-lg font-medium leading-relaxed uppercase tracking-tight">
+                            All transacting parties undergo rigorous KYC/KYB screening to maintain the integrity of the professional network.
                         </p>
                     </div>
                 </div>
 
-                <div className="pt-12">
-                    <button className="group flex items-center gap-4 bg-emerald-500 text-[#0f172a] px-10 py-6 rounded-full font-black uppercase tracking-widest text-sm hover:bg-white transition-all duration-500">
-                        Join Our Network <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
-                    </button>
+                <div className="grid md:grid-cols-2 gap-16 py-20">
+                    <div className="space-y-8">
+                        <h2 className="text-[11px] font-black uppercase tracking-[0.5em] text-[#f59e0b]">Compliance Framework</h2>
+                        <p className="text-2xl text-white/50 leading-tight font-black uppercase tracking-tighter">
+                            We adhere to international financial standards and data protection regulations. Our systems are monitored 24/7 to ensure continuous uptime and operational security.
+                        </p>
+                    </div>
+                    <div className="space-y-8 md:faded-line-l md:pl-16">
+                        <h2 className="text-[11px] font-black uppercase tracking-[0.5em] text-[#f59e0b]">Operational Integrity</h2>
+                        <p className="text-2xl text-white/50 leading-tight font-black uppercase tracking-tighter">
+                            Integrity is the core of our infrastructure. We provide the technical tools necessary for transparent financial interactions between specialized service providers and their clients.
+                        </p>
+                    </div>
                 </div>
             </div>
         </InfoLayout>

@@ -1,76 +1,83 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import InfoLayout from '../components/InfoLayout';
-import { Check, ArrowRight } from 'lucide-react';
+import axios from 'axios';
+import { Check, ArrowRight, Mail } from 'lucide-react';
 
 const Pricing = () => {
+    const [settings, setSettings] = useState({
+        support_email: 'support@moonderiv.com'
+    });
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
+                const res = await axios.get(`${baseUrl}/api/settings`);
+                if (res.data) setSettings(prev => ({ ...prev, ...res.data }));
+            } catch (err) {
+                console.error('Failed to fetch settings:', err);
+            }
+        };
+        fetchSettings();
+    }, []);
+
     return (
-        <InfoLayout title="Transparent Pricing Guide">
-            <div className="space-y-12">
-                <p className="text-2xl text-slate-400 font-medium leading-relaxed max-w-2xl">
-                    We offer competitive, transparent pricing based on complexity and specialized requirements. <span className="text-emerald-400">Zero hidden fees.</span>
+        <InfoLayout title="Service Fee Structure">
+            <div className="space-y-32 relative z-10">
+                <p className="text-3xl md:text-5xl text-white/40 font-black leading-tight max-w-5xl tracking-tighter uppercase">
+                    Our fees are calculated based on specialized requirements and technical complexity. <span className="text-[#10b981]">Fixed rate transparency.</span>
                 </p>
 
-                <div className="grid md:grid-cols-2 gap-8 my-12">
-                    <div className="p-8 bg-slate-900/50 border border-slate-800 rounded-[2rem] space-y-6">
-                        <div className="space-y-1">
-                            <p className="text-xs font-black text-emerald-500 uppercase tracking-widest">Standard Tier</p>
-                            <h3 className="text-3xl font-black text-white">Basic Research</h3>
+                <div className="grid md:grid-cols-2 gap-16 py-20 faded-line-y">
+                    <div className="space-y-12">
+                        <div className="space-y-4">
+                            <p className="text-[10px] font-black text-[#10b981] uppercase tracking-[0.6em]">Base Protocol</p>
+                            <h3 className="text-5xl font-black text-white tracking-tighter uppercase">Tier I</h3>
                         </div>
-                        <p className="text-5xl font-black text-white">$15 <span className="text-sm text-slate-600 font-bold uppercase tracking-widest">/ Unit</span></p>
-                        <ul className="space-y-4 pt-4 border-t border-slate-800">
-                            {['Standard Research', 'High Quality Delivery', 'Professional Formatting', '7-Day Support'].map(item => (
-                                <li key={item} className="flex items-center gap-3 text-sm font-bold text-slate-400">
-                                    <Check size={18} className="text-emerald-500" /> {item}
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-7xl font-black text-white">$15</span>
+                            <span className="text-xs text-white/20 font-black uppercase tracking-[0.2em]">/ Unit</span>
+                        </div>
+                        <ul className="space-y-6 pt-12 faded-line-t">
+                            {['Standard Processing', 'Technical Verification', 'Automated Receipts', 'L1 Support'].map(item => (
+                                <li key={item} className="flex items-center gap-4 text-[13px] font-black text-white/30 uppercase tracking-tight hover:text-white transition-colors">
+                                    <div className="w-1.5 h-1.5 bg-[#10b981] rounded-full"></div> {item}
                                 </li>
                             ))}
                         </ul>
                     </div>
                     
-                    <div className="p-8 bg-white text-[#0f172a] rounded-[2rem] space-y-6 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 bg-emerald-500 px-6 py-2 rounded-bl-2xl text-[10px] font-black uppercase tracking-widest">
-                            Recommended
+                    <div className="space-y-12 md:faded-line-l md:pl-16">
+                        <div className="space-y-4">
+                            <p className="text-[10px] font-black text-[#f59e0b] uppercase tracking-[0.6em]">Advanced Protocol</p>
+                            <h3 className="text-5xl font-black text-white tracking-tighter uppercase">Tier II</h3>
                         </div>
-                        <div className="space-y-1">
-                            <p className="text-xs font-black text-slate-500 uppercase tracking-widest">Premium Tier</p>
-                            <h3 className="text-3xl font-black">Advanced Analysis</h3>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-7xl font-black text-white">$25</span>
+                            <span className="text-xs text-white/20 font-black uppercase tracking-[0.2em]">/ Unit</span>
                         </div>
-                        <p className="text-5xl font-black">$25 <span className="text-sm text-slate-400 font-bold uppercase tracking-widest">/ Unit</span></p>
-                        <ul className="space-y-4 pt-4 border-t border-slate-100">
-                            {['Advanced Analysis', 'Premium Quality', 'Senior Level Expert', 'Priority Delivery'].map(item => (
-                                <li key={item} className="flex items-center gap-3 text-sm font-black uppercase tracking-tight">
-                                    <Check size={18} className="text-emerald-500" /> {item}
+                        <ul className="space-y-6 pt-12 faded-line-t">
+                            {['Priority Ledger Entry', 'Complex Logic Verification', 'Extended Audit Logs', 'Expedited Settlement'].map(item => (
+                                <li key={item} className="flex items-center gap-4 text-[13px] font-black text-white/30 uppercase tracking-tight hover:text-white transition-colors">
+                                    <div className="w-1.5 h-1.5 bg-[#f59e0b] rounded-full"></div> {item}
                                 </li>
                             ))}
                         </ul>
                     </div>
                 </div>
 
-                <div className="space-y-8">
-                    <h2 className="text-xl font-black uppercase tracking-widest text-emerald-400">Price Factors</h2>
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <div className="space-y-2">
-                            <p className="text-white font-black uppercase tracking-widest text-xs">Deadline</p>
-                            <p className="text-slate-500 text-sm font-medium">Urgent projects require priority allocation.</p>
-                        </div>
-                        <div className="space-y-2">
-                            <p className="text-white font-black uppercase tracking-widest text-xs">Complexity</p>
-                            <p className="text-slate-500 text-sm font-medium">Technical mastery levels influence tier selection.</p>
-                        </div>
-                        <div className="space-y-2">
-                            <p className="text-white font-black uppercase tracking-widest text-xs">Volume</p>
-                            <p className="text-slate-500 text-sm font-medium">Bulk projects qualify for custom discounts.</p>
-                        </div>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-12 py-20 faded-line-b">
+                    <div className="max-w-xl space-y-4">
+                        <p className="text-4xl font-black uppercase tracking-tighter text-white leading-none">High-Volume Settlement</p>
+                        <p className="text-white/30 font-black uppercase text-lg tracking-tighter">Customized fee structures for enterprise-scale transaction cycles requiring dedicated infrastructure.</p>
                     </div>
-                </div>
-
-                <div className="bg-emerald-500 p-8 rounded-[2rem] flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="text-[#0f172a]">
-                        <p className="text-2xl font-black uppercase tracking-tighter">Bulk Discounts Available</p>
-                        <p className="font-bold opacity-80">Save up to 20% on ongoing projects.</p>
-                    </div>
-                    <button className="bg-[#0f172a] text-white px-8 py-4 rounded-full font-black uppercase tracking-widest text-xs flex items-center gap-2 hover:gap-4 transition-all">
-                        Contact Sales <ArrowRight size={16} />
-                    </button>
+                    <a 
+                        href={`mailto:${settings.support_email}?subject=Enterprise Settlement Inquiry`}
+                        className="modern-action-white text-xl hover:gap-8"
+                    >
+                        Initiate Inquiry
+                        <ArrowRight size={24} />
+                    </a>
                 </div>
             </div>
         </InfoLayout>

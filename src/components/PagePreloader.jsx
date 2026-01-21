@@ -26,18 +26,18 @@ const PagePreloader = ({ children }) => {
 
     if (isLoading) {
         return (
-            <div className="fixed inset-0 z-[100] bg-[#0f172a] flex flex-col items-center justify-center">
-                <div className="relative mb-8">
-                    <div className="w-24 h-24 border-[1px] border-slate-800 border-t-emerald-500 rounded-full animate-spin"></div>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <ShieldCheck className="text-emerald-500" size={32} />
+            <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center">
+                <div className="relative mb-12">
+                    <div className="w-24 h-24 border-[2px] border-white/5 border-t-[#10b981] rounded-full animate-spin"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-12 h-12 bg-[#10b981]/10 rounded-full blur-xl animate-pulse"></div>
                     </div>
                 </div>
-                <div className="flex flex-col items-center space-y-2">
-                    <h2 className="text-sm font-black text-white uppercase tracking-[0.4em]">{companyName}</h2>
-                    <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                        <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Secure Connection Active</p>
+                <div className="flex flex-col items-center space-y-6">
+                    <h2 className="text-[13px] font-black text-white uppercase tracking-[0.8em] ml-[0.8em]">{companyName}</h2>
+                    <div className="flex items-center gap-4 px-6 py-2 bg-white/5 border border-white/10 rounded-full">
+                        <div className="w-2 h-2 bg-[#10b981] rounded-full shadow-[0_0_10px_#10b981]"></div>
+                        <p className="text-[10px] font-black text-white uppercase tracking-[0.4em]">Protocol Active</p>
                     </div>
                 </div>
             </div>

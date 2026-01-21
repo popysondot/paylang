@@ -3,16 +3,18 @@ import { usePaystackPayment } from 'react-paystack';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 import { ShieldCheck, ArrowRight, CreditCard, Mail, User, DollarSign, AlertCircle, Lock, ChevronRight } from 'lucide-react';
+import { useToast } from '../components/Toast';
 
 const PaymentPage = () => {
+    const { addToast } = useToast();
     const [email, setEmail] = useState('');
     const [amount, setAmount] = useState('');
     const [name, setName] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
     const [envError, setEnvError] = useState('');
     const [settings, setSettings] = useState({
-        company_name: 'Payment Hub',
-        service_name: 'Professional Services',
+        company_name: 'Direct Settlement',
+        service_name: 'System Protocol',
     });
     
     const navigate = useNavigate();
@@ -39,7 +41,7 @@ const PaymentPage = () => {
         const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
         if (!paystackKey || !backendUrl) {
-            setEnvError('Configuration missing. Please set VITE_PAYSTACK_PUBLIC_KEY and VITE_BACKEND_URL.');
+            setEnvError('Configuration missing.');
         }
     }, [location]);
 
@@ -52,24 +54,31 @@ const PaymentPage = () => {
         amount: parseFloat(amount) * 100,
         publicKey: paystackKey,
         currency: 'USD',
+        metadata: {
+            custom_fields: [
+                {
+                    display_name: "Customer Name",
+                    variable_name: "customer_name",
+                    value: name
+                }
+            ]
+        }
     };
 
     const initializePayment = usePaystackPayment(config);
 
     const onSuccess = (reference) => {
         setIsProcessing(true);
-        axios.post(`${backendUrl.replace(/\/$/, '')}/api/verify-payment`, {
+        navigate('/thank-you', { state: { reference: reference.reference, amount, email, name } });
+
+        const cleanBackendUrl = (backendUrl || '').replace(/\/$/, '');
+        axios.post(`${cleanBackendUrl}/api/verify-payment`, {
             reference: reference.reference,
             email: email,
             amount: amount,
             name: name
-        }).then(res => {
-            if (res.data.status === 'success') {
-                navigate('/thank-you', { state: { reference: reference.reference, amount, email, name } });
-            }
         }).catch(err => {
-            setIsProcessing(false);
-            alert('Verification pending. Please check your email.');
+            console.error('Verification failed:', err.message);
         });
     };
 
@@ -77,7 +86,7 @@ const PaymentPage = () => {
         e.preventDefault();
         if (!paystackKey || !backendUrl) return;
         if (!email || !amount || !name) {
-            alert('Please fill in all fields');
+            addToast('Missing identity or amount', 'error');
             return;
         }
         initializePayment(onSuccess, () => setIsProcessing(false));
@@ -85,137 +94,132 @@ const PaymentPage = () => {
 
     if (isProcessing) {
         return (
-            <div className="min-h-screen bg-[#0f172a] flex flex-col items-center justify-center p-6">
-                <div className="w-12 h-12 border-2 border-slate-800 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Encrypting Transaction</p>
+            <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6">
+                <div className="w-24 h-24 border-[2px] border-white/5 border-t-[#10b981] rounded-full animate-spin mb-8"></div>
+                <p className="text-[11px] font-black text-white uppercase tracking-[0.8em] ml-[0.8em]">VALIDATING_SESSION</p>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#0f172a] text-slate-100 selection:bg-emerald-500/30 overflow-x-hidden flex flex-col">
+        <div className="min-h-screen bg-black text-white selection:bg-[#10b981]/30 overflow-x-hidden flex flex-col font-sans relative">
+            {/* Background Atmosphere */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#10b981]/5 blur-[120px] rounded-full animate-pulse"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#f59e0b]/3 blur-[120px] rounded-full"></div>
+            </div>
+
             {/* Nav */}
-            <nav className="w-full max-w-[1400px] mx-auto px-6 py-8 flex justify-between items-center relative z-10">
-                <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                        <ShieldCheck className="text-[#0f172a]" size={20} />
-                    </div>
-                    <span className="text-xs font-black uppercase tracking-[0.2em]">{settings.company_name}</span>
+            <nav className="w-full max-w-[1400px] mx-auto px-8 py-10 flex justify-between items-center relative z-10 faded-line-b">
+                <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-6 bg-[#10b981] rounded-full"></div>
+                    <span className="text-[11px] font-black uppercase tracking-[0.4em]">{settings.company_name}</span>
                 </div>
-                <Link to="/orders" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-400 transition-colors">
-                    Dashboard
-                </Link>
+                <div className="flex items-center gap-8">
+                    {envError && (
+                        <span className="text-[9px] font-black uppercase tracking-widest text-[#f59e0b]">{envError}</span>
+                    )}
+                    <Link to="/orders" className="modern-action-white hover:opacity-100">
+                        DASHBOARD
+                    </Link>
+                </div>
             </nav>
 
-            <main className="flex-1 w-full max-w-[1400px] mx-auto px-6 grid lg:grid-cols-12 gap-12 items-center py-12 md:py-20">
-                {/* Text Content */}
-                <div className="lg:col-span-7 space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                    <div className="space-y-4">
-                        <p className="text-emerald-400 text-xs font-black uppercase tracking-[0.3em]">Secure Gateway</p>
-                        <h1 className="text-6xl md:text-8xl xl:text-[120px] font-black tracking-tighter leading-[0.85] text-white">
-                            Pay for <br />
-                            <span className="text-slate-800 outline-text">{settings.service_name.split(' ')[0]}</span> <br />
-                            Services.
+            <main className="flex-1 w-full max-w-[1400px] mx-auto px-8 grid lg:grid-cols-2 gap-24 items-center py-20 relative z-10">
+                {/* Hero Section */}
+                <div className="space-y-12 animate-in fade-in slide-in-from-left-8 duration-1000">
+                    <div className="space-y-8">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-[1px] bg-[#f59e0b] rounded-full"></div>
+                            <p className="text-[#f59e0b] text-[10px] font-black uppercase tracking-[0.5em]">SETTLEMENT PROTOCOL</p>
+                        </div>
+                        <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none uppercase">
+                            Secure <br />
+                            <span className="text-white/50">Settlement.</span>
                         </h1>
                     </div>
-                    
-                    <p className="text-lg md:text-xl text-slate-500 font-medium max-w-xl leading-relaxed">
-                        The minimal hub for <span className="text-slate-300">{settings.company_name}</span> clients. Encrypted, fast, and secure.
-                    </p>
 
-                    <div className="hidden md:flex items-center gap-12 pt-4">
-                        <div className="space-y-1">
-                            <p className="text-sm font-black text-white">Level 1</p>
-                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">PCI Compliance</p>
-                        </div>
-                        <div className="w-px h-8 bg-slate-800"></div>
-                        <div className="space-y-1">
-                            <p className="text-sm font-black text-white">AES-256</p>
-                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">SSL Encryption</p>
-                        </div>
-                    </div>
+                    <p className="text-xl text-green-700 font-black max-w-sm leading-tight border-l-2 border-[#10b981] pl-8 uppercase tracking-tighter">
+                        Authorized payment gateway for <span className="text-yellow-600">{settings.company_name}</span> institutional transactions.
+                    </p>
                 </div>
 
-                {/* Form Section */}
-                <div className="lg:col-span-5 w-full animate-in fade-in slide-in-from-right-8 duration-1000 delay-200">
-                    <form onSubmit={handlePayment} className="space-y-10 md:space-y-14">
-                        <div className="space-y-8 md:space-y-12">
-                            <div className="group relative">
-                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest block mb-2 transition-colors group-focus-within:text-emerald-400">Client Name</label>
-                                <input 
-                                    type="text" 
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    className="w-full bg-transparent border-b-2 border-slate-800 focus:border-emerald-500 py-3 outline-none text-2xl md:text-3xl font-black transition-all placeholder:text-slate-800"
-                                    placeholder="Enter full name"
-                                    required
-                                />
-                            </div>
-
-                            <div className="group relative">
-                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest block mb-2 transition-colors group-focus-within:text-emerald-400">Email Address</label>
-                                <input 
-                                    type="email" 
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full bg-transparent border-b-2 border-slate-800 focus:border-emerald-500 py-3 outline-none text-2xl md:text-3xl font-black transition-all placeholder:text-slate-800"
-                                    placeholder="your@email.com"
-                                    required
-                                />
-                            </div>
-
-                            <div className="group relative">
-                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest block mb-2 transition-colors group-focus-within:text-emerald-400">Amount (USD)</label>
-                                <div className="flex items-end gap-3">
-                                    <span className="text-3xl md:text-5xl font-black text-slate-800 group-focus-within:text-emerald-500 transition-colors mb-2">$</span>
+                {/* Interaction Section */}
+                <div className="animate-in fade-in slide-in-from-right-8 duration-1000 delay-200">
+                    <div className="relative group">
+                        <form onSubmit={handlePayment} className="relative space-y-12">
+                            <div className="space-y-12">
+                                <div className="group relative">
+                                    <label className="text-[9px] font-black text-white uppercase tracking-[0.4em] block mb-2 group-focus-within:text-[#10b981] transition-all">Entity Identity</label>
                                     <input 
-                                        type="number" 
-                                        value={amount}
-                                        onChange={(e) => setAmount(e.target.value)}
-                                        className="flex-1 bg-transparent border-b-2 border-slate-800 focus:border-emerald-500 py-3 outline-none text-5xl md:text-7xl font-black transition-all placeholder:text-slate-800"
-                                        placeholder="00"
+                                        type="text" 
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        className="w-full bg-transparent faded-line-b py-6 outline-none text-xl font-black transition-all placeholder:text-white/20 uppercase text-white focus:border-[#10b981]"
+                                        placeholder="UID"
                                         required
-                                        step="0.01"
-                                        min="0"
                                     />
                                 </div>
-                            </div>
-                        </div>
 
-                        <button 
-                            type="submit"
-                            className="group w-full flex items-center justify-between bg-emerald-500 hover:bg-white text-[#0f172a] px-8 py-6 md:py-8 rounded-full transition-all duration-500 shadow-2xl shadow-emerald-500/20"
-                        >
-                            <span className="text-xl md:text-2xl font-black uppercase tracking-tighter">Initiate Payment</span>
-                            <ArrowRight size={32} className="group-hover:translate-x-2 transition-transform duration-500" />
-                        </button>
-                    </form>
+                                <div className="group relative">
+                                    <label className="text-[9px] font-black textwhite/20 uppercase tracking-[0.4em] block mb-2 group-focus-within:text-[#10b981] transition-all">Email Address</label> 
+                                    <input 
+                                        type="email" 
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full bg-transparent faded-line-b py-6 outline-none text-xl font-black transition-all placeholder:text-white/20 text-white focus:border-[#10b981]"
+                                        placeholder="company@domain.com"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="group relative">
+                                    <label className="text-[9px] font-black text-white uppercase tracking-[0.4em] block mb-2">Settlement Value (USD)</label>
+                                    <div className="flex items-center gap-6 faded-line-b focus-within:border-[#f59e0b] transition-all pb-2">
+                                        <span className="text-4xl font-black text-green-500">$</span>
+                                        <input 
+                                            type="number" 
+                                            value={amount}
+                                            onChange={(e) => setAmount(e.target.value)}
+                                            className="flex-1 bg-transparent border-none outline-none text-5xl md:text-5xl font-black transition-all placeholder:text-green-500 text-green-500 tracking-tighter"
+                                            placeholder="0.00"
+                                            required
+                                            step="0.01"
+                                            min="0"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button 
+                                type="submit"
+                                className="modern-action-green text-3xl hover:gap-10 w-full justify-center gap-4 py-4 underline"
+                            >
+                                <span>Initialize Payment</span>
+                                <ArrowRight size={20} />
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </main>
 
             {/* Footer */}
-            <footer className="w-full max-w-[1400px] mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-slate-900/50 mt-auto">
-                <div className="flex gap-8 text-[10px] font-black uppercase tracking-widest text-slate-700">
-                    <a href="/terms-of-service" className="hover:text-slate-400">Terms</a>
-                    <a href="/privacy-policy" className="hover:text-slate-400">Privacy</a>
-                    <a href="/refund" className="hover:text-slate-400">Refunds</a>
+            <footer className="w-full max-w-[1400px] mx-auto px-8 py-16 flex flex-col md:flex-row justify-between items-end gap-12 faded-line-t mt-auto relative z-10">
+                <div className="flex flex-col md:flex-row gap-8 text-[9px] font-black uppercase tracking-[0.4em] text-white/40">
+                    <Link to="/terms-of-service" className="hover:text-white transition-colors">TERMS</Link>
+                    <Link to="/privacy-policy" className="hover:text-white transition-colors">INTEGRITY</Link>
+                    <Link to="/refund" className="hover:text-[#f59e0b] transition-colors">ADJUSTMENT</Link>
                 </div>
-                <p className="text-[10px] font-bold text-slate-800 uppercase tracking-widest">
-                    © {new Date().getFullYear()} {settings.company_name}. Secure Checkout.
-                </p>
+                <div className="text-right space-y-4">
+                    <p className="text-[9px] font-black text-orange-300 uppercase tracking-[0.6em]">
+                        © {new Date().getFullYear()} {settings.company_name} // NODE_{config.reference.slice(-4)}
+                    </p>
+                    <div className="flex items-center justify-end gap-3">
+                        <div className="w-1.5 h-1.5 bg-[#10b981] rounded-full animate-pulse shadow-[0_0_10px_#10b981]"></div>
+                        <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/40">SYSTEM_NOMINAL</span>
+                    </div>
+                </div>
             </footer>
-
-            <style jsx>{`
-                .outline-text {
-                    -webkit-text-stroke: 1px #334155;
-                    color: transparent;
-                }
-                @media (min-width: 1024px) {
-                    .outline-text {
-                        -webkit-text-stroke: 2px #334155;
-                    }
-                }
-            `}</style>
         </div>
     );
 };

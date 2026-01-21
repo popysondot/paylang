@@ -11,7 +11,7 @@ const CustomerDashboard = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [searched, setSearched] = useState(false);
-    const [settings, setSettings] = useState({ company_name: 'Payment Hub' });
+    const [settings, setSettings] = useState({ company_name: 'Secure Portal' });
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -30,7 +30,7 @@ const CustomerDashboard = () => {
     const handleSearch = async (e) => {
         e.preventDefault();
         if (!email) {
-            setError('Please enter your email');
+            setError('Account email required');
             return;
         }
 
@@ -39,13 +39,14 @@ const CustomerDashboard = () => {
         setSearched(true);
 
         try {
-            const baseUrl = import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
+            const rawUrl = import.meta.env.VITE_BACKEND_URL;
+            const baseUrl = rawUrl.replace(/\/$/, '');
             const res = await axios.get(`${baseUrl}/api/customer/orders/${email}`);
             setOrders(res.data.payments || []);
             setRefunds(res.data.refunds || []);
             setLoading(false);
         } catch (err) {
-            setError('No orders found for this email. Please check and try again.');
+            setError('No records found for the provided identity.');
             setOrders([]);
             setRefunds([]);
             setLoading(false);
@@ -59,65 +60,82 @@ const CustomerDashboard = () => {
     const getStatusColor = (status) => {
         switch (status?.toLowerCase()) {
             case 'success':
-                return 'text-emerald-400';
+                return 'text-[#10b981]';
             case 'pending':
-                return 'text-amber-400';
+                return 'text-[#f59e0b]';
             case 'approved':
-                return 'text-blue-400';
+                return 'text-white';
             case 'rejected':
-                return 'text-red-400';
+                return 'text-red-600';
             default:
-                return 'text-slate-500';
+                return 'text-zinc-500';
         }
     };
 
     if (selectedOrder) {
         const orderRefunds = getRefundsForOrder(selectedOrder.id);
         return (
-            <div className="min-h-screen bg-[#0f172a] text-slate-100 selection:bg-emerald-500/30 overflow-x-hidden flex flex-col">
-                <nav className="w-full max-w-[1400px] mx-auto px-6 py-8 flex justify-between items-center">
-                    <button onClick={() => setSelectedOrder(null)} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-400 transition-colors">
-                        <ArrowLeft size={14} /> Back to List
-                    </button>
-                    <span className="text-xs font-black uppercase tracking-[0.2em]">{settings.company_name}</span>
-                </nav>
+            <div className="min-h-screen bg-black text-white selection:bg-[#10b981]/30 overflow-x-hidden flex flex-col font-sans relative">
+            {/* Atmospheric Background */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#10b981]/5 blur-[120px] rounded-full animate-pulse"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#10b981]/3 blur-[120px] rounded-full"></div>
+            </div>
 
-                <main className="flex-1 w-full max-w-[1400px] mx-auto px-6 py-12 md:py-20 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                    <div className="space-y-12">
+            <nav className="w-full max-w-[1400px] mx-auto px-8 py-10 flex justify-between items-center relative z-10 faded-line-b">
+                <button onClick={() => setSelectedOrder(null)} className="modern-action-white opacity-40 hover:opacity-100 group">
+                    <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> REVERT TO LIST
+                </button>
+                <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-6 bg-[#10b981] rounded-full"></div>
+                    <span className="text-[11px] font-black uppercase tracking-[0.4em]">{settings.company_name}</span>
+                </div>
+            </nav>
+
+            <main className="flex-1 w-full max-w-[1400px] mx-auto px-8 py-16 animate-in fade-in slide-in-from-bottom-8 duration-1000 relative z-10">
+                <div className="space-y-20">
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-[1px] bg-[#10b981] rounded-full"></div>
+                            <p className="text-[#10b981] text-[10px] font-black uppercase tracking-[0.4em]">Transaction Manifest</p>
+                        </div>
+                        <h1 className="text-4xl md:text-7xl font-black tracking-tighter leading-none text-white uppercase">
+                            {selectedOrder.reference.slice(0, 8)}<span className="text-white/20">{selectedOrder.reference.slice(8)}</span>
+                        </h1>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-16 py-16 faded-line-y">
                         <div className="space-y-4">
-                            <p className="text-emerald-400 text-xs font-black uppercase tracking-[0.3em]">Transaction Detail</p>
-                            <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.85] text-white break-all">
-                                {selectedOrder.reference.slice(0, 8)}<span className="text-slate-800 outline-text">{selectedOrder.reference.slice(8)}</span>
-                            </h1>
+                            <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] block">Settlement Value</span>
+                            <p className="text-5xl font-black text-white leading-none tracking-tighter">${Number(selectedOrder.amount).toFixed(2)}</p>
                         </div>
-
-                        <div className="grid md:grid-cols-3 gap-12 pt-12 border-t border-slate-900">
-                            <div className="space-y-2">
-                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest block">Amount Paid</span>
-                                <p className="text-5xl font-black text-white leading-none">${Number(selectedOrder.amount).toFixed(2)}</p>
-                            </div>
-                            <div className="space-y-2">
-                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest block">Status</span>
-                                <p className={`text-xl font-black uppercase tracking-tighter ${getStatusColor(selectedOrder.status)}`}>{selectedOrder.status}</p>
-                            </div>
-                            <div className="space-y-2">
-                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest block">Date</span>
-                                <p className="text-xl font-black text-white">{new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
+                        <div className="space-y-4 md:faded-line-l md:pl-16">
+                            <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] block">Protocol Status</span>
+                            <div className="inline-block">
+                                <p className={`text-xl font-black uppercase tracking-widest ${getStatusColor(selectedOrder.status)}`}>{selectedOrder.status}</p>
                             </div>
                         </div>
+                        <div className="space-y-4 md:faded-line-l md:pl-16">
+                            <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] block">Timestamp</span>
+                            <p className="text-2xl font-black text-white uppercase tracking-tighter">{new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
+                        </div>
+                    </div>
 
                         {orderRefunds.length > 0 && (
-                            <div className="space-y-8 pt-12">
-                                <h2 className="text-xl font-black uppercase tracking-widest text-emerald-400">Refund History</h2>
-                                <div className="space-y-4">
+                            <div className="space-y-10">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-8 h-[1px] bg-[#f59e0b] rounded-full"></div>
+                                    <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[#f59e0b]">Adjustment History</h2>
+                                </div>
+                                <div className="space-y-1">
                                     {orderRefunds.map((refund) => (
-                                        <div key={refund.id} className="bg-slate-900/50 border border-slate-800 p-8 rounded-[2rem] flex flex-col md:flex-row justify-between gap-6">
-                                            <div className="space-y-2">
-                                                <p className="text-xs font-black text-slate-600 uppercase tracking-widest">Requested on {new Date(refund.createdAt).toLocaleDateString()}</p>
-                                                <p className="text-lg font-medium text-slate-300">{refund.reason}</p>
+                                        <div key={refund.id} className="py-10 faded-line-b flex flex-col md:flex-row justify-between gap-12 group">
+                                            <div className="space-y-4 flex-1">
+                                                <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Requested: {new Date(refund.createdAt).toLocaleDateString()}</p>
+                                                <p className="text-3xl font-black text-white uppercase tracking-tighter leading-tight group-hover:text-[#f59e0b] transition-colors">{refund.reason}</p>
                                             </div>
                                             <div className="flex items-center">
-                                                <span className={`text-sm font-black uppercase tracking-widest ${getStatusColor(refund.status)}`}>{refund.status}</span>
+                                                <span className={`text-xl font-black uppercase tracking-widest ${getStatusColor(refund.status)}`}>{refund.status}</span>
                                             </div>
                                         </div>
                                     ))}
@@ -129,78 +147,71 @@ const CustomerDashboard = () => {
                             <div className="pt-12">
                                 <button 
                                     onClick={() => navigate('/refund')}
-                                    className="group flex items-center gap-4 bg-emerald-500 text-[#0f172a] px-8 py-4 rounded-full font-black uppercase tracking-widest text-xs hover:bg-white transition-all duration-500"
+                                    className="modern-action-orange text-xl hover:gap-8"
                                 >
-                                    Request Refund <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
+                                    Initiate Adjustment Appeal
+                                    <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
                                 </button>
                             </div>
                         )}
                     </div>
                 </main>
-
-                <style jsx>{`
-                    .outline-text {
-                        -webkit-text-stroke: 1px #334155;
-                        color: transparent;
-                    }
-                `}</style>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#0f172a] text-slate-100 selection:bg-emerald-500/30 overflow-x-hidden flex flex-col">
-            <nav className="w-full max-w-[1400px] mx-auto px-6 py-8 flex justify-between items-center relative z-10">
-                <Link to="/" className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                        <ShieldCheck className="text-[#0f172a]" size={20} />
-                    </div>
-                    <span className="text-xs font-black uppercase tracking-[0.2em]">{settings.company_name}</span>
+        <div className="min-h-screen bg-black text-white selection:bg-[#10b981]/30 overflow-x-hidden flex flex-col font-sans">
+            <nav className="w-full max-w-[1400px] mx-auto px-8 py-10 flex justify-between items-center relative z-10 faded-line-b">
+                <Link to="/" className="flex items-center gap-4">
+                    <div className="w-2 h-8 bg-[#10b981] rounded-full"></div>
+                    <span className="text-[11px] font-black uppercase tracking-[0.4em]">{settings.company_name}</span>
                 </Link>
-                <Link to="/" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-400 transition-colors">
-                    Back to Hub
+                <Link to="/" className="modern-action-white opacity-40 hover:opacity-100 group">
+                    <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> REVERT TO HUB
                 </Link>
             </nav>
 
-            <main className="flex-1 w-full max-w-[1400px] mx-auto px-6 py-12 md:py-20 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                <div className="max-w-4xl space-y-12">
-                    <div className="space-y-4">
-                        <p className="text-emerald-400 text-xs font-black uppercase tracking-[0.3em]">Client Portal</p>
-                        <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.85] text-white">
+            <main className="flex-1 w-full max-w-[1400px] mx-auto px-8 py-20 animate-in fade-in slide-in-from-bottom-8 duration-1000 relative z-10">
+                <div className="max-w-5xl space-y-24">
+                    <div className="space-y-8">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-[1px] bg-[#10b981] rounded-full"></div>
+                            <p className="text-[#10b981] text-[10px] font-black uppercase tracking-[0.5em]">ENTITY PORTAL</p>
+                        </div>
+                        <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none text-white uppercase">
                             Order <br />
-                            <span className="text-slate-800 outline-text">Tracking.</span>
+                            <span className="text-white/20">Tracking.</span>
                         </h1>
-                        <p className="text-xl text-slate-500 font-medium pt-4">Search your transaction history by email.</p>
+                        <p className="text-lg text-white/40 font-black uppercase tracking-tighter pt-4 max-w-xl">Search transaction ledger by registered digital signature.</p>
                     </div>
 
                     {!searched ? (
-                        <div className="pt-12">
-                            <form onSubmit={handleSearch} className="relative group max-w-xl">
-                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest block mb-4 group-focus-within:text-emerald-400">Email Address</label>
-                                <div className="flex flex-col md:flex-row gap-6">
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="your@email.com"
-                                        className="flex-1 bg-transparent border-b-2 border-slate-800 focus:border-emerald-500 py-4 outline-none text-2xl md:text-4xl font-black transition-all placeholder:text-slate-800"
-                                        required
-                                    />
-                                    <button
-                                        type="submit"
-                                        className="bg-emerald-500 text-[#0f172a] px-10 py-4 rounded-full font-black uppercase tracking-widest text-xs hover:bg-white transition-all duration-500 flex items-center justify-center gap-2"
-                                    >
-                                        Search <Search size={16} />
-                                    </button>
-                                </div>
+                        <div className="relative group max-w-2xl">
+                            <form onSubmit={handleSearch} className="relative py-6 flex flex-col md:flex-row gap-8 items-center faded-line-b focus-within:border-[#10b981]/50 transition-colors">
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="ENTER REGISTERED EMAIL"
+                                    className="flex-1 bg-transparent py-5 outline-none text-2xl md:text-3xl font-black transition-all placeholder:text-white/10 text-white uppercase tracking-tighter"
+                                    required
+                                />
+                                <button
+                                    type="submit"
+                                    className="modern-action-green text-lg whitespace-nowrap"
+                                >
+                                    Execute Query
+                                    <ArrowRight size={20} />
+                                </button>
                             </form>
                         </div>
                     ) : (
-                        <div className="space-y-12 pt-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                            <div className="flex justify-between items-end border-b border-slate-900 pb-8">
-                                <div className="space-y-1">
-                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Showing results for</p>
-                                    <p className="text-xl font-black text-white">{email}</p>
+                        <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-end py-10 faded-line-b gap-8">
+                                <div className="space-y-3">
+                                    <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Query Results For</p>
+                                    <p className="text-3xl font-black text-white uppercase tracking-tighter">{email}</p>
                                 </div>
                                 <button
                                     onClick={() => {
@@ -209,76 +220,58 @@ const CustomerDashboard = () => {
                                         setOrders([]);
                                         setRefunds([]);
                                     }}
-                                    className="text-[10px] font-black text-emerald-400 uppercase tracking-widest hover:text-white transition-colors"
+                                    className="modern-action-white opacity-40 hover:opacity-100"
                                 >
-                                    Change Email
+                                    Reset Query
                                 </button>
                             </div>
 
                             {loading && (
-                                <div className="py-20 flex flex-col items-center">
-                                    <div className="w-12 h-12 border-2 border-slate-800 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
-                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Querying Ledger</p>
+                                <div className="py-24 flex flex-col items-center space-y-8">
+                                    <div className="w-16 h-16 border-2 border-white/10 border-t-[#10b981] rounded-full animate-spin"></div>
+                                    <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em]">Syncing Ledger</p>
                                 </div>
                             )}
 
                             {error && (
-                                <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-8 rounded-[2rem] flex items-center gap-4">
-                                    <AlertCircle size={24} />
-                                    <p className="font-bold">{error}</p>
+                                <div className="py-12 space-y-4">
+                                    <p className="font-black uppercase tracking-[0.3em] text-[10px] text-red-500/60">Query Fault</p>
+                                    <p className="text-3xl font-black tracking-tighter uppercase text-red-500">{error}</p>
                                 </div>
                             )}
 
                             {!loading && orders.length === 0 && !error && (
-                                <div className="py-20 text-center space-y-4">
-                                    <Package size={48} className="text-slate-800 mx-auto" />
-                                    <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">No records found</p>
+                                <div className="py-24 text-center space-y-4">
+                                    <p className="text-white/20 font-black uppercase tracking-[0.5em] text-[10px]">Zero Records Retained</p>
                                 </div>
                             )}
 
                             {!loading && orders.length > 0 && (
-                                <div className="grid grid-cols-1 gap-4">
+                                <div className="space-y-1">
                                     {orders.map((order) => {
-                                        const orderRefunds = getRefundsForOrder(order.id);
                                         return (
                                             <div
                                                 key={order.id}
                                                 onClick={() => setSelectedOrder(order)}
-                                                className="group bg-slate-900/30 border border-slate-800 p-8 rounded-[2rem] hover:border-emerald-500 transition-all cursor-pointer flex flex-col md:flex-row justify-between items-start md:items-center gap-8"
+                                                className="group py-12 faded-line-b flex flex-col md:flex-row justify-between items-center hover:bg-white/[0.01] transition-all cursor-pointer"
                                             >
-                                                <div className="space-y-4 flex-1">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
-                                                            <Package className="text-slate-600 group-hover:text-[#0f172a]" size={20} />
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Reference</p>
-                                                            <p className="font-mono font-bold text-slate-300 break-all">{order.reference}</p>
-                                                        </div>
+                                                <div className="flex items-center gap-10 mb-8 md:mb-0">
+                                                    <div className="text-4xl font-black text-white/10 group-hover:text-[#10b981] leading-none tracking-tighter transition-colors w-20">
+                                                        {new Date(order.createdAt).getDate().toString().padStart(2, '0')}
                                                     </div>
-                                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                                                        <div>
-                                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Amount</p>
-                                                            <p className="text-2xl font-black text-white">${Number(order.amount).toFixed(2)}</p>
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Status</p>
-                                                            <p className={`text-sm font-black uppercase tracking-widest ${getStatusColor(order.status)}`}>{order.status}</p>
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Date</p>
-                                                            <p className="text-sm font-black text-slate-400">{new Date(order.createdAt).toLocaleDateString()}</p>
-                                                        </div>
-                                                        {orderRefunds.length > 0 && (
-                                                            <div>
-                                                                <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1">Refunds</p>
-                                                                <p className="text-sm font-black text-amber-500">{orderRefunds.length} Actioned</p>
-                                                            </div>
-                                                        )}
+                                                    <div>
+                                                        <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] mb-1 transition-colors">Reference</p>
+                                                        <p className="font-black text-white uppercase tracking-tighter text-2xl transition-all group-hover:translate-x-2">{order.reference}</p>
                                                     </div>
                                                 </div>
-                                                <div className="bg-slate-900 px-6 py-4 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:bg-white group-hover:text-[#0f172a] transition-all flex items-center gap-2">
-                                                    Details <ArrowRight size={14} />
+                                                <div className="flex items-center gap-16 w-full md:w-auto justify-between md:justify-end">
+                                                    <div className="text-right">
+                                                        <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] transition-colors mb-1">{new Date(order.createdAt).toLocaleDateString()}</p>
+                                                        <p className="text-3xl font-black text-white tracking-tighter">${Number(order.amount).toFixed(2)}</p>
+                                                    </div>
+                                                    <div className="transition-all group-hover:translate-x-2 text-white/20 group-hover:text-[#10b981]">
+                                                        <ArrowRight size={24} />
+                                                    </div>
                                                 </div>
                                             </div>
                                         );
@@ -290,23 +283,16 @@ const CustomerDashboard = () => {
                 </div>
             </main>
 
-            <footer className="w-full max-w-[1400px] mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-slate-900/50 mt-auto">
-                <p className="text-[10px] font-bold text-slate-800 uppercase tracking-widest">
-                    © {new Date().getFullYear()} {settings.company_name}. End-to-End Encryption Enabled.
-                </p>
+            <footer className="w-full max-w-[1400px] mx-auto px-8 py-16 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-white/[0.03] mt-auto relative z-10">
+                <div className="flex items-center gap-6">
+                    <ShieldCheck size={18} className="text-[#10b981]" />
+                    <p className="text-[10px] font-black text-white/10 uppercase tracking-[0.5em]">SECURE LEDGER ACCESS PROTOCOL // {new Date().getFullYear()}</p>
+                </div>
+                <div className="flex items-center gap-10 text-[9px] font-black uppercase tracking-[0.3em] text-white/20">
+                    <Link to="/terms-of-service" className="hover:text-[#10b981] transition-colors">Protocol Terms</Link>
+                    <Link to="/privacy-policy" className="hover:text-[#10b981] transition-colors">Data Privacy</Link>
+                </div>
             </footer>
-
-            <style jsx>{`
-                .outline-text {
-                    -webkit-text-stroke: 1px #334155;
-                    color: transparent;
-                }
-                @media (min-width: 1024px) {
-                    .outline-text {
-                        -webkit-text-stroke: 2px #334155;
-                    }
-                }
-            `}</style>
         </div>
     );
 };

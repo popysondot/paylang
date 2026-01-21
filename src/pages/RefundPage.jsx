@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import InfoLayout from '../components/InfoLayout';
 import axios from 'axios';
+import { useToast } from '../components/Toast';
 import { 
     Search, 
     AlertCircle, 
@@ -13,6 +14,7 @@ import {
 } from 'lucide-react';
 
 const RefundPage = () => {
+    const { addToast } = useToast();
     const [email, setEmail] = useState('');
     const [payments, setPayments] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -52,13 +54,14 @@ const RefundPage = () => {
         }
 
         try {
-            const response = await axios.get(`${backendUrl.replace(/\/$/, '')}/api/payments/${email}`);
+            const cleanBackendUrl = (backendUrl || '').replace(/\/$/, '');
+            const response = await axios.get(`${cleanBackendUrl}/api/payments/${email}`);
             setPayments(response.data);
             if (response.data.length === 0) {
-                setStatus({ type: 'error', message: 'No payments found for this email address.' });
+                addToast('No payments found for this email', 'error');
             }
         } catch (error) {
-            setStatus({ type: 'error', message: 'Failed to fetch payments.' });
+            addToast('Failed to fetch payments', 'error');
         }
         setLoading(false);
     };
@@ -76,115 +79,117 @@ const RefundPage = () => {
         }
 
         try {
-            const response = await axios.post(`${backendUrl.replace(/\/$/, '')}/api/refund-request`, {
+            const cleanBackendUrl = (backendUrl || '').replace(/\/$/, '');
+            const response = await axios.post(`${cleanBackendUrl}/api/refund-request`, {
                 reference: selectedPayment.reference,
                 email: email,
                 reason: reason
             });
             if (response.data.status === 'success') {
-                setStatus({ type: 'success', message: 'Your refund appeal has been submitted successfully.' });
+                addToast('Refund appeal submitted successfully', 'success');
                 setSelectedPayment(null);
                 setReason('');
                 setPayments([]);
             }
         } catch (error) {
-            setStatus({ type: 'error', message: 'Failed to submit refund appeal.' });
+            addToast('Failed to submit refund appeal', 'error');
         }
         setLoading(false);
     };
 
     return (
-        <InfoLayout title="Refund Portal & Consumer Protection">
-            <div className="space-y-16">
+        <InfoLayout title="Settlement Adjustments">
+            <div className="space-y-32 relative z-10">
                 {/* Hero Policy Section */}
-                <div className="bg-slate-900/50 rounded-[2rem] p-8 md:p-12 border border-slate-800 flex flex-col md:flex-row gap-12 items-center">
-                    <div className="w-20 h-20 bg-emerald-500 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
-                        <ShieldCheck size={40} className="text-[#0f172a]" />
-                    </div>
-                    <div className="space-y-4">
-                        <h2 className="text-3xl font-black text-white tracking-tight">Our 100% Satisfaction Guarantee</h2>
-                        <p className="text-lg text-slate-400 leading-relaxed max-w-2xl">
-                            At <span className="text-white font-bold">{settings.company_name}</span>, we stand by our quality. If you're not satisfied, our transparent refund process ensures fairness. Appeals are processed by our independent audit team.
+                <div className="py-20 flex flex-col md:flex-row gap-16 faded-line-y">
+                    <div className="w-1.5 h-20 bg-gradient-to-b from-[#f59e0b] to-transparent shrink-0 relative z-10 rounded-full"></div>
+                    <div className="space-y-8 relative z-10">
+                        <h2 className="text-[10px] font-black text-[#f59e0b] tracking-[0.6em] uppercase">Financial Adjustment Policy</h2>
+                        <p className="text-3xl md:text-5xl text-white/40 font-black leading-tight max-w-5xl tracking-tighter uppercase">
+                            <span className="text-white">{settings.company_name}</span> maintains a structured protocol for transaction adjustments. Requests are evaluated based on <span className="text-[#10b981]">service delivery</span> logs.
                         </p>
                     </div>
                 </div>
 
                 {/* Steps Section */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-16 py-20 faded-line-b">
                     {[
-                        { icon: Search, title: 'Locate', desc: 'Find your transaction using email.' },
-                        { icon: FileCheck, title: 'Appeal', desc: 'Describe the issue with the service.' },
-                        { icon: LifeBuoy, title: 'Resolve', desc: 'Review and process in 48 hours.' }
+                        { title: 'Identification', desc: 'Locate the specific transaction reference.' },
+                        { title: 'Submission', desc: 'Submit a detailed adjustment request.' },
+                        { title: 'Verification', desc: 'Administrative review and processing.' }
                     ].map((step, i) => (
-                        <div key={i} className="group p-8 bg-slate-900/30 border border-slate-800 rounded-[2rem] hover:border-emerald-500 transition-all">
-                            <step.icon className="text-emerald-500 mb-6" size={32} />
-                            <h4 className="text-xl font-black text-white uppercase tracking-tight mb-2">{step.title}</h4>
-                            <p className="text-slate-500 text-sm font-medium leading-relaxed">{step.desc}</p>
+                        <div key={i} className={`space-y-8 relative ${i > 0 ? 'md:faded-line-l md:pl-16' : ''}`}>
+                            <div className="text-[10px] font-black text-white/20 tracking-[0.6em] uppercase relative z-10">Phase 0{i+1}</div>
+                            <h4 className="text-3xl font-black text-white uppercase tracking-tighter group-hover:text-[#10b981] transition-colors relative z-10">{step.title}</h4>
+                            <p className="text-white/30 text-lg font-black uppercase tracking-tighter relative z-10">{step.desc}</p>
                         </div>
                     ))}
                 </div>
 
                 {/* Search Form Container */}
-                <div className="space-y-10">
-                    <div className="flex items-center gap-4">
-                        <History className="text-emerald-500" />
-                        <h3 className="text-xl font-black uppercase tracking-widest text-white">Search History</h3>
-                    </div>
-                    
-                    <form onSubmit={fetchPayments} className="max-w-3xl space-y-6">
-                        <div className="group relative">
-                            <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest block mb-4 group-focus-within:text-emerald-400 transition-colors">Email Address</label>
-                            <div className="flex flex-col md:flex-row gap-6">
-                                <input 
-                                    type="email" 
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="Enter the email used for payment"
-                                    className="flex-1 bg-transparent border-b-2 border-slate-800 focus:border-emerald-500 py-4 outline-none text-2xl md:text-3xl font-black transition-all placeholder:text-slate-800"
-                                    required
-                                />
-                                <button 
-                                    type="submit" 
-                                    disabled={loading}
-                                    className="bg-emerald-500 text-[#0f172a] font-black px-10 py-4 rounded-full hover:bg-white transition-all disabled:opacity-50 text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/10"
-                                >
-                                    {loading ? 'Searching...' : 'Find Transactions'}
-                                    <Search size={16} />
-                                </button>
-                            </div>
+                <div className="space-y-24 py-20">
+                    <div className="space-y-12">
+                        <div className="flex items-center gap-4">
+                            <div className="w-8 h-[1px] bg-[#10b981]"></div>
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.6em] text-white/60">Transaction History Query</h3>
                         </div>
-                    </form>
+                        
+                        <form onSubmit={fetchPayments} className="max-w-4xl space-y-12">
+                            <div className="space-y-8">
+                                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] block">Entity Email Signature</label>
+                                <div className="flex flex-col md:flex-row gap-12 items-center faded-line-b py-4">
+                                    <input 
+                                        type="email" 
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="ENTER REGISTERED EMAIL"
+                                        className="flex-1 bg-transparent py-6 outline-none text-2xl md:text-3xl font-black transition-all placeholder:text-white/10 text-white uppercase tracking-tighter"
+                                        required
+                                    />
+                                    <button 
+                                        type="submit" 
+                                        disabled={loading}
+                                        className="modern-action-green text-xl whitespace-nowrap"
+                                    >
+                                        {loading ? 'Processing...' : 'Execute Search'}
+                                        <ArrowRight size={24} />
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
 
                     {status.message && (
-                        <div className={`p-8 rounded-[2rem] flex items-start gap-4 animate-in fade-in slide-in-from-top-4 duration-300 ${status.type === 'success' ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border border-red-500/20 text-red-400'}`}>
-                            {status.type === 'success' ? <CheckCircle size={24} className="flex-shrink-0" /> : <AlertCircle size={24} className="flex-shrink-0" />}
-                            <div>
-                                <p className="font-black uppercase tracking-widest text-xs mb-2">{status.type === 'success' ? 'Submission Received' : 'Attention Required'}</p>
-                                <p className="text-lg font-medium">{status.message}</p>
-                            </div>
+                        <div className="py-12 faded-line-b animate-in fade-in slide-in-from-top-4 duration-300">
+                            <p className={`font-black uppercase tracking-[0.6em] text-[10px] mb-4 ${status.type === 'success' ? 'text-[#10b981]' : 'text-[#f59e0b]'}`}>
+                                {status.type === 'success' ? 'Submission Received' : 'Attention Required'}
+                            </p>
+                            <p className="text-3xl font-black tracking-tighter text-white uppercase">{status.message}</p>
                         </div>
                     )}
 
                     {/* Transactions List */}
                     {payments.length > 0 && !selectedPayment && (
-                        <div className="space-y-6 pt-10">
-                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Found {payments.length} Transactions</p>
-                            <div className="grid grid-cols-1 gap-4">
+                        <div className="space-y-12 animate-in fade-in duration-700">
+                            <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">Found {payments.length} Registered Transactions</p>
+                            <div className="space-y-1">
                                 {payments.map((p) => (
-                                    <div key={p.id} className="group flex flex-col md:flex-row items-center justify-between p-8 bg-slate-900/30 border border-slate-800 rounded-[2rem] hover:border-emerald-500 transition-all cursor-pointer" onClick={() => setSelectedPayment(p)}>
-                                        <div className="flex items-center gap-8 mb-6 md:mb-0">
-                                            <div className="text-4xl font-black text-white leading-none">
+                                    <div key={p.id} className="group py-12 faded-line-b flex flex-col md:flex-row items-center justify-between hover:bg-white/[0.01] transition-all cursor-pointer" onClick={() => setSelectedPayment(p)}>
+                                        <div className="flex items-center gap-12 mb-8 md:mb-0">
+                                            <div className="text-5xl font-black text-white leading-none tracking-tighter group-hover:text-[#10b981] transition-colors">
                                                 ${p.amount}
                                             </div>
+                                            <div className="h-10 w-[1px] bg-white/10 hidden md:block"></div>
                                             <div>
-                                                <p className="font-black text-white uppercase tracking-tight">{settings.service_name}</p>
-                                                <p className="text-xs text-slate-500 font-mono mt-1">{p.reference}</p>
+                                                <p className="font-black text-white uppercase tracking-tighter text-2xl group-hover:translate-x-2 transition-all">{settings.service_name}</p>
+                                                <p className="text-[10px] text-white/20 font-black tracking-[0.4em] mt-2 uppercase">{p.reference}</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-8">
-                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">{new Date(p.createdAt).toLocaleDateString()}</p>
-                                            <div className="bg-slate-900 px-6 py-4 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:bg-emerald-500 group-hover:text-[#0f172a] transition-all flex items-center gap-2">
-                                                Appeal <ArrowRight size={14} />
+                                        <div className="flex items-center gap-16 w-full md:w-auto justify-between md:justify-end">
+                                            <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">{new Date(p.createdAt).toLocaleDateString()}</p>
+                                            <div className="modern-action-green opacity-40 group-hover:opacity-100 whitespace-nowrap">
+                                                Initiate Appeal
+                                                <ArrowRight size={20} />
                                             </div>
                                         </div>
                                     </div>
@@ -195,35 +200,38 @@ const RefundPage = () => {
 
                     {/* Appeal Form Section */}
                     {selectedPayment && (
-                        <div className="mt-12 bg-slate-900/50 rounded-[2rem] p-8 md:p-12 border border-emerald-500 animate-in zoom-in-95 duration-300">
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 pb-12 border-b border-slate-800">
-                                <div className="space-y-2">
-                                    <p className="text-emerald-400 text-xs font-black uppercase tracking-[0.3em]">Official Appeal</p>
-                                    <h3 className="text-4xl font-black text-white tracking-tighter">File a Request</h3>
-                                    <p className="text-sm font-mono text-slate-500">Ref: {selectedPayment.reference}</p>
+                        <div className="py-20 animate-in zoom-in-95 duration-500">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12 mb-20 faded-line-b pb-12">
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-8 h-[1px] bg-[#10b981]"></div>
+                                        <p className="text-[#10b981] text-[10px] font-black uppercase tracking-[0.6em]">Official Appeal Interface</p>
+                                    </div>
+                                    <h3 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase leading-none">Adjustment <br /> Request</h3>
+                                    <p className="text-[10px] font-black text-white/20 tracking-[0.4em] uppercase">Ref: {selectedPayment.reference}</p>
                                 </div>
-                                <button onClick={() => setSelectedPayment(null)} className="text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-red-400 transition-colors">Discard Request</button>
+                                <button onClick={() => setSelectedPayment(null)} className="modern-action-white opacity-40 hover:opacity-100">Discard Request</button>
                             </div>
 
-                            <form onSubmit={handleRefundRequest} className="space-y-12">
-                                <div className="grid md:grid-cols-2 gap-8">
-                                    <div className="bg-slate-900/50 p-8 rounded-2xl border border-slate-800">
-                                        <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-2">Transaction Value</p>
-                                        <p className="text-4xl font-black text-white leading-none">${selectedPayment.amount}</p>
+                            <form onSubmit={handleRefundRequest} className="space-y-20">
+                                <div className="grid md:grid-cols-2 gap-16 py-12 faded-line-y">
+                                    <div className="space-y-4">
+                                        <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">Transaction Value</p>
+                                        <p className="text-6xl font-black text-white leading-none tracking-tighter">${selectedPayment.amount}</p>
                                     </div>
-                                    <div className="bg-slate-900/50 p-8 rounded-2xl border border-slate-800">
-                                        <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-2">Settlement Date</p>
-                                        <p className="text-4xl font-black text-white leading-none">{new Date(selectedPayment.createdAt).toLocaleDateString()}</p>
+                                    <div className="space-y-4 md:faded-line-l md:pl-16">
+                                        <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">Settlement Date</p>
+                                        <p className="text-6xl font-black text-white leading-none tracking-tighter">{new Date(selectedPayment.createdAt).toLocaleDateString()}</p>
                                     </div>
                                 </div>
 
-                                <div className="space-y-6">
-                                    <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest block">Reason for Appeal</label>
+                                <div className="space-y-8">
+                                    <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] block">Reason for Adjustment Appeal</label>
                                     <textarea 
                                         value={reason}
                                         onChange={(e) => setReason(e.target.value)}
-                                        className="w-full bg-slate-900/50 border border-slate-800 focus:border-emerald-500 rounded-3xl p-8 outline-none text-xl font-medium text-slate-300 h-48 resize-none transition-all placeholder:text-slate-800"
-                                        placeholder="Detail the discrepancy or issue..."
+                                        className="w-full bg-transparent faded-line-b py-6 outline-none text-2xl font-black text-white h-48 resize-none transition-all placeholder:text-white/5 uppercase tracking-tighter focus:border-[#10b981]"
+                                        placeholder="PROVIDE DETAILED LOG DISCREPANCIES..."
                                         required
                                     ></textarea>
                                 </div>
@@ -231,10 +239,10 @@ const RefundPage = () => {
                                 <button 
                                     type="submit" 
                                     disabled={loading}
-                                    className="group w-full bg-emerald-500 text-[#0f172a] font-black py-8 rounded-full hover:bg-white transition-all duration-500 disabled:opacity-50 text-xl uppercase tracking-tighter flex items-center justify-between px-12"
+                                    className="modern-action-green text-3xl w-full justify-between py-6"
                                 >
-                                    <span>{loading ? 'Processing...' : 'Submit Official Appeal'}</span>
-                                    <ArrowRight size={32} className="group-hover:translate-x-2 transition-transform" />
+                                    <span>{loading ? 'Transmitting...' : 'Submit Official Appeal'}</span>
+                                    <ArrowRight size={40} />
                                 </button>
                             </form>
                         </div>
@@ -242,15 +250,18 @@ const RefundPage = () => {
                 </div>
                 
                 {/* Support Footer */}
-                <div className="bg-slate-900/50 border border-slate-800 p-12 md:p-20 rounded-[3rem] text-center space-y-8 animate-in fade-in duration-1000">
-                    <div className="space-y-4">
-                        <p className="text-emerald-400 text-xs font-black uppercase tracking-[0.3em]">Need Assistance?</p>
-                        <h4 className="text-4xl md:text-6xl font-black text-white tracking-tighter">Talk to a Human.</h4>
+                <div className="py-32 faded-line-t space-y-16 animate-in fade-in duration-1000">
+                    <div className="space-y-8">
+                        <p className="text-[#10b981] text-[10px] font-black uppercase tracking-[0.6em]">Support Interface</p>
+                        <h4 className="text-5xl md:text-8xl font-black text-white tracking-tighter uppercase leading-none">Direct <br /> Resolution.</h4>
                     </div>
-                    <p className="text-xl font-medium text-slate-500 max-w-xl mx-auto leading-relaxed">Our specialized billing team is available 24/7 to resolve complex service discrepancies and process manual overrides.</p>
-                    <a href={`mailto:${settings.support_email}`} className="group inline-flex items-center gap-6 bg-white text-[#0f172a] font-black px-12 py-6 rounded-full hover:bg-emerald-500 transition-all duration-500 uppercase tracking-widest text-xs">
-                        Open Support Ticket <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
-                    </a>
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-16">
+                        <p className="text-2xl font-black uppercase tracking-tighter text-white/30 max-w-2xl leading-tight">Our administrative team is available to resolve complex settlement discrepancies and process manual adjustments.</p>
+                        <a href={`mailto:${settings.support_email}`} className="modern-action-white text-xl hover:gap-8 whitespace-nowrap">
+                            Contact Support
+                            <ArrowRight size={24} />
+                        </a>
+                    </div>
                 </div>
             </div>
         </InfoLayout>

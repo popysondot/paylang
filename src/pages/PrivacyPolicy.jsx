@@ -22,56 +22,57 @@ const PrivacyPolicy = () => {
     }, []);
 
     return (
-        <InfoLayout title="Privacy Policy">
-            <div className="space-y-12">
-                <section className="space-y-4">
-                    <h2 className="text-xl font-black uppercase tracking-widest text-emerald-400">1. Introduction</h2>
-                    <p className="text-lg text-slate-400 leading-relaxed">
-                        At <span className="text-white font-bold">{settings.company_name}</span>, we respect your privacy and are committed to protecting your personal data. This privacy policy will inform you as to how we look after your personal data when you visit our website and tell you about your privacy rights.
+        <InfoLayout title="Data Integrity Policy">
+            <div className="space-y-32">
+                <section className="space-y-8 py-12 faded-line-b">
+                    <h2 className="text-[11px] font-black uppercase tracking-[0.5em] text-[#f59e0b]">01. Protocol Scope</h2>
+                    <p className="text-2xl text-white/50 leading-tight font-black uppercase tracking-tighter">
+                        At <span className="text-white">{settings.company_name}</span>, we operate under strict data isolation protocols. This specification defines our methodology for handling entity data and maintaining the integrity of our settlement network.
                     </p>
                 </section>
 
-                <section className="space-y-4">
-                    <h2 className="text-xl font-black uppercase tracking-widest text-emerald-400">2. The Data We Collect</h2>
-                    <p className="text-lg text-slate-400 leading-relaxed">
-                        We may collect, use, store and transfer different kinds of personal data about you which we have grouped together as follows:
-                    </p>
-                    <ul className="grid md:grid-cols-2 gap-4 mt-6">
-                        <li className="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl">
-                            <strong className="text-white block mb-2">Identity Data</strong>
-                            <span className="text-sm text-slate-500">Includes first name, last name.</span>
-                        </li>
-                        <li className="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl">
-                            <strong className="text-white block mb-2">Contact Data</strong>
-                            <span className="text-sm text-slate-500">Includes email address and telephone numbers.</span>
-                        </li>
-                        <li className="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl">
-                            <strong className="text-white block mb-2">Financial Data</strong>
-                            <span className="text-sm text-slate-500">Handled securely by our payment processors; we do not store full card details.</span>
-                        </li>
-                        <li className="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl">
-                            <strong className="text-white block mb-2">Transaction Data</strong>
-                            <span className="text-sm text-slate-500">Includes details about payments to and from you.</span>
-                        </li>
-                    </ul>
+                <section className="space-y-12 py-12 faded-line-b">
+                    <div className="flex items-center gap-4 mb-16">
+                        <div className="w-12 h-[2px] bg-[#f59e0b]"></div>
+                        <h2 className="text-[11px] font-black uppercase tracking-[0.5em] text-[#f59e0b]">02. Data Classification</h2>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-16">
+                        <div className="space-y-4">
+                            <strong className="text-white text-3xl font-black block uppercase tracking-tighter">Identity Signature</strong>
+                            <p className="text-white/40 font-black text-lg uppercase tracking-tighter">Encrypted identifiers used for entity verification and session management.</p>
+                        </div>
+                        <div className="space-y-4 md:faded-line-l md:pl-16">
+                            <strong className="text-white text-3xl font-black block uppercase tracking-tighter">Network Contact</strong>
+                            <p className="text-white/40 font-black text-lg uppercase tracking-tighter">Secure routing addresses for protocol notifications and settlement alerts.</p>
+                        </div>
+                        <div className="space-y-4 pt-16 faded-line-t">
+                            <strong className="text-white text-3xl font-black block uppercase tracking-tighter">Financial Hash</strong>
+                            <p className="text-white/40 font-black text-lg uppercase tracking-tighter">Transaction metadata handled via L1 payment processors. We do not store raw card assets.</p>
+                        </div>
+                        <div className="space-y-4 pt-16 faded-line-t md:faded-line-l md:pl-16">
+                            <strong className="text-white text-3xl font-black block uppercase tracking-tighter">Ledger Entries</strong>
+                            <p className="text-white/40 font-black text-lg uppercase tracking-tighter">Immutable records of settlement history and administrative adjustments.</p>
+                        </div>
+                    </div>
                 </section>
 
-                <section className="space-y-4">
-                    <h2 className="text-xl font-black uppercase tracking-widest text-emerald-400">3. Confidentiality</h2>
-                    <p className="text-lg text-slate-400 leading-relaxed">
-                        Your association with <span className="text-white font-bold">{settings.company_name}</span> is strictly confidential. We never share your details with third parties or marketing agencies. All communication within our platform is secured.
-                    </p>
-                </section>
-
-                <section className="space-y-4">
-                    <h2 className="text-xl font-black uppercase tracking-widest text-emerald-400">4. Data Security</h2>
-                    <p className="text-lg text-slate-400 leading-relaxed">
-                        We have put in place appropriate security measures to prevent your personal data from being accidentally lost, used or accessed in an unauthorized way. We limit access to your personal data to those employees and authorized personnel who have a business need to know.
+                <section className="space-y-8 py-12 faded-line-b">
+                    <h2 className="text-[11px] font-black uppercase tracking-[0.5em] text-[#f59e0b]">03. Confidentiality Matrix</h2>
+                    <p className="text-2xl text-white/50 leading-tight font-black uppercase tracking-tighter">
+                        Your association with <span className="text-white">{settings.company_name}</span> is protected by multi-layer encryption. We maintain a zero-sharing policy with external marketing entities. All internal communication is routed through encrypted tunnels.
                     </p>
                 </section>
 
-                <div className="pt-8 border-t border-slate-900 text-[10px] font-black uppercase tracking-widest text-slate-800">
-                    Last updated: {new Date().toLocaleString('default', { month: 'long' })} {new Date().getFullYear()}. Support: {settings.support_email}
+                <section className="space-y-8 py-12">
+                    <h2 className="text-[11px] font-black uppercase tracking-[0.5em] text-[#f59e0b]">04. Infrastructure Security</h2>
+                    <p className="text-2xl text-white/50 leading-tight font-black uppercase tracking-tighter">
+                        Our infrastructure utilizes automated intrusion detection and continuous monitoring. Access to sensitive data is restricted to authorized administrative nodes with verifiable credentials.
+                    </p>
+                </section>
+
+                <div className="pt-12 text-[11px] font-black uppercase tracking-[0.4em] text-white/10 flex flex-col md:flex-row justify-between gap-4">
+                    <span>Last Protocol Update: {new Date().toLocaleString('default', { month: 'long' }).toUpperCase()} {new Date().getFullYear()}</span>
+                    <span className="text-[#10b981]">Admin: {settings.support_email}</span>
                 </div>
             </div>
         </InfoLayout>

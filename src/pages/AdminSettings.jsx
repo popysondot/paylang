@@ -12,10 +12,7 @@ const AdminSettings = ({ token, onClose }) => {
         refund_policy_days: '14',
         max_refund_percentage: '100',
         timezone: 'UTC',
-        service_name: 'Professional Services',
-        service_description: 'High-quality professional support from industry experts.',
-        landing_services: '[]',
-        landing_testimonials: '[]'
+        service_name: 'Professional Services'
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -104,43 +101,46 @@ const AdminSettings = ({ token, onClose }) => {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-96">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+                <div className="animate-spin h-12 w-12 border-2 border-white/25 border-t-[#10b981]"></div>
             </div>
         );
     }
 
-    const inputClasses = "w-full bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 outline-none focus:border-emerald-500 transition-all font-medium";
-    const labelClasses = "block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2";
-    const sectionClasses = "bg-slate-900/20 border border-slate-800/50 p-8 rounded-[2.5rem] space-y-6";
+    const inputClasses = "w-full bg-white/[0.03] border-none rounded-full px-8 py-4 text-white placeholder:text-white/5 outline-none focus:bg-white/[0.05] transition-all font-black uppercase tracking-[0.2em] text-[11px]";
+    const labelClasses = "block text-[9px] font-black text-white/30 uppercase tracking-[0.4em] mb-4 group-focus-within:text-white transition-all";
 
     return (
-        <div className="space-y-12 animate-in fade-in duration-700">
+        <div className="space-y-24 animate-in fade-in duration-1000 font-sans pb-40">
             {message && (
-                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-6 rounded-2xl flex items-center gap-3 font-black uppercase tracking-widest text-xs">
-                    <CheckCircle size={20} /> {message}
+                <div className="bg-[#10b981]/10 border border-[#10b981]/20 text-[#10b981] p-8 rounded-full flex items-center gap-6 font-black uppercase tracking-[0.2em] text-[11px] animate-in slide-in-from-top-4 duration-700">
+                    <CheckCircle size={24} /> {message}
                 </div>
             )}
 
             {error && (
-                <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-6 rounded-2xl flex items-center gap-3 font-black uppercase tracking-widest text-xs">
-                    <AlertCircle size={20} /> {error}
+                <div className="bg-[#f59e0b]/10 border border-[#f59e0b]/20 text-[#f59e0b] p-8 rounded-full flex items-center gap-6 font-black uppercase tracking-[0.2em] text-[11px] animate-in slide-in-from-top-4 duration-700">
+                    <AlertCircle size={24} /> {error}
                 </div>
             )}
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-32">
                 {/* Company Settings */}
-                <div className={sectionClasses}>
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-emerald-500">
-                            <Settings size={20} />
+                <div className="space-y-16 relative">
+                    <div className="absolute left-[-48px] top-0 w-1 h-32 bg-gradient-to-b from-[#10b981] to-transparent rounded-full"></div>
+                    <div className="flex items-center gap-6 relative z-10">
+                        <div className="w-16 h-16 bg-white/[0.03] rounded-full flex items-center justify-center text-[#10b981]">
+                            <Settings size={32} />
                         </div>
-                        <h3 className="text-sm font-black text-white uppercase tracking-widest">Global Identity</h3>
+                        <div>
+                            <h3 className="text-lg font-black text-white uppercase tracking-tighter">Global Identity</h3>
+                            <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] mt-2">CORE_BRANDING_CONFIGURATION</p>
+                        </div>
                     </div>
                     
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className={labelClasses}>Company Name</label>
+                    <div className="space-y-12 relative z-10">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div className="group">
+                                <label className={labelClasses}>Entity Name</label>
                                 <input
                                     type="text"
                                     value={settings.company_name || ''}
@@ -148,30 +148,20 @@ const AdminSettings = ({ token, onClose }) => {
                                     className={inputClasses}
                                 />
                             </div>
-                            <div>
+                            <div className="group">
                                 <label className={labelClasses}>Service Name</label>
                                 <input
                                     type="text"
                                     value={settings.service_name || ''}
                                     onChange={(e) => handleChange('service_name', e.target.value)}
                                     className={inputClasses}
-                                    placeholder="e.g. Professional Consulting"
+                                    placeholder="CORE_SETTLEMENT"
                                 />
                             </div>
                         </div>
 
-                        <div>
-                            <label className={labelClasses}>Service Description</label>
-                            <textarea
-                                value={settings.service_description || ''}
-                                onChange={(e) => handleChange('service_description', e.target.value)}
-                                className={`${inputClasses} h-32 resize-none`}
-                                placeholder="Short description of what you offer..."
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div className="group">
                                 <label className={labelClasses}>Support Email</label>
                                 <input
                                     type="email"
@@ -180,7 +170,7 @@ const AdminSettings = ({ token, onClose }) => {
                                     className={inputClasses}
                                 />
                             </div>
-                            <div>
+                            <div className="group">
                                 <label className={labelClasses}>Support Phone</label>
                                 <input
                                     type="tel"
@@ -191,8 +181,8 @@ const AdminSettings = ({ token, onClose }) => {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div className="group">
                                 <label className={labelClasses}>Admin Alerts</label>
                                 <input
                                     type="email"
@@ -200,20 +190,19 @@ const AdminSettings = ({ token, onClose }) => {
                                     onChange={(e) => handleChange('notification_email', e.target.value)}
                                     className={inputClasses}
                                 />
-                                <p className="text-[9px] font-bold text-slate-600 uppercase mt-2">Sales & Refund notifications</p>
                             </div>
-                            <div>
-                                <label className={labelClasses}>System Timezone</label>
+                            <div className="group">
+                                <label className={labelClasses}>Timezone</label>
                                 <select
                                     value={settings.timezone || 'UTC'}
                                     onChange={(e) => handleChange('timezone', e.target.value)}
-                                    className={inputClasses}
+                                    className={`${inputClasses} cursor-pointer appearance-none`}
                                 >
-                                    <option className="bg-[#0f172a]">UTC</option>
-                                    <option className="bg-[#0f172a]">EST</option>
-                                    <option className="bg-[#0f172a]">CST</option>
-                                    <option className="bg-[#0f172a]">MST</option>
-                                    <option className="bg-[#0f172a]">PST</option>
+                                    <option className="bg-black">UTC</option>
+                                    <option className="bg-black">EST</option>
+                                    <option className="bg-black">CST</option>
+                                    <option className="bg-black">MST</option>
+                                    <option className="bg-black">PST</option>
                                 </select>
                             </div>
                         </div>
@@ -221,18 +210,22 @@ const AdminSettings = ({ token, onClose }) => {
                 </div>
 
                 {/* Policies & Content */}
-                <div className="space-y-8">
-                    <div className={sectionClasses}>
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-amber-500">
-                                <AlertCircle size={20} />
+                <div className="space-y-24">
+                    <div className="space-y-16 relative">
+                        <div className="absolute left-[-48px] top-0 w-1 h-32 bg-gradient-to-b from-[#f59e0b] to-transparent rounded-full"></div>
+                        <div className="flex items-center gap-6 relative z-10">
+                            <div className="w-16 h-16 bg-white/[0.03] rounded-full flex items-center justify-center text-[#f59e0b]">
+                                <AlertCircle size={32} />
                             </div>
-                            <h3 className="text-sm font-black text-white uppercase tracking-widest">Refund Parameters</h3>
+                            <div>
+                                <h3 className="text-lg font-black text-white uppercase tracking-tighter">Adjustments</h3>
+                                <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] mt-2">POLICY_VECTOR_CONSTRAINTS</p>
+                            </div>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className={labelClasses}>Policy Window (Days)</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 relative z-10">
+                            <div className="group">
+                                <label className={labelClasses}>Window (Days)</label>
                                 <input
                                     type="number"
                                     value={settings.refund_policy_days || '14'}
@@ -240,8 +233,8 @@ const AdminSettings = ({ token, onClose }) => {
                                     className={inputClasses}
                                 />
                             </div>
-                            <div>
-                                <label className={labelClasses}>Max Percentage (%)</label>
+                            <div className="group">
+                                <label className={labelClasses}>Max Ratio (%)</label>
                                 <input
                                     type="number"
                                     value={settings.max_refund_percentage || '100'}
@@ -252,28 +245,21 @@ const AdminSettings = ({ token, onClose }) => {
                         </div>
                     </div>
 
-                    <div className={sectionClasses}>
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-purple-500">
-                                <Save size={20} />
+                    <div className="space-y-16 relative">
+                        <div className="absolute left-[-48px] top-0 w-1 h-32 bg-gradient-to-b from-[#a855f7] to-transparent rounded-full"></div>
+                        <div className="flex items-center gap-6 relative z-10">
+                            <div className="w-16 h-16 bg-white/[0.03] rounded-full flex items-center justify-center text-[#a855f7]">
+                                <Save size={32} />
                             </div>
-                            <h3 className="text-sm font-black text-white uppercase tracking-widest">Security Update</h3>
+                            <div>
+                                <h3 className="text-lg font-black text-white uppercase tracking-tighter">Access Key</h3>
+                                <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] mt-2">SECURITY_TOKEN_ROTATION</p>
+                            </div>
                         </div>
 
-                        {passwordMessage && (
-                            <div className="bg-emerald-500/10 text-emerald-400 p-4 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                                <CheckCircle size={14} /> {passwordMessage}
-                            </div>
-                        )}
-                        {passwordError && (
-                            <div className="bg-red-500/10 text-red-400 p-4 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                                <AlertCircle size={14} /> {passwordError}
-                            </div>
-                        )}
-
-                        <form onSubmit={handleChangePassword} className="space-y-4">
-                            <div>
-                                <label className={labelClasses}>Current Password</label>
+                        <form onSubmit={handleChangePassword} className="space-y-12 relative z-10">
+                            <div className="group">
+                                <label className={labelClasses}>Current Key</label>
                                 <input
                                     type="password"
                                     value={passwordData.currentPassword}
@@ -282,9 +268,9 @@ const AdminSettings = ({ token, onClose }) => {
                                     required
                                 />
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className={labelClasses}>New Secret</label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                <div className="group">
+                                    <label className={labelClasses}>New Key</label>
                                     <input
                                         type="password"
                                         value={passwordData.newPassword}
@@ -293,8 +279,8 @@ const AdminSettings = ({ token, onClose }) => {
                                         required
                                     />
                                 </div>
-                                <div>
-                                    <label className={labelClasses}>Confirm Secret</label>
+                                <div className="group">
+                                    <label className={labelClasses}>Verify</label>
                                     <input
                                         type="password"
                                         value={passwordData.confirmPassword}
@@ -306,52 +292,23 @@ const AdminSettings = ({ token, onClose }) => {
                             </div>
                             <button
                                 type="submit"
-                                className="w-full bg-white text-[#0f172a] py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-emerald-500 transition-all mt-2"
+                                className="w-full bg-white text-black py-6 rounded-full font-black uppercase tracking-[0.4em] text-[11px] hover:bg-white/90 transition-all duration-700 shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
                             >
-                                Authenticate & Update
+                                Update Credentials
                             </button>
                         </form>
                     </div>
                 </div>
             </div>
 
-            {/* Landing Content JSONs */}
-            <div className={sectionClasses}>
-                <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-blue-500">
-                        <Settings size={20} />
-                    </div>
-                    <h3 className="text-sm font-black text-white uppercase tracking-widest">Dynamic Landing Content</h3>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div>
-                        <label className={labelClasses}>Services Config (JSON)</label>
-                        <textarea
-                            value={settings.landing_services || '[]'}
-                            onChange={(e) => handleChange('landing_services', e.target.value)}
-                            className={`${inputClasses} h-64 font-mono text-xs`}
-                        />
-                    </div>
-                    <div>
-                        <label className={labelClasses}>Testimonials Config (JSON)</label>
-                        <textarea
-                            value={settings.landing_testimonials || '[]'}
-                            onChange={(e) => handleChange('landing_testimonials', e.target.value)}
-                            className={`${inputClasses} h-64 font-mono text-xs`}
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <div className="flex justify-end pt-12">
+            <div className="flex justify-end pt-24 border-t border-white/[0.03]">
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="group bg-emerald-500 text-[#0f172a] px-12 py-6 rounded-full font-black uppercase tracking-widest text-xs flex items-center gap-4 hover:bg-white transition-all disabled:opacity-50 shadow-xl shadow-emerald-500/10"
+                    className="group bg-[#10b981] text-black px-12 py-6 rounded-full font-black uppercase tracking-[0.4em] text-[11px] flex items-center gap-6 hover:bg-white transition-all duration-700 disabled:opacity-50 shadow-[0_30px_60px_rgba(16,185,129,0.1)]"
                 >
                     {saving ? 'Synchronizing...' : 'Commit Changes'}
-                    <Save size={18} className="group-hover:rotate-12 transition-transform" />
+                    <Save size={20} className="group-hover:scale-110 transition-transform" />
                 </button>
             </div>
         </div>

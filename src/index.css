@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply font-sans bg-black text-white antialiased;
+  }
+}
+
 @layer utilities {
   .animate-in {
     animation-duration: 800ms;
@@ -27,6 +33,46 @@
   .delay-200 {
     animation-delay: 200ms;
   }
+
+  .faded-line {
+    @apply border-white/[0.03];
+  }
+
+  .faded-line-y {
+    @apply border-y border-white/[0.03];
+  }
+
+  .faded-line-b {
+    @apply border-b border-white/[0.03];
+  }
+
+  .faded-line-t {
+    @apply border-t border-white/[0.03];
+  }
+
+  .faded-line-l {
+    @apply border-l border-white/[0.03];
+  }
+
+  .faded-line-r {
+    @apply border-r border-white/[0.03];
+  }
+
+  .modern-action {
+    @apply inline-flex items-center gap-4 text-[11px] font-black uppercase tracking-[0.3em] transition-all duration-500 hover:gap-6;
+  }
+
+  .modern-action-white {
+    @apply modern-action text-white;
+  }
+
+  .modern-action-green {
+    @apply modern-action text-[#10b981];
+  }
+
+  .modern-action-orange {
+    @apply modern-action text-[#f59e0b];
+  }
 }
 
 @keyframes fade-in {
@@ -50,12 +96,33 @@
 }
 
 /* Typography Overrides */
+h1, h2, h3, h4, h5, h6 {
+  @apply text-white uppercase font-black tracking-tighter;
+}
+
 h1 {
   letter-spacing: -0.05em !important;
 }
 
+.text-accent-green {
+  @apply text-[#10b981];
+}
+
+.text-accent-orange {
+  @apply text-[#f59e0b];
+}
+
+.text-dim {
+  @apply text-white/40;
+}
+
 input::placeholder {
-  color: #f1f5f9;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+::selection {
+  background-color: rgba(16, 185, 129, 0.3);
+  color: white;
 }
 
 /* Hide Spinners on Input Number */

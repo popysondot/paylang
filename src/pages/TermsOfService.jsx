@@ -23,42 +23,47 @@ const TermsOfService = () => {
     }, []);
 
     return (
-        <InfoLayout title="Terms of Service">
-            <div className="space-y-12">
-                <section className="space-y-4">
-                    <h2 className="text-xl font-black uppercase tracking-widest text-emerald-400">1. Acceptance of Terms</h2>
-                    <p className="text-lg text-slate-400 leading-relaxed">
-                        By accessing and using <span className="text-white font-bold">{settings.company_name}</span>, you agree to be bound by these Terms of Service and all applicable laws and regulations.
+        <InfoLayout title="Protocol Terms">
+            <div className="space-y-32">
+                <section className="space-y-8 py-12 faded-line-b">
+                    <h2 className="text-[11px] font-black uppercase tracking-[0.5em] text-[#10b981]">01. Acceptance of Protocol</h2>
+                    <p className="text-2xl text-white/50 leading-tight font-black uppercase tracking-tighter">
+                        By initiating a transaction through the <span className="text-white">{settings.company_name}</span> network, you agree to adhere to these Protocol Terms and all governing financial regulations.
                     </p>
                 </section>
 
-                <section className="space-y-4">
-                    <h2 className="text-xl font-black uppercase tracking-widest text-emerald-400">2. Service Description</h2>
-                    <p className="text-lg text-slate-400 leading-relaxed">
-                        <span className="text-white font-bold">{settings.company_name}</span> provides {settings.service_name.toLowerCase()} and related support services. The work provided is intended to be used according to applicable laws and regulations.
+                <section className="space-y-8 py-12 faded-line-b">
+                    <h2 className="text-[11px] font-black uppercase tracking-[0.5em] text-[#10b981]">02. Service Specification</h2>
+                    <p className="text-2xl text-white/50 leading-tight font-black uppercase tracking-tighter">
+                        <span className="text-white">{settings.company_name}</span> facilitates high-performance {settings.service_name.toLowerCase()} through dedicated settlement channels. All deliverables are executed according to technical specifications provided at initiation.
                     </p>
                 </section>
 
-                <section className="space-y-4">
-                    <h2 className="text-xl font-black uppercase tracking-widest text-emerald-400">3. Refund Policy</h2>
-                    <p className="text-lg text-slate-400 leading-relaxed">
-                        We guarantee high-quality results. If the delivered service does not meet the initial specifications provided, you are entitled to revisions. Refund requests can be filed through our portal within <span className="text-emerald-400 font-black">{settings.refund_policy_days} days</span> of transaction.
+                <section className="space-y-8 py-12 border-l-4 border-[#f59e0b] pl-16">
+                    <h2 className="text-[11px] font-black uppercase tracking-[0.5em] text-[#f59e0b]">03. Adjustment Protocol</h2>
+                    <p className="text-2xl text-white/50 leading-tight font-black uppercase tracking-tighter">
+                        We maintain a commitment to operational excellence. If a settlement does not align with initial parameters, entities are entitled to technical revisions. Adjustment appeals must be logged via the portal within <span className="text-white">{settings.refund_policy_days} DAYS</span> of the primary transaction.
                     </p>
                 </section>
 
-                <section className="space-y-4">
-                    <h2 className="text-xl font-black uppercase tracking-widest text-emerald-400">4. Payment Terms</h2>
-                    <p className="text-lg text-slate-400 leading-relaxed">
-                        Payments are processed securely via our integrated payment gateways. Service begins only after the initial payment has been confirmed. All prices are in USD unless otherwise specified.
+                <section className="space-y-8 py-12 faded-line-b">
+                    <h2 className="text-[11px] font-black uppercase tracking-[0.5em] text-[#10b981]">04. Settlement Terms</h2>
+                    <p className="text-2xl text-white/50 leading-tight font-black uppercase tracking-tighter">
+                        Transactions are processed via secure cryptographic gateways. Service execution is triggered upon confirmation of initial settlement. All denominations are in USD unless otherwise specified in the project manifest.
                     </p>
                 </section>
 
-                <section className="space-y-4">
-                    <h2 className="text-xl font-black uppercase tracking-widest text-emerald-400">5. User Responsibility</h2>
-                    <p className="text-lg text-slate-400 leading-relaxed">
-                        You are responsible for ensuring that your use of our services complies with all applicable local and international laws. <span className="text-white font-bold">{settings.company_name}</span> is not liable for any misuse of the services provided.
+                <section className="space-y-8 py-12 faded-line-b">
+                    <h2 className="text-[11px] font-black uppercase tracking-[0.5em] text-[#10b981]">05. Entity Responsibility</h2>
+                    <p className="text-2xl text-white/50 leading-tight font-black uppercase tracking-tighter">
+                        Entities are responsible for ensuring that their utilization of our infrastructure complies with jurisdictional legal frameworks. <span className="text-white">{settings.company_name}</span> assumes no liability for external protocol misuse.
                     </p>
                 </section>
+
+                <div className="pt-12 text-[11px] font-black uppercase tracking-[0.4em] text-white/10 flex justify-between">
+                    <span>Protocol Version: 4.2.0</span>
+                    <span>© {new Date().getFullYear()} {settings.company_name}</span>
+                </div>
             </div>
         </InfoLayout>
     );

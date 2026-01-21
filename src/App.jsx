@@ -27,8 +27,8 @@ function App() {
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/refund" element={<RefundPage />} />
           <Route path="/orders" element={<CustomerDashboard />} />
+          <Route path="/dashboard" element={<CustomerDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admindashboard" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </PagePreloader>

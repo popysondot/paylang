@@ -23,58 +23,55 @@ const NotFound = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-[#0f172a] text-slate-100 selection:bg-emerald-500/30 overflow-x-hidden flex flex-col">
-            <nav className="w-full max-w-[1400px] mx-auto px-6 py-8 flex justify-between items-center relative z-10">
-                <Link to="/" className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                        <ShieldCheck className="text-[#0f172a]" size={20} />
-                    </div>
-                    <span className="text-xs font-black uppercase tracking-[0.2em]">{settings.company_name}</span>
+        <div className="min-h-screen bg-black text-white selection:bg-[#10b981]/30 overflow-x-hidden flex flex-col">
+            <nav className="w-full max-w-[1400px] mx-auto px-6 py-10 flex justify-between items-center relative z-10">
+                <Link to="/" className="flex items-center gap-4">
+                    <div className="w-2 h-8 bg-[#f59e0b]"></div>
+                    <span className="text-[12px] font-black uppercase tracking-[0.4em]">{settings.company_name}</span>
                 </Link>
-                <Link to="/" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-400 transition-colors">
-                    Back to Hub
+                <Link to="/" className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-white transition-colors px-6 py-3 bg-white/5 border border-white/10 rounded-full">
+                    <ArrowLeft size={14} /> REVERT TO HUB
                 </Link>
             </nav>
 
-            <main className="flex-grow flex items-center justify-center px-6 py-12 md:py-20 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            <main className="flex-grow flex items-center justify-center px-6 py-20 animate-in fade-in slide-in-from-bottom-8 duration-1000 relative">
+                {/* Background Atmosphere */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#f59e0b]/5 blur-[140px] rounded-full pointer-events-none"></div>
+
                 {show404 && !snakeStarted ? (
-                    <div className="max-w-4xl w-full">
-                        <div className="space-y-4 mb-12">
-                            <p className="text-emerald-400 text-xs font-black uppercase tracking-[0.3em]">Error 404</p>
-                            <h1 className="text-7xl md:text-9xl font-black tracking-tighter leading-[0.85] text-white">
+                    <div className="max-w-5xl w-full relative z-10">
+                        <div className="space-y-12 mb-32">
+                            <div className="flex items-center gap-6">
+                                <div className="w-1 rounded-full h-12 bg-gradient-to-b from-[#f59e0b] to-transparent"></div>
+                                <p className="text-[#f59e0b] text-[11px] font-black uppercase tracking-[0.6em]">ERROR_404</p>
+                            </div>
+                            <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-tight text-white uppercase">
                                 Page <br />
-                                <span className="text-slate-800 outline-text">Missing.</span>
+                                <span className="text-white/5">Missing.</span>
                             </h1>
-                            <p className="text-xl text-slate-500 font-medium pt-4">The route you requested does not exist in our index.</p>
+                            <p className="text-xl text-white/40 font-black uppercase tracking-tighter pt-8 max-w-2xl">The route you requested does not exist in our index. Connection terminated.</p>
                         </div>
 
                         {showGamePrompt && (
-                            <div className="bg-slate-900/30 border border-slate-800 p-8 md:p-12 rounded-[2rem] space-y-8">
-                                <div className="flex items-center gap-6">
-                                    <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center shadow-xl">
-                                        <Gamepad2 size={32} className="text-emerald-500" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-2xl font-black text-white uppercase tracking-tight">Lost in the Void?</h3>
-                                        <p className="text-slate-500 font-medium">Score 20 points in Snake to unlock a shortcut back.</p>
-                                    </div>
+                            <div className="pt-24 border-t border-white/[0.03] flex flex-col md:flex-row justify-between items-start md:items-center gap-16 relative z-10">
+                                <div className="space-y-4">
+                                    <h3 className="text-3xl font-black text-white uppercase tracking-tighter">Lost in the Void?</h3>
+                                    <p className="text-white/20 font-black uppercase tracking-[0.2em] text-[10px]">Score 20 points in Snake to unlock a shortcut back.</p>
                                 </div>
-                                <div className="flex flex-col sm:flex-row gap-6">
+                                <div className="flex flex-col sm:flex-row gap-8 w-full md:w-auto">
                                     <button
                                         onClick={() => {
                                             setShowGamePrompt(false);
                                             setSnakeStarted(true);
                                         }}
-                                        className="bg-emerald-500 text-[#0f172a] px-10 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-white transition-all duration-500 flex items-center justify-center gap-3 shadow-lg shadow-emerald-500/10"
+                                        className="bg-[#10b981] text-black px-12 py-6 font-black uppercase tracking-widest text-[11px] hover:bg-white transition-all duration-700 rounded-full shadow-[0_20px_40px_rgba(16,185,129,0.05)]"
                                     >
-                                        <Play size={18} />
                                         Initiate Snake
                                     </button>
                                     <Link 
                                         to="/"
-                                        className="bg-slate-900 text-white px-10 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-slate-800 transition-all border border-slate-800 flex items-center justify-center gap-3"
+                                        className="bg-white/[0.05] text-white px-12 py-6 font-black uppercase tracking-widest text-[11px] hover:bg-white hover:text-black transition-all rounded-full text-center"
                                     >
-                                        <Home size={18} />
                                         Return Home
                                     </Link>
                                 </div>
@@ -86,23 +83,11 @@ const NotFound = () => {
                 )}
             </main>
 
-            <footer className="w-full max-w-[1400px] mx-auto px-6 py-12 border-t border-slate-900/50 mt-auto">
-                <p className="text-[10px] font-bold text-slate-800 uppercase tracking-widest text-center md:text-left">
-                    © {new Date().getFullYear()} {settings.company_name}. Secure Navigation.
+            <footer className="w-full max-w-[1400px] mx-auto px-6 py-16 flex justify-between items-center border-t border-white/5 mt-auto">
+                <p className="text-[11px] font-black text-white/20 uppercase tracking-[0.5em]">
+                    © {new Date().getFullYear()} {settings.company_name}. SECURE NAVIGATION.
                 </p>
             </footer>
-
-            <style jsx>{`
-                .outline-text {
-                    -webkit-text-stroke: 1px #334155;
-                    color: transparent;
-                }
-                @media (min-width: 1024px) {
-                    .outline-text {
-                        -webkit-text-stroke: 2px #334155;
-                    }
-                }
-            `}</style>
         </div>
     );
 };
@@ -246,17 +231,16 @@ const SnakeGame = ({ onComplete, isStarted }) => {
 
     if (won) {
         return (
-            <div className="max-w-xl w-full text-center space-y-10 animate-in zoom-in-95 duration-700">
-                <div className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20">
-                    <Trophy size={48} className="text-[#0f172a]" />
+            <div className="max-w-xl w-full text-center space-y-16 animate-in zoom-in-95 duration-1000 relative">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#10b981]/10 blur-[100px] rounded-full animate-pulse"></div>
+                <div className="w-1 rounded-full h-32 bg-gradient-to-b from-[#10b981] to-transparent mx-auto relative z-10"></div>
+                <div className="space-y-8 relative z-10">
+                    <h2 className="text-5xl font-black text-white tracking-tighter uppercase">Protocol Surmounted</h2>
+                    <p className="text-xl text-white/20 font-black uppercase tracking-tighter">You scored {score} points and bypassed the void.</p>
                 </div>
-                <div className="space-y-4">
-                    <h2 className="text-5xl font-black text-white tracking-tighter uppercase">Victory!</h2>
-                    <p className="text-xl text-slate-500 font-medium">You scored {score} points and escaped the void.</p>
-                </div>
-                <div className="flex justify-center">
-                    <Link to="/" className="group bg-white text-[#0f172a] px-12 py-6 rounded-full font-black uppercase tracking-widest text-sm flex items-center gap-4 hover:bg-emerald-500 transition-all duration-500">
-                        Escape to Home <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                <div className="flex justify-center relative z-10">
+                    <Link to="/" className="bg-[#10b981] text-black px-16 py-8 font-black uppercase tracking-[0.4em] text-[12px] hover:bg-white transition-all duration-700 rounded-full shadow-[0_20px_40px_rgba(16,185,129,0.1)]">
+                        Escape to Hub
                     </Link>
                 </div>
             </div>
@@ -264,13 +248,14 @@ const SnakeGame = ({ onComplete, isStarted }) => {
     }
 
     return (
-        <div className="w-full max-w-5xl flex flex-col md:flex-row gap-12 items-center">
-            <div className="relative bg-slate-900 border-4 border-slate-800 rounded-[2rem] p-4 shadow-2xl">
+        <div className="w-full max-w-7xl flex flex-col xl:flex-row gap-32 items-center relative z-10">
+            <div className="relative group">
+                <div className="absolute -inset-10 bg-[#10b981]/5 blur-[80px] rounded-full opacity-0 group-hover:opacity-100 transition-all duration-1000"></div>
                 <div 
-                    className="relative grid bg-[#0f172a] rounded-xl overflow-hidden"
+                    className="relative grid bg-black overflow-hidden border border-white/[0.05] rounded-[2.5rem] shadow-[0_40px_80px_rgba(0,0,0,0.5)]"
                     style={{
-                        width: 'min(80vw, 400px)',
-                        height: 'min(80vw, 400px)',
+                        width: 'min(90vw, 550px)',
+                        height: 'min(90vw, 550px)',
                         gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
                         gridTemplateRows: `repeat(${GRID_SIZE}, 1fr)`
                     }}
@@ -278,15 +263,16 @@ const SnakeGame = ({ onComplete, isStarted }) => {
                     {snake.map((seg, i) => (
                         <div 
                             key={i}
-                            className={`${i === 0 ? 'bg-emerald-500' : 'bg-emerald-500/50'} rounded-sm`}
+                            className={i === 0 ? 'bg-[#10b981]' : 'bg-[#10b981]/20'}
                             style={{
                                 gridColumnStart: seg.x + 1,
-                                gridRowStart: seg.y + 1
+                                gridRowStart: seg.y + 1,
+                                borderRadius: i === 0 ? '4px' : '2px'
                             }}
                         />
                     ))}
                     <div 
-                        className="bg-red-500 rounded-full animate-pulse scale-75"
+                        className="bg-[#f59e0b] shadow-[0_0_15px_#f59e0b] animate-pulse rounded-sm"
                         style={{
                             gridColumnStart: food.x + 1,
                             gridRowStart: food.y + 1
@@ -295,50 +281,58 @@ const SnakeGame = ({ onComplete, isStarted }) => {
                 </div>
 
                 {gameOver && (
-                    <div className="absolute inset-0 bg-[#0f172a]/90 flex flex-col items-center justify-center rounded-[2rem] p-8 text-center space-y-6 animate-in fade-in duration-300">
-                        <X className="text-red-500" size={48} />
-                        <h3 className="text-2xl font-black text-white uppercase tracking-widest">Game Over</h3>
-                        <button onClick={restart} className="bg-emerald-500 text-[#0f172a] px-8 py-3 rounded-full font-black uppercase tracking-widest text-xs flex items-center gap-2">
-                            <RotateCcw size={16} /> Try Again
+                    <div className="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-12 text-center space-y-12 animate-in fade-in duration-500 rounded-[2.5rem]">
+                        <div className="space-y-4">
+                            <h3 className="text-3xl font-black text-white uppercase tracking-tighter">Execution Terminated</h3>
+                            <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">BUFFER_OVERFLOW_DETECTED</p>
+                        </div>
+                        <button onClick={restart} className="bg-[#f59e0b] text-white px-12 py-6 font-black uppercase tracking-widest text-[11px] flex items-center gap-6 hover:bg-white hover:text-black transition-all duration-700 rounded-full shadow-xl">
+                            <RotateCcw size={18} /> Re-Initiate
                         </button>
                     </div>
                 )}
 
                 {(direction.x === 0 && direction.y === 0 && !gameOver) && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <p className="text-[10px] font-black text-emerald-500/50 uppercase tracking-widest animate-pulse">Press arrows to start</p>
+                        <p className="text-[10px] font-black text-[#10b981] uppercase tracking-[0.8em] animate-pulse">AWAITING_SIGNALS</p>
                     </div>
                 )}
             </div>
 
-            <div className="flex-1 space-y-8">
-                <div className="space-y-2">
-                    <p className="text-emerald-400 text-xs font-black uppercase tracking-[0.3em]">Game Stats</p>
-                    <div className="flex gap-12 pt-4">
-                        <div className="space-y-1">
-                            <p className="text-4xl font-black text-white">{score}</p>
-                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Current Score</p>
+            <div className="flex-1 space-y-20">
+                <div className="space-y-12">
+                    <div className="flex items-center gap-6">
+                        <div className="w-1 rounded-full h-8 bg-gradient-to-b from-[#10b981] to-transparent"></div>
+                        <p className="text-[#10b981] text-[11px] font-black uppercase tracking-[0.6em]">PROTOCOL_STATS</p>
+                    </div>
+                    <div className="flex gap-24">
+                        <div className="space-y-4">
+                            <p className="text-6xl md:text-7xl font-black text-white tracking-tighter leading-none">{score}</p>
+                            <p className="text-[10px] font-black text-white/10 uppercase tracking-[0.6em]">CURRENT_VAL</p>
                         </div>
-                        <div className="space-y-1">
-                            <p className="text-4xl font-black text-white">{WIN_SCORE}</p>
-                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Target Score</p>
+                        <div className="space-y-4">
+                            <p className="text-6xl md:text-7xl font-black text-white/5 tracking-tighter leading-none">{WIN_SCORE}</p>
+                            <p className="text-[10px] font-black text-white/10 uppercase tracking-[0.6em]">THRESHOLD</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="p-8 bg-slate-900/30 border border-slate-800 rounded-[2rem] space-y-4">
-                    <h4 className="text-sm font-black text-white uppercase tracking-widest">Instructions</h4>
-                    <p className="text-sm text-slate-500 font-medium leading-relaxed">
-                        Use <span className="text-white font-bold">Arrow Keys</span> or <span className="text-white font-bold">WASD</span> to navigate the snake. Collect red nodes to grow. Do not hit the walls or yourself.
+                <div className="space-y-8">
+                    <div className="flex items-center gap-6">
+                        <div className="w-1 rounded-full h-8 bg-gradient-to-b from-white/20 to-transparent"></div>
+                        <h4 className="text-[11px] font-black text-white uppercase tracking-[0.6em]">INPUT_INTERFACE</h4>
+                    </div>
+                    <p className="text-xl text-white/30 font-black uppercase tracking-tighter leading-relaxed max-w-md">
+                        Utilize <span className="text-white/60">Arrow Keys</span> or <span className="text-white/60">WASD</span> to navigate the vector. Surmount the threshold to proceed.
                     </p>
                 </div>
 
-                <div className="flex gap-4">
-                    <button onClick={restart} className="text-[10px] font-black text-slate-600 uppercase tracking-widest hover:text-white transition-colors flex items-center gap-2">
-                        <RotateCcw size={14} /> Reset
+                <div className="flex flex-col sm:flex-row gap-12 pt-12 border-t border-white/[0.03]">
+                    <button onClick={restart} className="text-[11px] font-black text-white/20 uppercase tracking-[0.4em] hover:text-white transition-all duration-500 flex items-center gap-5 group">
+                        <RotateCcw size={16} className="group-hover:rotate-180 transition-transform duration-700" /> RE_INITIALIZE
                     </button>
-                    <Link to="/" className="text-[10px] font-black text-slate-600 uppercase tracking-widest hover:text-emerald-400 transition-colors flex items-center gap-2">
-                        <Home size={14} /> Quit Game
+                    <Link to="/" className="text-[11px] font-black text-white/20 uppercase tracking-[0.4em] hover:text-white transition-all duration-500 flex items-center gap-5 group">
+                        <Home size={16} /> TERMINATE_SESSION
                     </Link>
                 </div>
             </div>
