@@ -19,16 +19,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(express.json());
-
-// Request Logger
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-  next();
-});
-
-app.get('/ping', (req, res) => res.send('pong'));
+// Trust proxy for Render
+app.set('trust proxy', 1);
 
 const allowedOrigins = [
   'https://paylang.moonderiv.com',
@@ -37,26 +29,36 @@ const allowedOrigins = [
   'http://localhost:5000'
 ];
 
+// CORS Middleware - MUST BE FIRST
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.onrender.com')) {
       callback(null, true);
     } else {
+      console.log('CORS Blocked for origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  optionsSuccessStatus: 200
 }));
 
-// Rate Limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: 'Too many requests, please try again later.'
+// Middleware
+app.use(express.json());
+
+// Request Logger
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  console.log('Headers:', JSON.stringify(req.headers));
+  next();
 });
-app.use('/api', limiter);
+
+app.get('/ping', (req, res) => res.send('pong'));
 
 // Database Pool
 const pool = new Pool({
@@ -91,6 +93,7 @@ const transporter = nodemailer.createTransport({
 
 // Public Settings
 app.get('/api/settings', async (req, res) => {
+  console.log('Fetching public settings...');
   try {
     const result = await pool.query('SELECT key, value FROM admin_settings');
     const settings = {};
@@ -109,6 +112,14 @@ app.get('/api/settings', async (req, res) => {
     res.status(500).json({ error: 'Database error' });
   }
 });
+
+// Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Too many requests, please try again later.'
+});
+app.use('/api', limiter);
 
 // Payment Verification (Webhook/Callback)
 app.post('/api/verify-payment', async (req, res) => {
@@ -427,6 +438,22 @@ app.use((req, res, next) => {
   // Otherwise, serve the frontend
   const indexPath = path.join(distPath, 'index.html');
   res.sendFile(indexPath);
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled Error:', err);
+  
+  // Ensure CORS headers are present even on errors
+  const origin = req.headers.origin;
+  if (origin && (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.onrender.com'))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  }
+
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal server error'
+  });
 });
 
 app.listen(PORT, () => {
