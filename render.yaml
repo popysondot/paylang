@@ -12,7 +12,19 @@ services:
       - key: NODE_ENV
         value: production
       - key: VITE_BACKEND_URL
-        value: https://paylang-tusk.onrender.com
+        value: ""
       - key: SKIP_PREFLIGHT_CHECK
         value: true
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
+      - key: VITE_PAYSTACK_PUBLIC_KEY
+        value: pk_test_232531a5c927ef2cc67ed1b85af3f26e3b8ed2f2
 
