@@ -17,6 +17,12 @@ const PaymentPage = () => {
         service_name: 'System Protocol',
     });
     
+    const getBaseUrl = () => {
+        return window.location.hostname === 'localhost' 
+            ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+            : '';
+    };
+
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -28,11 +34,7 @@ const PaymentPage = () => {
 
         const fetchSettings = async () => {
             try {
-                // Force relative path in production to stop CORS issues
-                const baseUrl = window.location.hostname === 'localhost' 
-                    ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
-                    : '';
-                const res = await axios.get(`${baseUrl}/api/settings`);
+                const res = await axios.get(`${getBaseUrl()}/api/settings`);
                 if (res.data) setSettings(prev => ({ ...prev, ...res.data }));
             } catch (err) {
                 console.error('Failed to fetch settings:', err);
@@ -41,15 +43,15 @@ const PaymentPage = () => {
         fetchSettings();
 
         const paystackKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+        const isLocal = window.location.hostname === 'localhost';
         const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-        if (!paystackKey || !backendUrl) {
+        if (!paystackKey || (isLocal && !backendUrl)) {
             setEnvError('Configuration missing.');
         }
     }, [location]);
 
     const paystackKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     const config = {
         reference: (new Date()).getTime().toString(),
@@ -74,10 +76,7 @@ const PaymentPage = () => {
         setIsProcessing(true);
         navigate('/thank-you', { state: { reference: reference.reference, amount, email, name } });
 
-        const baseUrl = window.location.hostname === 'localhost' 
-            ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
-            : '';
-        axios.post(`${baseUrl}/api/verify-payment`, {
+        axios.post(`${getBaseUrl()}/api/verify-payment`, {
             reference: reference.reference,
             email: email,
             amount: amount,
@@ -89,7 +88,13 @@ const PaymentPage = () => {
 
     const handlePayment = (e) => {
         e.preventDefault();
-        if (!paystackKey || !backendUrl) return;
+        const isLocal = window.location.hostname === 'localhost';
+        const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+        if (!paystackKey || (isLocal && !backendUrl)) {
+            addToast('System configuration incomplete', 'error');
+            return;
+        }
         if (!email || !amount || !name) {
             addToast('Missing identity or amount', 'error');
             return;

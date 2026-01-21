@@ -3,6 +3,12 @@ import InfoLayout from '../components/InfoLayout';
 import axios from 'axios';
 
 const PrivacyPolicy = () => {
+    const getBaseUrl = () => {
+        return window.location.hostname === 'localhost' 
+            ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+            : '';
+    };
+
     const [settings, setSettings] = useState({
         company_name: 'Payment Hub',
         support_email: 'support@moonderiv.com'
@@ -11,8 +17,7 @@ const PrivacyPolicy = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
-                const res = await axios.get(`${baseUrl}/api/settings`);
+                const res = await axios.get(`${getBaseUrl()}/api/settings`);
                 if (res.data) setSettings(prev => ({ ...prev, ...res.data }));
             } catch (err) {
                 console.error('Failed to fetch settings:', err);

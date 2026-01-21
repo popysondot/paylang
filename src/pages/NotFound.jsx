@@ -4,6 +4,12 @@ import { ShieldCheck, Home, ArrowLeft, Gamepad2, Trophy, Play, RotateCcw, X, Arr
 import axios from 'axios';
 
 const NotFound = () => {
+    const getBaseUrl = () => {
+        return window.location.hostname === 'localhost' 
+            ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+            : '';
+    };
+
     const [show404, setShow404] = useState(true);
     const [showGamePrompt, setShowGamePrompt] = useState(true);
     const [snakeStarted, setSnakeStarted] = useState(false);
@@ -12,8 +18,7 @@ const NotFound = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
-                const res = await axios.get(`${baseUrl}/api/settings`);
+                const res = await axios.get(`${getBaseUrl()}/api/settings`);
                 if (res.data.company_name) setSettings(prev => ({ ...prev, ...res.data }));
             } catch (err) {
                 // Keep default

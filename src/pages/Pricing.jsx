@@ -4,6 +4,12 @@ import axios from 'axios';
 import { Check, ArrowRight, Mail } from 'lucide-react';
 
 const Pricing = () => {
+    const getBaseUrl = () => {
+        return window.location.hostname === 'localhost' 
+            ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+            : '';
+    };
+
     const [settings, setSettings] = useState({
         support_email: 'support@moonderiv.com'
     });
@@ -11,8 +17,7 @@ const Pricing = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
-                const res = await axios.get(`${baseUrl}/api/settings`);
+                const res = await axios.get(`${getBaseUrl()}/api/settings`);
                 if (res.data) setSettings(prev => ({ ...prev, ...res.data }));
             } catch (err) {
                 console.error('Failed to fetch settings:', err);
