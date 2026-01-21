@@ -268,7 +268,7 @@ const AdminDashboard = () => {
     const filteredRefunds = refunds.filter(r => 
         r.email.toLowerCase().includes(filter.toLowerCase()) || 
         r.reason.toLowerCase().includes(filter.toLowerCase()) ||
-        (r.paymentId && r.paymentId.reference.toLowerCase().includes(filter.toLowerCase()))
+        (r.reference && r.reference.toLowerCase().includes(filter.toLowerCase()))
     );
 
     if (!isAuthenticated) {
@@ -586,7 +586,7 @@ const AdminDashboard = () => {
                                     <div key={i} className="grid grid-cols-5 items-center px-0 py-12 transition-all duration-500 group">
                                         <div>
                                             <p className="text-sm font-black text-white uppercase tracking-tighter leading-none mb-2 group-hover:text-[#f59e0b] transition-colors">{r.email}</p>
-                                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">{r.paymentId?.reference || 'REF_NULL'}</p>
+                                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">{r.reference || 'REF_NULL'}</p>
                                         </div>
                                         <div className="text-2xl font-black text-white tracking-tighter">${Number(r.amount).toLocaleString()}</div>
                                         <div className="text-[10px] font-black text-white/40 uppercase tracking-widest truncate pr-8">{r.reason}</div>
@@ -628,14 +628,14 @@ const AdminDashboard = () => {
                             <div className="divide-y divide-white/[0.03]">
                                 {auditLogs.map((log, i) => (
                                     <div key={i} className="flex items-start gap-16 py-12 transition-all duration-700 group">
-                                        <span className="text-[10px] font-black text-white/20 w-48 shrink-0 mt-2 tracking-widest uppercase">{new Date(log.createdAt).toLocaleString()}</span>
+                                        <span className="text-[10px] font-black text-white/20 w-48 shrink-0 mt-2 tracking-widest uppercase">{new Date(log.created_at).toLocaleString()}</span>
                                         <div className="flex-grow">
                                             <p className="text-[11px] font-black uppercase tracking-[0.4em] mb-6 text-[#10b981]">{log.action}</p>
                                             <DiffViewer data={log.newData || log.details} />
                                         </div>
                                         <div className="text-right">
                                             <span className="text-[8px] font-black text-white/5 uppercase tracking-[0.6em] block mb-2">OPERATOR</span>
-                                            <span className="text-[11px] font-black uppercase tracking-widest text-white/40">{log.adminId?.username || 'SYSTEM'}</span>
+                                            <span className="text-[11px] font-black uppercase tracking-widest text-white/40">{log.username || 'SYSTEM'}</span>
                                         </div>
                                     </div>
                                 ))}

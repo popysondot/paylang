@@ -253,11 +253,17 @@ app.get('/api/admin/analytics', authenticateToken, async (req, res) => {
       SELECT 
         COALESCE(SUM(amount), 0) as total_revenue,
         COUNT(*) as total_transactions,
-        (SELECT COUNT(*) FROM admin_users) as total_admins
+        COUNT(DISTINCT email) as unique_customers,
+        (SELECT COUNT(*) FROM refunds) as total_refunds
       FROM payments WHERE status = 'success'
     `);
 
-    // Chart data (mocking the aggregation for simplicity, or we can do real group by)
+    const stats = statsRes.rows[0];
+    const totalTransactions = parseInt(stats.total_transactions);
+    const totalRefunds = parseInt(stats.total_refunds);
+    const refundRate = totalTransactions > 0 ? ((totalRefunds / totalTransactions) * 100).toFixed(1) : 0;
+
+    // Chart data
     const chartRes = await pool.query(`
       SELECT DATE_TRUNC('day', "createdAt") as date, SUM(amount) as amount, COUNT(*) as count
       FROM payments
@@ -265,14 +271,18 @@ app.get('/api/admin/analytics', authenticateToken, async (req, res) => {
     `);
 
     res.json({
-      summary: statsRes.rows[0],
+      totalRevenue: parseFloat(stats.total_revenue),
+      transactionCount: totalTransactions,
+      uniqueCustomers: parseInt(stats.unique_customers),
+      refundRate: refundRate,
       chartData: chartRes.rows.map(r => ({
-        date: r.date.toISOString().split('T')[0],
+        name: r.date.toISOString().split('T')[0],
         revenue: parseFloat(r.amount),
         transactions: parseInt(r.count)
       }))
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Analytics failed' });
   }
 });
@@ -290,7 +300,7 @@ app.get('/api/admin/transactions', authenticateToken, async (req, res) => {
 // Admin Refunds
 app.get('/api/admin/refunds', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query('SELECT r.*, p.reference FROM refunds r LEFT JOIN payments p ON r."paymentId" = p.id ORDER BY r."createdAt" DESC');
+    const result = await pool.query('SELECT r.*, p.reference, p.amount FROM refunds r LEFT JOIN payments p ON r."paymentId" = p.id ORDER BY r."createdAt" DESC');
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: 'Fetch failed' });

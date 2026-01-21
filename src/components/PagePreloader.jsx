@@ -9,7 +9,9 @@ const PagePreloader = ({ children }) => {
     useEffect(() => {
         const fetchBranding = async () => {
             try {
-                const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
+                const baseUrl = window.location.hostname === 'localhost' 
+                    ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+                    : '';
                 const res = await axios.get(`${baseUrl}/api/settings`);
                 if (res.data.company_name) setCompanyName(res.data.company_name);
             } catch (err) {
