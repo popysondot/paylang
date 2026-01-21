@@ -412,7 +412,7 @@ console.log(`Serving static files from: ${distPath}`);
 app.use(express.static(distPath));
 
 // SPA Routing: Redirect all non-API requests to index.html
-app.use((req, res, next) => {
+app.get('*', (req, res) => {
   // If it's an API request that didn't match any route, return 404
   if (req.path.startsWith('/api')) {
     console.log(`Unmatched API request: ${req.method} ${req.path}`);
@@ -435,6 +435,7 @@ app.use((req, res, next) => {
       ]
     });
   }
+  
   // Otherwise, serve the frontend
   const indexPath = path.join(distPath, 'index.html');
   res.sendFile(indexPath);

@@ -477,46 +477,52 @@ const AdminDashboard = () => {
                                         <option value="months" className="bg-black">06_MONTHS</option>
                                     </select>
                                 </div>
-                                <div className="h-[400px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart data={analytics?.chartData}>
-                                            <CartesianGrid strokeDasharray="0" vertical={false} stroke="#ffffff" strokeOpacity={0.02} />
-                                            <XAxis 
-                                                dataKey="name" 
-                                                stroke="#ffffff" 
-                                                fontSize={8} 
-                                                fontWeight={900} 
-                                                tick={{ fill: '#ffffff', opacity: 0.1 }}
-                                                axisLine={false}
-                                                tickLine={false}
-                                                dy={20}
-                                            />
-                                            <YAxis 
-                                                stroke="#ffffff" 
-                                                fontSize={8} 
-                                                fontWeight={900} 
-                                                tick={{ fill: '#ffffff', opacity: 0.1 }}
-                                                axisLine={false}
-                                                tickLine={false}
-                                                tickFormatter={(value) => `$${value}`}
-                                            />
-                                            <Tooltip 
-                                                cursor={{ stroke: '#10b981', strokeWidth: 1 }}
-                                                contentStyle={{ backgroundColor: '#000000', border: '1px solid rgba(255,255,255,0.05)', padding: '24px', borderRadius: '0' }}
-                                                itemStyle={{ color: '#10b981', fontWeight: 900, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.1em' }}
-                                                labelStyle={{ color: '#ffffff20', fontWeight: 900, fontSize: '9px', textTransform: 'uppercase', marginBottom: '12px', letterSpacing: '0.4em' }}
-                                            />
-                                            <Line 
-                                                type="monotone" 
-                                                dataKey="revenue" 
-                                                stroke="#10b981" 
-                                                strokeWidth={2} 
-                                                dot={false} 
-                                                activeDot={{ r: 4, fill: '#10b981', stroke: '#000000', strokeWidth: 2 }} 
-                                            />
-                                        </LineChart>
-                                    </ResponsiveContainer>
-                                </div>
+                                {analytics ? (
+                                    <div className="h-[400px] w-full">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={analytics?.chartData}>
+                                                <CartesianGrid strokeDasharray="0" vertical={false} stroke="#ffffff" strokeOpacity={0.02} />
+                                                <XAxis 
+                                                    dataKey="name" 
+                                                    stroke="#ffffff" 
+                                                    fontSize={8} 
+                                                    fontWeight={900} 
+                                                    tick={{ fill: '#ffffff', opacity: 0.1 }}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                    dy={20}
+                                                />
+                                                <YAxis 
+                                                    stroke="#ffffff" 
+                                                    fontSize={8} 
+                                                    fontWeight={900} 
+                                                    tick={{ fill: '#ffffff', opacity: 0.1 }}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                    tickFormatter={(value) => `$${value}`}
+                                                />
+                                                <Tooltip 
+                                                    cursor={{ stroke: '#10b981', strokeWidth: 1 }}
+                                                    contentStyle={{ backgroundColor: '#000000', border: '1px solid rgba(255,255,255,0.05)', padding: '24px', borderRadius: '0' }}
+                                                    itemStyle={{ color: '#10b981', fontWeight: 900, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.1em' }}
+                                                    labelStyle={{ color: '#ffffff20', fontWeight: 900, fontSize: '9px', textTransform: 'uppercase', marginBottom: '12px', letterSpacing: '0.4em' }}
+                                                />
+                                                <Line 
+                                                    type="monotone" 
+                                                    dataKey="revenue" 
+                                                    stroke="#10b981" 
+                                                    strokeWidth={2} 
+                                                    dot={false} 
+                                                    activeDot={{ r: 4, fill: '#10b981', stroke: '#000000', strokeWidth: 2 }} 
+                                                />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                ) : (
+                                    <div className="h-[400px] w-full flex items-center justify-center border border-white/[0.03] bg-white/[0.01]">
+                                        <p className="text-[10px] font-black text-white/10 uppercase tracking-[0.8em] animate-pulse">AWAITING_DATA_STREAM</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
