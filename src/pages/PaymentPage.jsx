@@ -106,8 +106,8 @@ const PaymentPage = () => {
     if (isProcessing) {
         return (
             <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6">
-                <div className="w-24 h-24 border-[2px] border-white/5 border-t-[#10b981] rounded-full animate-spin mb-8"></div>
-                <p className="text-[11px] font-black text-white uppercase tracking-[0.8em] ml-[0.8em]">VALIDATING_SESSION</p>
+                <div className="w-24 h-24 border-2 border-[#10b981] animate-spin mb-8 shadow-[0_0_40px_rgba(16,185,129,0.2)]"></div>
+                <p className="text-[10px] font-black text-white uppercase tracking-[0.4em] md:tracking-[0.8em] md:ml-[0.8em]">VALIDATING_SESSION</p>
             </div>
         );
     }
@@ -116,57 +116,57 @@ const PaymentPage = () => {
         <div className="min-h-screen bg-black text-white selection:bg-[#10b981]/30 overflow-x-hidden flex flex-col font-sans relative">
             {/* Background Atmosphere */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#10b981]/5 blur-[120px] rounded-full animate-pulse"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#f59e0b]/3 blur-[120px] rounded-full"></div>
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#10b981]/5 blur-[120px] animate-pulse"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#f59e0b]/3 blur-[120px]"></div>
             </div>
 
             {/* Nav */}
-            <nav className="w-full max-w-[1400px] mx-auto px-8 py-10 flex justify-between items-center relative z-10 faded-line-b">
-                <div className="flex items-center gap-3">
-                    <div className="w-1.5 h-6 bg-[#10b981] rounded-full"></div>
-                    <span className="text-[11px] font-black uppercase tracking-[0.4em]">{settings.company_name}</span>
+            <nav className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 md:py-10 flex flex-row justify-between items-center relative z-10 faded-line-b gap-4">
+                <div className="flex items-center gap-2 md:gap-3 min-w-0">
+                    <div className="w-1.5 h-6 bg-[#10b981] flex-shrink-0"></div>
+                    <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] md:tracking-[0.4em] truncate">{settings.company_name}</span>
                 </div>
-                <div className="flex items-center gap-8">
+                <div className="flex items-center gap-4 md:gap-8 flex-shrink-0">
                     {envError && (
-                        <span className="text-[9px] font-black uppercase tracking-widest text-[#f59e0b]">{envError}</span>
+                        <span className="hidden sm:inline text-[9px] font-black uppercase tracking-widest text-[#f59e0b]">{envError}</span>
                     )}
-                    <Link to="/orders" className="modern-action-white hover:opacity-100">
+                    <Link to="/orders" className="modern-action-white hover:opacity-100 text-[9px] md:text-[11px]">
                         DASHBOARD
                     </Link>
                 </div>
             </nav>
 
-            <main className="flex-1 w-full max-w-[1400px] mx-auto px-8 grid lg:grid-cols-2 gap-24 items-center py-20 relative z-10">
+            <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-8 grid lg:grid-cols-2 gap-12 md:gap-24 items-center py-8 md:py-20 relative z-10">
                 {/* Hero Section */}
-                <div className="space-y-12 animate-in fade-in slide-in-from-left-8 duration-1000">
-                    <div className="space-y-8">
+                <div className="space-y-6 md:space-y-12 animate-in fade-in slide-in-from-left-8 duration-1000">
+                    <div className="space-y-4 md:space-y-8">
                         <div className="flex items-center gap-4">
-                            <div className="w-10 h-[1px] bg-[#f59e0b] rounded-full"></div>
-                            <p className="text-[#f59e0b] text-[10px] font-black uppercase tracking-[0.5em]">SETTLEMENT PROTOCOL</p>
+                            <div className="w-8 md:w-10 h-[1px] bg-[#f59e0b]"></div>
+                            <p className="text-[#f59e0b] text-[9px] md:text-[10px] font-black uppercase tracking-[0.5em]">SETTLEMENT PROTOCOL</p>
                         </div>
-                        <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none uppercase">
+                        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-none uppercase break-words">
                             Secure <br />
                             <span className="text-white/50">Settlement.</span>
                         </h1>
                     </div>
 
-                    <p className="text-xl text-green-700 font-black max-w-sm leading-tight border-l-2 border-[#10b981] pl-8 uppercase tracking-tighter">
-                        Authorized payment gateway for <span className="text-yellow-600">{settings.company_name}</span> institutional transactions.
+                    <p className="text-base md:text-xl text-[#10b981] font-black max-w-xl md:max-w-sm leading-tight border-l-2 border-[#10b981] pl-4 md:pl-8 uppercase tracking-tighter">
+                        Authorized payment gateway for <span className="text-[#f59e0b]">{settings.company_name}</span> institutional transactions.
                     </p>
                 </div>
 
                 {/* Interaction Section */}
                 <div className="animate-in fade-in slide-in-from-right-8 duration-1000 delay-200">
                     <div className="relative group">
-                        <form onSubmit={handlePayment} className="relative space-y-12">
-                            <div className="space-y-12">
+                        <form onSubmit={handlePayment} className="relative space-y-8 md:space-y-12">
+                            <div className="space-y-8 md:space-y-12">
                                 <div className="group relative">
                                     <label className="text-[9px] font-black text-white uppercase tracking-[0.4em] block mb-2 group-focus-within:text-[#10b981] transition-all">Entity Identity</label>
                                     <input 
                                         type="text" 
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
-                                        className="w-full bg-transparent faded-line-b py-6 outline-none text-xl font-black transition-all placeholder:text-white/20 uppercase text-white focus:border-[#10b981]"
+                                        className="w-full bg-transparent faded-line-b py-4 md:py-6 outline-none text-xl font-black transition-all placeholder:text-white/20 uppercase text-white focus:border-[#10b981]"
                                         placeholder="Name"
                                         required
                                     />
@@ -178,21 +178,21 @@ const PaymentPage = () => {
                                         type="email" 
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full bg-transparent faded-line-b py-6 outline-none text-xl font-black transition-all placeholder:text-white/20 text-white focus:border-[#10b981]"
+                                        className="w-full bg-transparent faded-line-b py-4 md:py-6 outline-none text-xl font-black transition-all placeholder:text-white/20 text-white focus:border-[#10b981]"
                                         placeholder="company@domain.com"
                                         required
                                     />
                                 </div>
 
                                 <div className="group relative">
-                                    <label className="text-[9px] font-black text-white uppercase tracking-[0.4em] block mb-2">Settlement Value (USD)</label>
-                                    <div className="flex items-center gap-6 faded-line-b focus-within:border-[#f59e0b] transition-all pb-2">
-                                        <span className="text-4xl font-black text-green-500">$</span>
+                                    <label className="text-[9px] md:text-[10px] font-black text-white uppercase tracking-[0.4em] block mb-2">Settlement Value (USD)</label>
+                                    <div className="flex items-center gap-4 md:gap-6 faded-line-b focus-within:border-[#f59e0b] transition-all pb-2">
+                                        <span className="text-2xl sm:text-3xl md:text-4xl font-black text-[#10b981] flex-shrink-0">$</span>
                                         <input 
                                             type="number" 
                                             value={amount}
                                             onChange={(e) => setAmount(e.target.value)}
-                                            className="flex-1 bg-transparent border-none outline-none text-5xl md:text-5xl font-black transition-all placeholder:text-green-500 text-green-500 tracking-tighter"
+                                            className="flex-1 bg-transparent border-none outline-none text-3xl sm:text-4xl md:text-5xl font-black transition-all placeholder:text-[#10b981] text-[#10b981] tracking-tighter min-w-0"
                                             placeholder="0.00"
                                             required
                                             step="0.01"
@@ -204,10 +204,10 @@ const PaymentPage = () => {
 
                             <button 
                                 type="submit"
-                                className="modern-action-green text-3xl hover:gap-10 w-full justify-center gap-4 py-4 underline"
+                                className="modern-action-green text-lg md:text-2xl hover:gap-10 w-full justify-center gap-4 py-6 md:py-8"
                             >
                                 <span>Initialize Payment</span>
-                                <ArrowRight size={20} />
+                                <ArrowRight size={20} className="flex-shrink-0" />
                             </button>
                         </form>
                     </div>
@@ -215,18 +215,18 @@ const PaymentPage = () => {
             </main>
 
             {/* Footer */}
-            <footer className="w-full max-w-[1400px] mx-auto px-8 py-16 flex flex-col md:flex-row justify-between items-end gap-12 faded-line-t mt-auto relative z-10">
-                <div className="flex flex-col md:flex-row gap-8 text-[9px] font-black uppercase tracking-[0.4em] text-white/40">
+            <footer className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-12 md:py-16 flex flex-col md:flex-row justify-between items-center md:items-end gap-10 md:gap-12 faded-line-t mt-auto relative z-10">
+                <div className="flex flex-row flex-wrap justify-center md:justify-start gap-6 md:gap-8 text-[9px] font-black uppercase tracking-[0.3em] md:tracking-[0.4em] text-white/40">
                     <Link to="/terms-of-service" className="hover:text-white transition-colors">TERMS</Link>
                     <Link to="/privacy-policy" className="hover:text-white transition-colors">INTEGRITY</Link>
                     <Link to="/refund" className="hover:text-[#f59e0b] transition-colors">ADJUSTMENT</Link>
                 </div>
-                <div className="text-right space-y-4">
-                    <p className="text-[9px] font-black text-orange-300 uppercase tracking-[0.6em]">
+                <div className="text-center md:text-right space-y-4">
+                    <p className="text-[9px] font-black text-orange-300 uppercase tracking-[0.4em] md:tracking-[0.6em]">
                         © {new Date().getFullYear()} {settings.company_name} // NODE_{config.reference.slice(-4)}
                     </p>
-                    <div className="flex items-center justify-end gap-3">
-                        <div className="w-1.5 h-1.5 bg-[#10b981] rounded-full animate-pulse shadow-[0_0_10px_#10b981]"></div>
+                    <div className="flex items-center justify-center md:justify-end gap-3">
+                        <div className="w-1.5 h-1.5 bg-[#10b981] animate-pulse shadow-[0_0_10px_#10b981]"></div>
                         <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/40">SYSTEM_NOMINAL</span>
                     </div>
                 </div>

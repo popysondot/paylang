@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Settings, Save, AlertCircle, CheckCircle } from 'lucide-react';
+import { Settings, Save, AlertCircle, CheckCircle, ShieldCheck, Mail, Phone, Globe, Clock, Percent, ArrowRight } from 'lucide-react';
 
 const AdminSettings = ({ token, onClose }) => {
     const getBaseUrl = () => {
+        if (import.meta.env.VITE_BACKEND_URL) return import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
         return window.location.hostname === 'localhost' 
-            ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+            ? 'http://localhost:5000'
             : '';
     };
 
@@ -63,7 +64,7 @@ const AdminSettings = ({ token, onClose }) => {
                 );
             }
 
-            setMessage('Settings saved successfully!');
+            setMessage('Settings synchronized successfully');
             setTimeout(() => setMessage(''), 3000);
         } catch (err) {
             setError(err.response?.data?.error || 'Failed to save settings');
@@ -78,7 +79,7 @@ const AdminSettings = ({ token, onClose }) => {
         setPasswordError('');
 
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-            setPasswordError('New passwords do not match');
+            setPasswordError('Verification failed: Passwords mismatch');
             return;
         }
 
@@ -92,55 +93,54 @@ const AdminSettings = ({ token, onClose }) => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            setPasswordMessage('Password updated successfully!');
+            setPasswordMessage('Access credentials updated successfully');
             setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
             setTimeout(() => setPasswordMessage(''), 3000);
         } catch (err) {
-            setPasswordError(err.response?.data?.error || 'Failed to update password');
+            setPasswordError(err.response?.data?.error || 'Authorization update failed');
         }
     };
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-96">
-                <div className="animate-spin h-12 w-12 border-2 border-white/25 border-t-[#10b981]"></div>
+            <div className="flex flex-col justify-center items-center h-96 space-y-8">
+                <div className="w-12 h-12 border-2 border-[#10b981] animate-spin mb-8 shadow-[0_0_30px_rgba(16,185,129,0.2)]"></div>
+                <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.8em] animate-pulse">RETRIEVING_CONFIG</p>
             </div>
         );
     }
 
-    const inputClasses = "w-full bg-white/[0.03] border-none rounded-full px-8 py-4 text-white placeholder:text-white/5 outline-none focus:bg-white/[0.05] transition-all font-black uppercase tracking-[0.2em] text-[11px]";
-    const labelClasses = "block text-[9px] font-black text-white/30 uppercase tracking-[0.4em] mb-4 group-focus-within:text-white transition-all";
+    const inputClasses = "w-full bg-transparent border-b border-white/10 py-6 outline-none text-2xl font-black transition-all placeholder:text-white/5 uppercase text-white tracking-tight focus:border-[#10b981]";
+    const labelClasses = "block text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-2 transition-all group-focus-within:text-[#10b981]";
 
     return (
-        <div className="space-y-24 animate-in fade-in duration-1000 font-sans pb-40">
-            {message && (
-                <div className="bg-[#10b981]/10 border border-[#10b981]/20 text-[#10b981] p-8 rounded-full flex items-center gap-6 font-black uppercase tracking-[0.2em] text-[11px] animate-in slide-in-from-top-4 duration-700">
-                    <CheckCircle size={24} /> {message}
+        <div className="space-y-16 md:space-y-32 animate-in fade-in duration-1000 font-sans pb-40 relative px-2 md:px-0">
+            {(message || error) && (
+                <div className={`fixed top-24 md:top-32 right-4 md:right-12 z-[100] p-6 flex items-center gap-6 font-black uppercase tracking-[0.2em] text-[10px] animate-in slide-in-from-right-12 duration-700 shadow-2xl backdrop-blur-xl border ${
+                    message ? 'bg-[#10b981]/10 border-[#10b981]/20 text-[#10b981]' : 'bg-red-500/10 border-red-500/20 text-red-500'
+                }`}>
+                    {message ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
+                    {message || error}
                 </div>
             )}
 
-            {error && (
-                <div className="bg-[#f59e0b]/10 border border-[#f59e0b]/20 text-[#f59e0b] p-8 rounded-full flex items-center gap-6 font-black uppercase tracking-[0.2em] text-[11px] animate-in slide-in-from-top-4 duration-700">
-                    <AlertCircle size={24} /> {error}
-                </div>
-            )}
-
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-32">
-                {/* Company Settings */}
-                <div className="space-y-16 relative">
-                    <div className="absolute left-[-48px] top-0 w-1 h-32 bg-gradient-to-b from-[#10b981] to-transparent rounded-full"></div>
-                    <div className="flex items-center gap-6 relative z-10">
-                        <div className="w-16 h-16 bg-white/[0.03] rounded-full flex items-center justify-center text-[#10b981]">
-                            <Settings size={32} />
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-black text-white uppercase tracking-tighter">Global Identity</h3>
-                            <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] mt-2">CORE_BRANDING_CONFIGURATION</p>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-16 md:gap-32">
+                {/* Global Configuration */}
+                <div className="space-y-12 md:space-y-16">
+                    <div className="flex items-center justify-between border-b border-white/10 pb-6 md:pb-8">
+                        <div className="flex items-center gap-6">
+                            <div className="text-[#10b981]">
+                                <Globe size={20} strokeWidth={3} />
+                            </div>
+                            <div>
+                                <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">Global Identity</h3>
+                                <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mt-2">CORE_BRANDING_CONFIGURATION</p>
+                            </div>
                         </div>
                     </div>
                     
-                    <div className="space-y-12 relative z-10">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div className="space-y-10 md:space-y-12">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 md:gap-x-12 gap-y-12 md:gap-y-16">
                             <div className="group">
                                 <label className={labelClasses}>Entity Name</label>
                                 <input
@@ -151,7 +151,7 @@ const AdminSettings = ({ token, onClose }) => {
                                 />
                             </div>
                             <div className="group">
-                                <label className={labelClasses}>Service Name</label>
+                                <label className={labelClasses}>Service Identifier</label>
                                 <input
                                     type="text"
                                     value={settings.service_name || ''}
@@ -160,157 +160,170 @@ const AdminSettings = ({ token, onClose }) => {
                                     placeholder="CORE_SETTLEMENT"
                                 />
                             </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                             <div className="group">
-                                <label className={labelClasses}>Support Email</label>
+                                <label className={labelClasses}>Support Channel</label>
                                 <input
                                     type="email"
                                     value={settings.support_email || ''}
                                     onChange={(e) => handleChange('support_email', e.target.value)}
                                     className={inputClasses}
+                                    placeholder="SUPPORT@PROTOCOL"
                                 />
                             </div>
                             <div className="group">
-                                <label className={labelClasses}>Support Phone</label>
+                                <label className={labelClasses}>Voice Uplink</label>
                                 <input
                                     type="tel"
                                     value={settings.support_phone || ''}
                                     onChange={(e) => handleChange('support_phone', e.target.value)}
                                     className={inputClasses}
+                                    placeholder="+1_ADMIN_LINE"
                                 />
                             </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                             <div className="group">
-                                <label className={labelClasses}>Admin Alerts</label>
+                                <label className={labelClasses}>Alert Distribution</label>
                                 <input
                                     type="email"
                                     value={settings.notification_email || ''}
                                     onChange={(e) => handleChange('notification_email', e.target.value)}
                                     className={inputClasses}
+                                    placeholder="ALERTS@PROTOCOL"
                                 />
                             </div>
                             <div className="group">
-                                <label className={labelClasses}>Timezone</label>
-                                <select
-                                    value={settings.timezone || 'UTC'}
-                                    onChange={(e) => handleChange('timezone', e.target.value)}
-                                    className={`${inputClasses} cursor-pointer appearance-none`}
-                                >
-                                    <option className="bg-black">UTC</option>
-                                    <option className="bg-black">EST</option>
-                                    <option className="bg-black">CST</option>
-                                    <option className="bg-black">MST</option>
-                                    <option className="bg-black">PST</option>
-                                </select>
+                                <label className={labelClasses}>Temporal Zone</label>
+                                <div className="relative group">
+                                    <select
+                                        value={settings.timezone || 'UTC'}
+                                        onChange={(e) => handleChange('timezone', e.target.value)}
+                                        className={`${inputClasses} cursor-pointer appearance-none pr-10`}
+                                    >
+                                        <option className="bg-black">UTC</option>
+                                        <option className="bg-black">EST</option>
+                                        <option className="bg-black">CST</option>
+                                        <option className="bg-black">MST</option>
+                                        <option className="bg-black">PST</option>
+                                    </select>
+                                    <Clock size={14} className="absolute right-0 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none group-focus-within:text-[#10b981]" />
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Policies & Content */}
-                <div className="space-y-24">
-                    <div className="space-y-16 relative">
-                        <div className="absolute left-[-48px] top-0 w-1 h-32 bg-gradient-to-b from-[#f59e0b] to-transparent rounded-full"></div>
-                        <div className="flex items-center gap-6 relative z-10">
-                            <div className="w-16 h-16 bg-white/[0.03] rounded-full flex items-center justify-center text-[#f59e0b]">
-                                <AlertCircle size={32} />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-black text-white uppercase tracking-tighter">Adjustments</h3>
-                                <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] mt-2">POLICY_VECTOR_CONSTRAINTS</p>
+                {/* Policies & Security */}
+                <div className="space-y-16 md:space-y-24">
+                    <div className="space-y-12 md:space-y-16">
+                        <div className="flex items-center justify-between border-b border-white/10 pb-6 md:pb-8">
+                            <div className="flex items-center gap-6">
+                                <div className="text-[#f59e0b]">
+                                    <Percent size={20} strokeWidth={3} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">Adjustment Logic</h3>
+                                    <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mt-2">POLICY_VECTOR_CONSTRAINTS</p>
+                                </div>
                             </div>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 relative z-10">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
                             <div className="group">
-                                <label className={labelClasses}>Window (Days)</label>
+                                <label className={labelClasses}>Temporal Window (Days)</label>
                                 <input
                                     type="number"
                                     value={settings.refund_policy_days || '14'}
                                     onChange={(e) => handleChange('refund_policy_days', e.target.value)}
-                                    className={inputClasses}
+                                    className={inputClasses.replace('focus:border-[#10b981]', 'focus:border-[#f59e0b]')}
                                 />
                             </div>
                             <div className="group">
-                                <label className={labelClasses}>Max Ratio (%)</label>
+                                <label className={labelClasses}>Max Threshold (%)</label>
                                 <input
                                     type="number"
                                     value={settings.max_refund_percentage || '100'}
                                     onChange={(e) => handleChange('max_refund_percentage', e.target.value)}
-                                    className={inputClasses}
+                                    className={inputClasses.replace('focus:border-[#10b981]', 'focus:border-[#f59e0b]')}
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className="space-y-16 relative">
-                        <div className="absolute left-[-48px] top-0 w-1 h-32 bg-gradient-to-b from-[#a855f7] to-transparent rounded-full"></div>
-                        <div className="flex items-center gap-6 relative z-10">
-                            <div className="w-16 h-16 bg-white/[0.03] rounded-full flex items-center justify-center text-[#a855f7]">
-                                <Save size={32} />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-black text-white uppercase tracking-tighter">Access Key</h3>
-                                <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] mt-2">SECURITY_TOKEN_ROTATION</p>
+                    <div className="space-y-12 md:space-y-16">
+                        <div className="flex items-center justify-between border-b border-white/10 pb-6 md:pb-8">
+                            <div className="flex items-center gap-6">
+                                <div className="text-white/40">
+                                    <ShieldCheck size={20} strokeWidth={3} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">Access Key</h3>
+                                    <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mt-2">SECURITY_TOKEN_ROTATION</p>
+                                </div>
                             </div>
                         </div>
 
-                        <form onSubmit={handleChangePassword} className="space-y-12 relative z-10">
+                        <form onSubmit={handleChangePassword} className="space-y-10 md:space-y-12">
+                            {(passwordMessage || passwordError) && (
+                                <div className={`p-4 text-[9px] font-black uppercase tracking-widest text-center border ${
+                                    passwordMessage ? 'bg-[#10b981]/5 border-[#10b981]/20 text-[#10b981]' : 'bg-red-500/5 border-red-500/20 text-red-500'
+                                }`}>
+                                    {passwordMessage || passwordError}
+                                </div>
+                            )}
                             <div className="group">
                                 <label className={labelClasses}>Current Key</label>
                                 <input
                                     type="password"
                                     value={passwordData.currentPassword}
                                     onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                                    className={inputClasses}
+                                    className={inputClasses.replace('focus:border-[#10b981]', 'focus:border-white')}
+                                    placeholder="••••••••"
                                     required
                                 />
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
                                 <div className="group">
                                     <label className={labelClasses}>New Key</label>
                                     <input
                                         type="password"
                                         value={passwordData.newPassword}
                                         onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-                                        className={inputClasses}
+                                        className={inputClasses.replace('focus:border-[#10b981]', 'focus:border-white')}
+                                        placeholder="••••••••"
                                         required
                                     />
                                 </div>
                                 <div className="group">
-                                    <label className={labelClasses}>Verify</label>
+                                    <label className={labelClasses}>Verify Key</label>
                                     <input
                                         type="password"
                                         value={passwordData.confirmPassword}
                                         onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                                        className={inputClasses}
+                                        className={inputClasses.replace('focus:border-[#10b981]', 'focus:border-white')}
+                                        placeholder="••••••••"
                                         required
                                     />
                                 </div>
                             </div>
                             <button
                                 type="submit"
-                                className="w-full bg-white text-black py-6 rounded-full font-black uppercase tracking-[0.4em] text-[11px] hover:bg-white/90 transition-all duration-700 shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
+                                className="w-full bg-white text-black py-5 md:py-6 font-black uppercase tracking-[0.4em] text-[9px] md:text-[10px] hover:bg-[#10b981] transition-all duration-700 shadow-[0_20px_40px_rgba(0,0,0,0.3)] group flex items-center justify-center gap-4"
                             >
-                                Update Credentials
+                                <span>Update Credentials</span>
+                                <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
                             </button>
                         </form>
                     </div>
                 </div>
             </div>
 
-            <div className="flex justify-end pt-24 border-t border-white/[0.03]">
+            <div className="flex justify-center pt-24 md:pt-32">
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="group bg-[#10b981] text-black px-12 py-6 rounded-full font-black uppercase tracking-[0.4em] text-[11px] flex items-center gap-6 hover:bg-white transition-all duration-700 disabled:opacity-50 shadow-[0_30px_60px_rgba(16,185,129,0.1)]"
+                    className="group bg-[#10b981] text-black px-12 md:px-24 py-6 md:py-8 font-black uppercase tracking-[0.5em] text-[10px] md:text-[11px] flex items-center gap-4 md:gap-6 hover:bg-white transition-all duration-700 disabled:opacity-50 shadow-[0_30px_60px_rgba(16,185,129,0.15)]"
                 >
-                    {saving ? 'Synchronizing...' : 'Commit Changes'}
-                    <Save size={20} className="group-hover:scale-110 transition-transform" />
+                    {saving ? 'SYNCHRONIZING...' : 'COMMIT_GLOBAL_CHANGES'}
+                    <Save size={18} className="group-hover:scale-110 transition-transform" />
                 </button>
             </div>
         </div>

@@ -29,28 +29,28 @@ const NotFound = () => {
 
     return (
         <div className="min-h-screen bg-black text-white selection:bg-[#10b981]/30 overflow-x-hidden flex flex-col">
-            <nav className="w-full max-w-[1400px] mx-auto px-6 py-10 flex justify-between items-center relative z-10">
+            <nav className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex justify-between items-center relative z-10">
                 <Link to="/" className="flex items-center gap-4">
                     <div className="w-2 h-8 bg-[#f59e0b]"></div>
                     <span className="text-[12px] font-black uppercase tracking-[0.4em]">{settings.company_name}</span>
                 </Link>
-                <Link to="/" className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-white transition-colors px-6 py-3 bg-white/5 border border-white/10 rounded-full">
+                <Link to="/" className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-white transition-colors px-6 py-3 bg-white/5 border border-white/10">
                     <ArrowLeft size={14} /> REVERT TO HUB
                 </Link>
             </nav>
 
-            <main className="flex-grow flex items-center justify-center px-6 py-20 animate-in fade-in slide-in-from-bottom-8 duration-1000 relative">
+            <main className="flex-grow flex items-center justify-center px-4 md:px-8 py-20 animate-in fade-in slide-in-from-bottom-8 duration-1000 relative">
                 {/* Background Atmosphere */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#f59e0b]/5 blur-[140px] rounded-full pointer-events-none"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#f59e0b]/5 blur-[140px] pointer-events-none"></div>
 
                 {show404 && !snakeStarted ? (
                     <div className="max-w-5xl w-full relative z-10">
                         <div className="space-y-12 mb-32">
                             <div className="flex items-center gap-6">
-                                <div className="w-1 rounded-full h-12 bg-gradient-to-b from-[#f59e0b] to-transparent"></div>
+                                <div className="w-1 h-12 bg-gradient-to-b from-[#f59e0b] to-transparent"></div>
                                 <p className="text-[#f59e0b] text-[11px] font-black uppercase tracking-[0.6em]">ERROR_404</p>
                             </div>
-                            <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-tight text-white uppercase">
+                            <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none text-white uppercase">
                                 Page <br />
                                 <span className="text-white/5">Missing.</span>
                             </h1>
@@ -69,13 +69,13 @@ const NotFound = () => {
                                             setShowGamePrompt(false);
                                             setSnakeStarted(true);
                                         }}
-                                        className="bg-[#10b981] text-black px-12 py-6 font-black uppercase tracking-widest text-[11px] hover:bg-white transition-all duration-700 rounded-full shadow-[0_20px_40px_rgba(16,185,129,0.05)]"
+                                        className="bg-[#10b981] text-black px-12 py-6 font-black uppercase tracking-widest text-[11px] hover:bg-white transition-all duration-700 shadow-[0_20px_40px_rgba(16,185,129,0.05)]"
                                     >
                                         Initiate Snake
                                     </button>
                                     <Link 
                                         to="/"
-                                        className="bg-white/[0.05] text-white px-12 py-6 font-black uppercase tracking-widest text-[11px] hover:bg-white hover:text-black transition-all rounded-full text-center"
+                                        className="bg-white/[0.05] text-white px-12 py-6 font-black uppercase tracking-widest text-[11px] hover:bg-white hover:text-black transition-all text-center"
                                     >
                                         Return Home
                                     </Link>
@@ -88,7 +88,7 @@ const NotFound = () => {
                 )}
             </main>
 
-            <footer className="w-full max-w-[1400px] mx-auto px-6 py-16 flex justify-between items-center border-t border-white/5 mt-auto">
+            <footer className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-16 flex justify-between items-center border-t border-white/5 mt-auto">
                 <p className="text-[11px] font-black text-white/20 uppercase tracking-[0.5em]">
                     © {new Date().getFullYear()} {settings.company_name}. SECURE NAVIGATION.
                 </p>
@@ -237,14 +237,14 @@ const SnakeGame = ({ onComplete, isStarted }) => {
     if (won) {
         return (
             <div className="max-w-xl w-full text-center space-y-16 animate-in zoom-in-95 duration-1000 relative">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#10b981]/10 blur-[100px] rounded-full animate-pulse"></div>
-                <div className="w-1 rounded-full h-32 bg-gradient-to-b from-[#10b981] to-transparent mx-auto relative z-10"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#10b981]/10 blur-[100px] animate-pulse"></div>
+                <div className="w-1 h-32 bg-gradient-to-b from-[#10b981] to-transparent mx-auto relative z-10"></div>
                 <div className="space-y-8 relative z-10">
                     <h2 className="text-5xl font-black text-white tracking-tighter uppercase">Protocol Surmounted</h2>
                     <p className="text-xl text-white/20 font-black uppercase tracking-tighter">You scored {score} points and bypassed the void.</p>
                 </div>
                 <div className="flex justify-center relative z-10">
-                    <Link to="/" className="bg-[#10b981] text-black px-16 py-8 font-black uppercase tracking-[0.4em] text-[12px] hover:bg-white transition-all duration-700 rounded-full shadow-[0_20px_40px_rgba(16,185,129,0.1)]">
+                    <Link to="/" className="bg-[#10b981] text-black px-16 py-8 font-black uppercase tracking-[0.4em] text-[12px] hover:bg-white transition-all duration-700 shadow-[0_20px_40px_rgba(16,185,129,0.1)]">
                         Escape to Hub
                     </Link>
                 </div>
@@ -255,9 +255,9 @@ const SnakeGame = ({ onComplete, isStarted }) => {
     return (
         <div className="w-full max-w-7xl flex flex-col xl:flex-row gap-32 items-center relative z-10">
             <div className="relative group">
-                <div className="absolute -inset-10 bg-[#10b981]/5 blur-[80px] rounded-full opacity-0 group-hover:opacity-100 transition-all duration-1000"></div>
+                <div className="absolute -inset-10 bg-[#10b981]/5 blur-[80px] opacity-0 group-hover:opacity-100 transition-all duration-1000"></div>
                 <div 
-                    className="relative grid bg-black overflow-hidden border border-white/[0.05] rounded-[2.5rem] shadow-[0_40px_80px_rgba(0,0,0,0.5)]"
+                    className="relative grid bg-black overflow-hidden border border-white/[0.05] shadow-[0_40px_80px_rgba(0,0,0,0.5)]"
                     style={{
                         width: 'min(90vw, 550px)',
                         height: 'min(90vw, 550px)',
@@ -272,12 +272,12 @@ const SnakeGame = ({ onComplete, isStarted }) => {
                             style={{
                                 gridColumnStart: seg.x + 1,
                                 gridRowStart: seg.y + 1,
-                                borderRadius: i === 0 ? '4px' : '2px'
+                                borderRadius: '0px'
                             }}
                         />
                     ))}
                     <div 
-                        className="bg-[#f59e0b] shadow-[0_0_15px_#f59e0b] animate-pulse rounded-sm"
+                        className="bg-[#f59e0b] shadow-[0_0_15px_#f59e0b] animate-pulse"
                         style={{
                             gridColumnStart: food.x + 1,
                             gridRowStart: food.y + 1
@@ -286,12 +286,12 @@ const SnakeGame = ({ onComplete, isStarted }) => {
                 </div>
 
                 {gameOver && (
-                    <div className="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-12 text-center space-y-12 animate-in fade-in duration-500 rounded-[2.5rem]">
+                    <div className="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-12 text-center space-y-12 animate-in fade-in duration-500">
                         <div className="space-y-4">
                             <h3 className="text-3xl font-black text-white uppercase tracking-tighter">Execution Terminated</h3>
                             <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">BUFFER_OVERFLOW_DETECTED</p>
                         </div>
-                        <button onClick={restart} className="bg-[#f59e0b] text-white px-12 py-6 font-black uppercase tracking-widest text-[11px] flex items-center gap-6 hover:bg-white hover:text-black transition-all duration-700 rounded-full shadow-xl">
+                        <button onClick={restart} className="bg-[#f59e0b] text-white px-12 py-6 font-black uppercase tracking-widest text-[11px] flex items-center gap-6 hover:bg-white hover:text-black transition-all duration-700 shadow-xl">
                             <RotateCcw size={18} /> Re-Initiate
                         </button>
                     </div>
@@ -307,7 +307,7 @@ const SnakeGame = ({ onComplete, isStarted }) => {
             <div className="flex-1 space-y-20">
                 <div className="space-y-12">
                     <div className="flex items-center gap-6">
-                        <div className="w-1 rounded-full h-8 bg-gradient-to-b from-[#10b981] to-transparent"></div>
+                        <div className="w-1 h-8 bg-gradient-to-b from-[#10b981] to-transparent"></div>
                         <p className="text-[#10b981] text-[11px] font-black uppercase tracking-[0.6em]">PROTOCOL_STATS</p>
                     </div>
                     <div className="flex gap-24">
@@ -324,7 +324,7 @@ const SnakeGame = ({ onComplete, isStarted }) => {
 
                 <div className="space-y-8">
                     <div className="flex items-center gap-6">
-                        <div className="w-1 rounded-full h-8 bg-gradient-to-b from-white/20 to-transparent"></div>
+                        <div className="w-1 h-8 bg-gradient-to-b from-white/20 to-transparent"></div>
                         <h4 className="text-[11px] font-black text-white uppercase tracking-[0.6em]">INPUT_INTERFACE</h4>
                     </div>
                     <p className="text-xl text-white/30 font-black uppercase tracking-tighter leading-relaxed max-w-md">

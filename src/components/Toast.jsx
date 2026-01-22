@@ -38,13 +38,13 @@ const Toast = ({ message, type, onClose }) => {
     return (
         <div className={`
             pointer-events-auto
-            flex items-center gap-8 px-8 py-5 border border-white/10 shadow-2xl bg-black/80 backdrop-blur-xl rounded-full
+            flex items-center gap-8 px-8 py-5 border border-white/10 shadow-2xl bg-black/80 backdrop-blur-xl
             animate-in slide-in-from-right-8 duration-500
             ${type === 'success' ? 'ring-1 ring-[#10b981]/50' : 
               type === 'error' ? 'ring-1 ring-red-500/50' : 
               'ring-1 ring-[#f59e0b]/50'}
         `}>
-            <div className={`w-2 h-2 rounded-full ${
+            <div className={`w-2 h-2 ${
                 type === 'success' ? 'bg-[#10b981] shadow-[0_0_10px_#10b981]' : 
                 type === 'error' ? 'bg-red-500 shadow-[0_0_10px_red]' : 
                 'bg-[#f59e0b] shadow-[0_0_10px_#f59e0b]'

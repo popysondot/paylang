@@ -81,28 +81,28 @@ const CustomerDashboard = () => {
             <div className="min-h-screen bg-black text-white selection:bg-[#10b981]/30 overflow-x-hidden flex flex-col font-sans relative">
             {/* Atmospheric Background */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#10b981]/5 blur-[120px] rounded-full animate-pulse"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#10b981]/3 blur-[120px] rounded-full"></div>
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#10b981]/5 blur-[120px] animate-pulse"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#10b981]/3 blur-[120px]"></div>
             </div>
 
-            <nav className="w-full max-w-[1400px] mx-auto px-8 py-10 flex justify-between items-center relative z-10 faded-line-b">
+            <nav className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex justify-between items-center relative z-10 faded-line-b">
                 <button onClick={() => setSelectedOrder(null)} className="modern-action-white opacity-40 hover:opacity-100 group">
                     <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> REVERT TO LIST
                 </button>
                 <div className="flex items-center gap-3">
-                    <div className="w-1.5 h-6 bg-[#10b981] rounded-full"></div>
+                    <div className="w-1.5 h-6 bg-[#10b981]"></div>
                     <span className="text-[11px] font-black uppercase tracking-[0.4em]">{settings.company_name}</span>
                 </div>
             </nav>
 
-            <main className="flex-1 w-full max-w-[1400px] mx-auto px-8 py-16 animate-in fade-in slide-in-from-bottom-8 duration-1000 relative z-10">
+            <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-8 py-16 animate-in fade-in slide-in-from-bottom-8 duration-1000 relative z-10">
                 <div className="space-y-20">
                     <div className="space-y-6">
                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-[1px] bg-[#10b981] rounded-full"></div>
+                            <div className="w-8 h-[1px] bg-[#10b981]"></div>
                             <p className="text-[#10b981] text-[10px] font-black uppercase tracking-[0.4em]">Transaction Manifest</p>
                         </div>
-                        <h1 className="text-4xl md:text-7xl font-black tracking-tighter leading-none text-white uppercase">
+                        <h1 className="text-2xl sm:text-4xl md:text-7xl font-black tracking-tighter leading-none text-white uppercase break-all">
                             {selectedOrder.reference.slice(0, 8)}<span className="text-white/20">{selectedOrder.reference.slice(8)}</span>
                         </h1>
                     </div>
@@ -127,7 +127,7 @@ const CustomerDashboard = () => {
                         {orderRefunds.length > 0 && (
                             <div className="space-y-10">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-8 h-[1px] bg-[#f59e0b] rounded-full"></div>
+                                    <div className="w-8 h-[1px] bg-[#f59e0b]"></div>
                                     <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[#f59e0b]">Adjustment History</h2>
                                 </div>
                                 <div className="space-y-1">
@@ -165,9 +165,9 @@ const CustomerDashboard = () => {
 
     return (
         <div className="min-h-screen bg-black text-white selection:bg-[#10b981]/30 overflow-x-hidden flex flex-col font-sans">
-            <nav className="w-full max-w-[1400px] mx-auto px-8 py-10 flex justify-between items-center relative z-10 faded-line-b">
+            <nav className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex justify-between items-center relative z-10 faded-line-b">
                 <Link to="/" className="flex items-center gap-4">
-                    <div className="w-2 h-8 bg-[#10b981] rounded-full"></div>
+                    <div className="w-2 h-8 bg-[#10b981]"></div>
                     <span className="text-[11px] font-black uppercase tracking-[0.4em]">{settings.company_name}</span>
                 </Link>
                 <Link to="/" className="modern-action-white opacity-40 hover:opacity-100 group">
@@ -175,14 +175,14 @@ const CustomerDashboard = () => {
                 </Link>
             </nav>
 
-            <main className="flex-1 w-full max-w-[1400px] mx-auto px-8 py-20 animate-in fade-in slide-in-from-bottom-8 duration-1000 relative z-10">
+            <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-8 py-20 animate-in fade-in slide-in-from-bottom-8 duration-1000 relative z-10">
                 <div className="max-w-5xl space-y-24">
                     <div className="space-y-8">
                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-[1px] bg-[#10b981] rounded-full"></div>
+                            <div className="w-8 h-[1px] bg-[#10b981]"></div>
                             <p className="text-[#10b981] text-[10px] font-black uppercase tracking-[0.5em]">ENTITY PORTAL</p>
                         </div>
-                        <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none text-white uppercase">
+                        <h1 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter leading-none text-white uppercase">
                             Order <br />
                             <span className="text-white/20">Tracking.</span>
                         </h1>
@@ -231,7 +231,7 @@ const CustomerDashboard = () => {
 
                             {loading && (
                                 <div className="py-24 flex flex-col items-center space-y-8">
-                                    <div className="w-16 h-16 border-2 border-white/10 border-t-[#10b981] rounded-full animate-spin"></div>
+                                    <div className="w-16 h-16 border-2 border-[#10b981] animate-spin shadow-[0_0_30px_rgba(16,185,129,0.2)]"></div>
                                     <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em]">Syncing Ledger</p>
                                 </div>
                             )}
@@ -286,7 +286,7 @@ const CustomerDashboard = () => {
                 </div>
             </main>
 
-            <footer className="w-full max-w-[1400px] mx-auto px-8 py-16 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-white/[0.03] mt-auto relative z-10">
+            <footer className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-16 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-white/[0.03] mt-auto relative z-10">
                 <div className="flex items-center gap-6">
                     <ShieldCheck size={18} className="text-[#10b981]" />
                     <p className="text-[10px] font-black text-white/10 uppercase tracking-[0.5em]">SECURE LEDGER ACCESS PROTOCOL // {new Date().getFullYear()}</p>

@@ -30,15 +30,15 @@ const PagePreloader = ({ children }) => {
         return (
             <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center">
                 <div className="relative mb-12">
-                    <div className="w-24 h-24 border-[2px] border-white/5 border-t-[#10b981] rounded-full animate-spin"></div>
+                    <div className="w-24 h-24 border-2 border-[#10b981] animate-spin shadow-[0_0_40px_rgba(16,185,129,0.2)]"></div>
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-12 h-12 bg-[#10b981]/10 rounded-full blur-xl animate-pulse"></div>
+                        <div className="w-12 h-12 bg-[#10b981]/10 blur-xl animate-pulse"></div>
                     </div>
                 </div>
                 <div className="flex flex-col items-center space-y-6">
                     <h2 className="text-[13px] font-black text-white uppercase tracking-[0.8em] ml-[0.8em]">{companyName}</h2>
-                    <div className="flex items-center gap-4 px-6 py-2 bg-white/5 border border-white/10 rounded-full">
-                        <div className="w-2 h-2 bg-[#10b981] rounded-full shadow-[0_0_10px_#10b981]"></div>
+                    <div className="flex items-center gap-4 px-6 py-2 bg-white/5 border border-white/10">
+                        <div className="w-2 h-2 bg-[#10b981] shadow-[0_0_10px_#10b981]"></div>
                         <p className="text-[10px] font-black text-white uppercase tracking-[0.4em]">Protocol Active</p>
                     </div>
                 </div>

@@ -93,7 +93,7 @@ const RefundPage = () => {
             <div className="space-y-32 relative z-10">
                 {/* Hero Policy Section */}
                 <div className="py-20 flex flex-col md:flex-row gap-16 faded-line-y">
-                    <div className="w-1.5 h-20 bg-gradient-to-b from-[#f59e0b] to-transparent shrink-0 relative z-10 rounded-full"></div>
+                    <div className="w-1.5 h-20 bg-gradient-to-b from-[#f59e0b] to-transparent shrink-0 relative z-10"></div>
                     <div className="space-y-8 relative z-10">
                         <h2 className="text-[10px] font-black text-[#f59e0b] tracking-[0.6em] uppercase">Financial Adjustment Policy</h2>
                         <p className="text-3xl md:text-5xl text-white/40 font-black leading-tight max-w-5xl tracking-tighter uppercase">

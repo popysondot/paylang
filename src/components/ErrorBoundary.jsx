@@ -35,7 +35,7 @@ class ErrorBoundary extends React.Component {
         if (this.state.hasError) {
             return (
                 <div className="min-h-screen bg-black flex items-center justify-center p-8 selection:bg-[#10b981]/30">
-                    <div className="max-w-4xl w-full bg-white/5 border border-white/10 p-12 md:p-20 rounded-[2.5rem] space-y-20 animate-in fade-in duration-1000 relative overflow-hidden">
+                    <div className="max-w-4xl w-full bg-white/5 border border-white/10 p-12 md:p-20 space-y-20 animate-in fade-in duration-1000 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/5 blur-[100px] -mr-32 -mt-32"></div>
                         <div className="space-y-8 relative z-10">
                             <div className="flex items-center gap-4">
@@ -56,7 +56,7 @@ class ErrorBoundary extends React.Component {
                         {this.state.error && (
                             <div className="border-t border-white/10 pt-10 space-y-6 relative z-10">
                                 <p className="text-[11px] font-black text-white/20 uppercase tracking-[0.4em]">Stack Debug Manifest</p>
-                                <div className="max-h-64 overflow-y-auto font-mono text-xs text-white/40 leading-relaxed break-all bg-black/50 p-8 border border-white/10 rounded-[2.5rem]">
+                                <div className="max-h-64 overflow-y-auto font-mono text-xs text-white/40 leading-relaxed break-all bg-black/50 p-8 border border-white/10">
                                     {this.state.error.toString()}
                                     {this.state.errorInfo && (
                                         <div className="mt-6 text-white/20">
@@ -70,13 +70,13 @@ class ErrorBoundary extends React.Component {
                         <div className="flex flex-col sm:flex-row gap-6 relative z-10">
                             <button
                                 onClick={this.handleReset}
-                                className="flex-1 bg-[#10b981] text-black px-12 py-8 hover:bg-white transition-all duration-500 rounded-full"
+                                className="flex-1 bg-[#10b981] text-black px-12 py-8 hover:bg-white transition-all duration-500"
                             >
                                 <span className="text-xs font-black uppercase tracking-[0.3em]">Reinitialize Protocol</span>
                             </button>
                             <button
                                 onClick={() => window.location.href = '/'}
-                                className="flex-1 bg-white/5 text-white px-12 py-8 hover:bg-white hover:text-black border border-white/10 transition-all duration-500 rounded-full"
+                                className="flex-1 bg-white/5 text-white px-12 py-8 hover:bg-white hover:text-black border border-white/10 transition-all duration-500"
                             >
                                 <span className="text-xs font-black uppercase tracking-[0.3em]">Return to Hub</span>
                             </button>
