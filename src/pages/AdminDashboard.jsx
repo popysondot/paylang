@@ -27,7 +27,7 @@ const AdminDashboard = () => {
         if (import.meta.env.VITE_BACKEND_URL) return import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
         return window.location.hostname === 'localhost' 
             ? 'http://localhost:5000'
-            : '';
+            : 'https://paylang-tusk.onrender.com';
     };
 
     const [activeView, setActiveView] = useState('dashboard');
