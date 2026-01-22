@@ -150,11 +150,53 @@ app.post('/api/verify-payment', async (req, res) => {
     console.log('Payment recorded successfully');
 
     // Send Confirmation Email
+    const frontendUrl = process.env.FRONTEND_URL || 'https://paylang.moonderiv.com';
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: 'Payment Confirmation',
-      text: `Hello ${name},\n\nYour payment of $${amount} (Ref: ${reference}) has been successfully processed.\n\nThank you.`
+      subject: `Payment Successful - Ref: ${reference}`,
+      html: `
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; color: #333333; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+          <div style="background-color: #000000; padding: 30px; text-align: center;">
+            <h1 style="color: #10b981; margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 2px;">Transaction Verified</h1>
+          </div>
+          <div style="padding: 40px 30px;">
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">Hello <strong>${name}</strong>,</p>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">Your settlement has been successfully processed and verified by our institutional gateway.</p>
+            
+            <div style="background-color: #f9fafb; border-left: 4px solid #10b981; padding: 20px; margin-bottom: 30px;">
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 5px 0; color: #6b7280; font-size: 13px; text-transform: uppercase;">Reference</td>
+                  <td style="padding: 5px 0; font-weight: bold; text-align: right;">${reference}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px 0; color: #6b7280; font-size: 13px; text-transform: uppercase;">Amount</td>
+                  <td style="padding: 5px 0; font-weight: bold; text-align: right; color: #10b981;">$${amount} USD</td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px 0; color: #6b7280; font-size: 13px; text-transform: uppercase;">Status</td>
+                  <td style="padding: 5px 0; font-weight: bold; text-align: right;">VERIFIED</td>
+                </tr>
+              </table>
+            </div>
+
+            <div style="text-align: center; margin: 40px 0;">
+              <a href="${frontendUrl}/thank-you?ref=${reference}" 
+                 style="background-color: #10b981; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; display: inline-block;">
+                Access Official Receipt
+              </a>
+            </div>
+
+            <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 40px; border-top: 1px solid #e5e7eb; pt-20;">
+              This is an automated dispatch. For protocol adjustments or support, please visit your dashboard.
+            </p>
+          </div>
+          <div style="background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;">
+            &copy; ${new Date().getFullYear()} Institutional Settlement Protocol
+          </div>
+        </div>
+      `
     };
     
     try {
@@ -168,6 +210,19 @@ app.post('/api/verify-payment', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get Single Payment by Reference (Public for Receipt)
+app.get('/api/payment/:reference', async (req, res) => {
+  const { reference } = req.params;
+  try {
+    const result = await pool.query('SELECT * FROM payments WHERE reference = $1', [reference]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Payment not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Fetch failed' });
   }
 });
 

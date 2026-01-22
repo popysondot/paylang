@@ -13,30 +13,48 @@ import {
 
 const ThankYouPage = () => {
     const getBaseUrl = () => {
+        if (import.meta.env.VITE_BACKEND_URL) return import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
         return window.location.hostname === 'localhost' 
-            ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+            ? 'http://localhost:5000'
             : '';
     };
 
     const location = useLocation();
-    const { reference, amount, email, name } = location.state || {};
+    const [paymentData, setPaymentData] = useState(location.state || null);
     const [settings, setSettings] = useState({
         company_name: 'Direct Settlement',
         support_email: 'support@moonderiv.com',
         service_name: 'System Protocol'
     });
+    const [loading, setLoading] = useState(!location.state);
 
     useEffect(() => {
-        const fetchSettings = async () => {
+        const params = new URLSearchParams(location.search);
+        const refParam = params.get('ref');
+
+        const fetchData = async () => {
             try {
-                const res = await axios.get(`${getBaseUrl()}/api/settings`);
-                if (res.data) setSettings(prev => ({ ...prev, ...res.data }));
+                // Fetch settings
+                const settingsRes = await axios.get(`${getBaseUrl()}/api/settings`);
+                if (settingsRes.data) setSettings(prev => ({ ...prev, ...settingsRes.data }));
+
+                // Fetch payment if missing from state but has ref param
+                if (!paymentData && refParam) {
+                    const paymentRes = await axios.get(`${getBaseUrl()}/api/payment/${refParam}`);
+                    if (paymentRes.data) {
+                        setPaymentData(paymentRes.data);
+                    }
+                }
             } catch (err) {
-                console.error('Failed to fetch settings:', err);
+                console.error('Failed to fetch data:', err);
+            } finally {
+                setLoading(false);
             }
         };
-        fetchSettings();
-    }, []);
+        fetchData();
+    }, [location, paymentData]);
+
+    const { reference, amount, email, name } = paymentData || {};
 
     const downloadReceipt = () => {
         if (!reference || !name) return;
@@ -92,6 +110,14 @@ const ThankYouPage = () => {
         
         doc.save(`Receipt_${reference}.pdf`);
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center p-6 text-center">
+                <div className="w-16 h-16 border-2 border-[#10b981] animate-spin mb-8 shadow-[0_0_40px_rgba(16,185,129,0.2)]"></div>
+            </div>
+        );
+    }
 
     if (!reference) {
         return (

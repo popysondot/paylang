@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Package, DollarSign, Clock, AlertCircle, CheckCircle, Eye, ArrowLeft, ArrowRight, ShieldCheck, Search } from 'lucide-react';
+import { Package, DollarSign, Clock, AlertCircle, CheckCircle, Eye, ArrowLeft, ArrowRight, ShieldCheck, Search, Download } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import { jsPDF } from 'jspdf';
 
 const CustomerDashboard = () => {
     const getBaseUrl = () => {
@@ -75,6 +76,61 @@ const CustomerDashboard = () => {
         }
     };
 
+    const downloadReceipt = (order) => {
+        if (!order || !order.reference) return;
+        const doc = new jsPDF();
+        
+        doc.setFillColor(0, 0, 0);
+        doc.rect(0, 0, 210, 40, 'F');
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.text(settings.company_name.toUpperCase(), 20, 25);
+        
+        doc.setTextColor(16, 185, 129);
+        doc.setFontSize(10);
+        doc.text('SETTLEMENT VERIFICATION', 140, 25);
+        
+        doc.setTextColor(82, 82, 91);
+        doc.setFontSize(10);
+        doc.text('ENTITY IDENTIFIER:', 20, 60);
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(12);
+        doc.text(order.name || 'N/A', 20, 70);
+        doc.text(order.email, 20, 77);
+        
+        doc.setTextColor(82, 82, 91);
+        doc.setFontSize(10);
+        doc.text('PROTOCOL REF:', 120, 60);
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(10);
+        doc.text(`Timestamp: ${new Date(order.createdAt).toLocaleDateString()}`, 120, 70);
+        doc.text(`Reference: ${order.reference}`, 120, 77);
+        
+        doc.setFillColor(244, 244, 245);
+        doc.rect(20, 100, 170, 10, 'F');
+        doc.setTextColor(113, 113, 122);
+        doc.text('SERVICE DEFINITION', 25, 106.5);
+        doc.text('VALUE', 160, 106.5);
+        
+        doc.setTextColor(0, 0, 0);
+        doc.text(settings.service_name || 'System Protocol', 25, 120);
+        doc.text(`$${Number(order.amount).toFixed(2)}`, 160, 120);
+        
+        doc.setDrawColor(228, 228, 231);
+        doc.line(20, 140, 190, 140);
+        doc.setFontSize(14);
+        doc.text('FINAL SETTLEMENT', 25, 155);
+        doc.setTextColor(16, 185, 129);
+        doc.text(`$${Number(order.amount).toFixed(2)} USD`, 160, 155);
+        
+        doc.setTextColor(161, 161, 170);
+        doc.setFontSize(8);
+        doc.text('Authenticated Transaction Record.', 105, 280, { align: 'center' });
+        
+        doc.save(`Receipt_${order.reference}.pdf`);
+    };
+
     if (selectedOrder) {
         const orderRefunds = getRefundsForOrder(selectedOrder.id);
         return (
@@ -89,7 +145,15 @@ const CustomerDashboard = () => {
                 <button onClick={() => setSelectedOrder(null)} className="modern-action-white opacity-40 hover:opacity-100 group">
                     <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> REVERT TO LIST
                 </button>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
+                    {selectedOrder.status === 'success' && (
+                        <button 
+                            onClick={() => downloadReceipt(selectedOrder)}
+                            className="modern-action-green text-[10px] py-2 px-4"
+                        >
+                            <Download size={14} /> DOWNLOAD PROTOCOL
+                        </button>
+                    )}
                     <div className="w-1.5 h-6 bg-[#10b981]"></div>
                     <span className="text-[11px] font-black uppercase tracking-[0.4em]">{settings.company_name}</span>
                 </div>
