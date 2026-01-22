@@ -33,7 +33,7 @@ async function inspectDb() {
         console.log('Users:', users.rows);
       }
       if (row.table_name === 'payments') {
-        const payments = await pool.query('SELECT name, email, amount FROM payments');
+        const payments = await pool.query('SELECT * FROM payments');
         console.log('Payments:', payments.rows);
       }
     }

@@ -24,6 +24,7 @@ app.set('trust proxy', 1);
 
 const allowedOrigins = [
   'https://paylang.moonderiv.com',
+  'https://www.paylang.moonderiv.com',
   'https://paylang-tusk.onrender.com',
   'http://localhost:5173',
   'http://localhost:5000'
@@ -157,7 +158,7 @@ app.post('/api/verify-payment', async (req, res) => {
     );
     console.log('Payment recorded successfully');
 
-    // Send Confirmation Email
+    // Send Confirmation Email - Don't await to avoid blocking response
     const frontendUrl = process.env.FRONTEND_URL || 'https://paylang.moonderiv.com';
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -207,12 +208,10 @@ app.post('/api/verify-payment', async (req, res) => {
       `
     };
     
-    try {
-      const info = await transporter.sendMail(mailOptions);
-      console.log('Email sent successfully:', info.messageId);
-    } catch (mailErr) {
-      console.error('Email delivery failed:', mailErr);
-    }
+    // Fire and forget email
+    transporter.sendMail(mailOptions)
+      .then(info => console.log('Email sent successfully:', info.messageId))
+      .catch(mailErr => console.error('Email delivery failed:', mailErr));
 
     res.json({ status: 'success' });
   } catch (err) {

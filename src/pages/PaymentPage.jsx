@@ -18,12 +18,19 @@ const PaymentPage = () => {
     });
     
     const getBaseUrl = () => {
+        // 1. Check for explicit environment variable
         const envUrl = import.meta.env.VITE_BACKEND_URL;
-        if (envUrl && !envUrl.includes('localhost')) return envUrl.replace(/\/$/, '');
+        if (envUrl && envUrl.trim() !== '' && !envUrl.includes('localhost')) {
+            return envUrl.replace(/\/$/, '');
+        }
         
-        return window.location.hostname === 'localhost' 
-            ? 'http://localhost:5000'
-            : ''; // Relative to current domain in production
+        // 2. Local development fallback
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return 'http://localhost:5000';
+        }
+        
+        // 3. Same-domain production fallback (for unified deployments like Render)
+        return ''; 
     };
 
     const navigate = useNavigate();
@@ -75,29 +82,44 @@ const PaymentPage = () => {
 
     const initializePayment = usePaystackPayment(config);
 
-    const onSuccess = async (reference) => {
+    const onSuccess = async (paystackResponse) => {
         setIsProcessing(true);
-        console.log('Payment successful, received reference:', reference);
+        console.log('Paystack callback triggered:', paystackResponse);
+
+        // Handle both object and string response formats
+        const referenceValue = typeof paystackResponse === 'object' 
+            ? (paystackResponse.reference || paystackResponse.trxref) 
+            : paystackResponse;
+
+        console.log('Extracted reference:', referenceValue);
 
         // Small delay to ensure state stability
-        await new Promise(resolve => setTimeout(resolve, 800));
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         try {
-            console.log('Verifying with backend...');
-            await axios.post(`${getBaseUrl()}/api/verify-payment`, {
-                reference: reference.reference,
+            const backendUrl = getBaseUrl();
+            console.log('Verifying with backend at:', `${backendUrl}/api/verify-payment`);
+            
+            const payload = {
+                reference: referenceValue,
                 email: email,
                 amount: amount,
                 name: name
-            }, {
+            };
+            
+            console.log('Verification payload:', payload);
+
+            const response = await axios.post(`${backendUrl}/api/verify-payment`, payload, {
                 withCredentials: true,
-                timeout: 15000 // 15s timeout
+                timeout: 20000 // Increased to 20s
             });
+            
+            console.log('Backend response:', response.data);
             
             console.log('Verification successful, navigating...');
             navigate('/thank-you', { 
                 state: { 
-                    reference: reference.reference, 
+                    reference: referenceValue, 
                     amount, 
                     email, 
                     name 
@@ -105,7 +127,8 @@ const PaymentPage = () => {
             });
         } catch (err) {
             console.error('Verification error details:', err.response?.data || err.message);
-            addToast('Payment recorded but verification confirmation failed. Check your dashboard.', 'warning');
+            const errorMsg = err.response?.data?.error || err.message;
+            addToast(`Payment verification pending: ${errorMsg}`, 'warning');
             setIsProcessing(false);
         }
     };
