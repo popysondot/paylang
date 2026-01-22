@@ -149,12 +149,25 @@ app.post('/api/verify-payment', async (req, res) => {
     return res.status(400).json({ error: 'Missing reference or email' });
   }
 
+  // Ensure amount is a valid number for the numeric column
+  const numericAmount = parseFloat(amount);
+  if (isNaN(numericAmount)) {
+    console.error('Invalid amount received:', amount);
+    return res.status(400).json({ error: 'Invalid amount format' });
+  }
+
   try {
-    // Record payment
+    // Record payment - check if reference already exists to avoid 500
+    const checkRes = await pool.query('SELECT id FROM payments WHERE reference = $1', [reference]);
+    if (checkRes.rows.length > 0) {
+      console.log('Payment with this reference already exists, returning success to allow redirection.');
+      return res.json({ status: 'success', message: 'already_recorded' });
+    }
+
     console.log('Recording payment in database...');
     await pool.query(
       'INSERT INTO payments (reference, email, amount, name, status, "createdAt") VALUES ($1, $2, $3, $4, $5, NOW())',
-      [reference, email, amount, name, 'success']
+      [reference, email, numericAmount, name, 'success']
     );
     console.log('Payment recorded successfully');
 

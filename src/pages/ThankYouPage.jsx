@@ -171,7 +171,7 @@ const ThankYouPage = () => {
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-16 py-12 md:py-20 faded-line-y">
                         <div className="space-y-6">
                             <span className="text-[10px] md:text-[11px] font-black text-white/20 uppercase tracking-[0.4em] block">Value (USD)</span>
-                            <p className="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter">${amount}</p>
+                            <p className="text-5xl md:text-7xl font-black text-white leading-none tracking-tighter">${Number(amount || 0).toFixed(2)}</p>
                         </div>
                         <div className="space-y-6 sm:faded-line-l sm:pl-12 md:pl-16">
                             <span className="text-[10px] md:text-[11px] font-black text-white/20 uppercase tracking-[0.4em] block">Reference ID</span>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { usePaystackPayment } from 'react-paystack';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 import { ShieldCheck, ArrowRight, CreditCard, Mail, User, DollarSign, AlertCircle, Lock, ChevronRight } from 'lucide-react';
@@ -72,23 +71,6 @@ const PaymentPage = () => {
 
     const paystackKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 
-    const config = React.useMemo(() => ({
-        reference: reference,
-        email: email,
-        amount: Math.round(parseFloat(amount || 0) * 100),
-        publicKey: paystackKey,
-        currency: 'USD',
-        metadata: {
-            custom_fields: [
-                {
-                    display_name: "Customer Name",
-                    variable_name: "customer_name",
-                    value: name
-                }
-            ]
-        }
-    }), [reference, email, amount, name, paystackKey]);
-
     const onSuccess = React.useCallback(async (paystackResponse) => {
         // Prevent multiple simultaneous verification attempts
         if (isProcessing) return;
@@ -154,7 +136,7 @@ const PaymentPage = () => {
         refreshReference();
     }, [refreshReference]);
 
-    const initializePayment = usePaystackPayment(config);
+    const [paymentConfig, setPaymentConfig] = useState(null);
 
     const handlePayment = (e) => {
         e.preventDefault();
@@ -191,15 +173,47 @@ const PaymentPage = () => {
             return;
         }
 
+        const newConfig = {
+            reference: reference,
+            email: email,
+            amount: Math.round(parsedAmount * 100),
+            publicKey: paystackKey,
+            currency: 'USD',
+            metadata: {
+                custom_fields: [
+                    {
+                        display_name: "Customer Name",
+                        variable_name: "customer_name",
+                        value: name
+                    }
+                ]
+            }
+        };
+
         console.log('[DEBUG] Opening Paystack popup with reference:', reference);
-        try {
-            initializePayment(onSuccess, onClose);
-        } catch (err) {
-            console.error('[DEBUG] initializePayment error:', err);
-            addToast(`Error: ${err.message}`, 'error');
-            refreshReference();
-        }
+        setPaymentConfig(newConfig);
+        setIsProcessing(true); // Set processing immediately to lock the UI
     };
+
+    // Use a separate effect to trigger payment once config is locked
+    useEffect(() => {
+        if (paymentConfig && isProcessing) {
+            console.log('[DEBUG] Payment config locked, initializing Paystack');
+            const handler = window.PaystackPop.setup({
+                ...paymentConfig,
+                callback: (response) => {
+                    console.log('[DEBUG] Paystack callback:', response);
+                    onSuccess(response);
+                },
+                onClose: () => {
+                    console.log('[DEBUG] Paystack closed');
+                    onClose();
+                    setPaymentConfig(null);
+                }
+            });
+            handler.openIframe();
+        }
+    }, [paymentConfig, isProcessing]);
 
     if (isProcessing) {
         return (
