@@ -199,6 +199,15 @@ const PaymentPage = () => {
     useEffect(() => {
         if (paymentConfig && isProcessing) {
             console.log('[DEBUG] Payment config locked, initializing Paystack');
+            
+            if (typeof window.PaystackPop === 'undefined') {
+                console.error('[DEBUG] Paystack script not loaded');
+                addToast('Payment gateway is still loading, please wait...', 'warning');
+                setIsProcessing(false);
+                setPaymentConfig(null);
+                return;
+            }
+
             const handler = window.PaystackPop.setup({
                 ...paymentConfig,
                 callback: (response) => {
@@ -335,7 +344,7 @@ const PaymentPage = () => {
                 </div>
                 <div className="text-center md:text-right space-y-4">
                     <p className="text-[9px] font-black text-orange-300 uppercase tracking-[0.4em] md:tracking-[0.6em]">
-                        © {new Date().getFullYear()} {settings.company_name} // NODE_{config.reference.slice(-4)}
+                        © {new Date().getFullYear()} {settings.company_name} // NODE_{reference.slice(-4)}
                     </p>
                     <div className="flex items-center justify-center md:justify-end gap-3">
                         <div className="w-1.5 h-1.5 bg-[#10b981] animate-pulse shadow-[0_0_10px_#10b981]"></div>
