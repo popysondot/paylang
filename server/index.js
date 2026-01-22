@@ -11,10 +11,10 @@ import nodemailer from 'nodemailer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -89,6 +89,15 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// Verify Transporter
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('Email Transporter Error:', error);
+  } else {
+    console.log('Email Server Ready');
+  }
+});
+
 // --- PUBLIC ROUTES ---
 
 // Public Settings
@@ -139,7 +148,12 @@ app.post('/api/verify-payment', async (req, res) => {
       text: `Hello ${name},\n\nYour payment of $${amount} (Ref: ${reference}) has been successfully processed.\n\nThank you.`
     };
     
-    transporter.sendMail(mailOptions).catch(err => console.error('Email failed:', err));
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Email sent successfully:', info.messageId);
+    } catch (mailErr) {
+      console.error('Email delivery failed:', mailErr);
+    }
 
     res.json({ status: 'success' });
   } catch (err) {
