@@ -82,15 +82,23 @@ const authenticateToken = (req, res, next) => {
 
 // Email Transporter
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true, // Use SSL
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
+  },
+  tls: {
+    rejectUnauthorized: false // Helps in some cloud environments
   }
 });
 
 // Verify Transporter
 transporter.verify((error, success) => {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.warn('WARNING: Email credentials (EMAIL_USER/EMAIL_PASS) are not set in environment variables.');
+  }
   if (error) {
     console.error('Email Transporter Error:', error);
   } else {
@@ -499,6 +507,7 @@ app.use((req, res) => {
       availableRoutes: [
         'GET /api/settings',
         'POST /api/verify-payment',
+        'GET /api/payment/:reference',
         'GET /api/customer/orders/:email',
         'GET /api/payments/:email',
         'POST /api/refund-request',
