@@ -132,13 +132,22 @@ app.use('/api', limiter);
 
 // Payment Verification (Webhook/Callback)
 app.post('/api/verify-payment', async (req, res) => {
+  console.log('Incoming verification request:', req.body);
   const { reference, email, amount, name } = req.body;
+  
+  if (!reference || !email) {
+    console.error('Missing required fields in verification request');
+    return res.status(400).json({ error: 'Missing reference or email' });
+  }
+
   try {
     // Record payment
+    console.log('Recording payment in database...');
     await pool.query(
       'INSERT INTO payments (reference, email, amount, name, status, "createdAt") VALUES ($1, $2, $3, $4, $5, NOW())',
       [reference, email, amount, name, 'success']
     );
+    console.log('Payment recorded successfully');
 
     // Send Confirmation Email
     const mailOptions = {

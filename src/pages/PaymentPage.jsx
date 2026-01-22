@@ -73,18 +73,39 @@ const PaymentPage = () => {
 
     const initializePayment = usePaystackPayment(config);
 
-    const onSuccess = (reference) => {
+    const onSuccess = async (reference) => {
         setIsProcessing(true);
-        navigate('/thank-you', { state: { reference: reference.reference, amount, email, name } });
+        console.log('Payment successful, received reference:', reference);
 
-        axios.post(`${getBaseUrl()}/api/verify-payment`, {
-            reference: reference.reference,
-            email: email,
-            amount: amount,
-            name: name
-        }).catch(err => {
-            console.error('Verification failed:', err.message);
-        });
+        // Small delay to ensure state stability
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        try {
+            console.log('Verifying with backend...');
+            await axios.post(`${getBaseUrl()}/api/verify-payment`, {
+                reference: reference.reference,
+                email: email,
+                amount: amount,
+                name: name
+            }, {
+                withCredentials: true,
+                timeout: 15000 // 15s timeout
+            });
+            
+            console.log('Verification successful, navigating...');
+            navigate('/thank-you', { 
+                state: { 
+                    reference: reference.reference, 
+                    amount, 
+                    email, 
+                    name 
+                } 
+            });
+        } catch (err) {
+            console.error('Verification error details:', err.response?.data || err.message);
+            addToast('Payment recorded but verification confirmation failed. Check your dashboard.', 'warning');
+            setIsProcessing(false);
+        }
     };
 
     const handlePayment = (e) => {
