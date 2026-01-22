@@ -13,12 +13,19 @@ import {
 
 const ThankYouPage = () => {
     const getBaseUrl = () => {
+        // 1. Check for explicit environment variable
         const envUrl = import.meta.env.VITE_BACKEND_URL;
-        if (envUrl && !envUrl.includes('localhost')) return envUrl.replace(/\/$/, '');
+        if (envUrl && envUrl.trim() !== '' && !envUrl.includes('localhost')) {
+            return envUrl.replace(/\/$/, '');
+        }
         
-        return window.location.hostname === 'localhost' 
-            ? 'http://localhost:5000'
-            : ''; // Relative to current domain in production
+        // 2. Local development fallback
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return 'http://localhost:5000';
+        }
+        
+        // 3. Same-domain production fallback (for unified deployments like Render)
+        return ''; 
     };
 
     const location = useLocation();

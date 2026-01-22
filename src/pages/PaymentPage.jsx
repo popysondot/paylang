@@ -36,6 +36,15 @@ const PaymentPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    // Generate a stable reference for the current session, with a setter to refresh it
+    const [reference, setReference] = useState(() => (new Date()).getTime().toString());
+
+    const refreshReference = React.useCallback(() => {
+        const newRef = (new Date()).getTime().toString();
+        console.log('[DEBUG] Refreshing reference:', newRef);
+        setReference(newRef);
+    }, []);
+
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         if (params.get('email')) setEmail(params.get('email'));
@@ -63,10 +72,10 @@ const PaymentPage = () => {
 
     const paystackKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 
-    const config = {
-        reference: (new Date()).getTime().toString(),
+    const config = React.useMemo(() => ({
+        reference: reference,
         email: email,
-        amount: parseFloat(amount) * 100,
+        amount: Math.round(parseFloat(amount || 0) * 100),
         publicKey: paystackKey,
         currency: 'USD',
         metadata: {
@@ -78,75 +87,118 @@ const PaymentPage = () => {
                 }
             ]
         }
-    };
+    }), [reference, email, amount, name, paystackKey]);
 
-    const initializePayment = usePaystackPayment(config);
-
-    const onSuccess = async (paystackResponse) => {
+    const onSuccess = React.useCallback(async (paystackResponse) => {
+        // Prevent multiple simultaneous verification attempts
+        if (isProcessing) return;
+        
         setIsProcessing(true);
-        console.log('Paystack callback triggered:', paystackResponse);
+        console.log('[DEBUG] Paystack onSuccess triggered. Response:', paystackResponse);
 
-        // Handle both object and string response formats
         const referenceValue = typeof paystackResponse === 'object' 
             ? (paystackResponse.reference || paystackResponse.trxref) 
             : paystackResponse;
 
-        console.log('Extracted reference:', referenceValue);
-
-        // Small delay to ensure state stability
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log('[DEBUG] Extracted reference:', referenceValue);
 
         try {
             const backendUrl = getBaseUrl();
-            console.log('Verifying with backend at:', `${backendUrl}/api/verify-payment`);
+            const verificationUrl = `${backendUrl}/api/verify-payment`;
+            console.log('[DEBUG] Verifying with backend at:', verificationUrl);
             
             const payload = {
-                reference: referenceValue,
+                reference: referenceValue || reference,
                 email: email,
                 amount: amount,
                 name: name
             };
             
-            console.log('Verification payload:', payload);
+            console.log('[DEBUG] Verification payload:', payload);
 
-            const response = await axios.post(`${backendUrl}/api/verify-payment`, payload, {
+            const response = await axios.post(verificationUrl, payload, {
                 withCredentials: true,
-                timeout: 20000 // Increased to 20s
+                timeout: 30000 
             });
             
-            console.log('Backend response:', response.data);
+            console.log('[DEBUG] Backend verification response:', response.data);
             
-            console.log('Verification successful, navigating...');
-            navigate('/thank-you', { 
-                state: { 
-                    reference: referenceValue, 
-                    amount, 
-                    email, 
-                    name 
-                } 
-            });
+            if (response.data && (response.data.status === 'success' || response.data.message === 'success' || response.data.status === 'OK')) {
+                console.log('[DEBUG] Verification successful, navigating to thank-you');
+                navigate(`/thank-you?ref=${referenceValue || reference}`, { 
+                    state: { 
+                        reference: referenceValue || reference, 
+                        amount, 
+                        email, 
+                        name 
+                    } 
+                });
+            } else {
+                console.error('[DEBUG] Backend verification failed: Unexpected response format', response.data);
+                throw new Error('Verification failed: Unexpected server response');
+            }
         } catch (err) {
-            console.error('Verification error details:', err.response?.data || err.message);
+            console.error('[DEBUG] Verification error details:', err.response?.data || err.message);
             const errorMsg = err.response?.data?.error || err.message;
-            addToast(`Payment verification pending: ${errorMsg}`, 'warning');
+            addToast(`Verification Error: ${errorMsg}`, 'error');
             setIsProcessing(false);
+            // Refresh reference so they can try again with a fresh one
+            refreshReference();
         }
-    };
+    }, [email, amount, name, reference, navigate, addToast, isProcessing, refreshReference]);
+
+    const onClose = React.useCallback(() => {
+        console.log('[DEBUG] Paystack popup closed');
+        setIsProcessing(false);
+        // Refresh reference for the next attempt
+        refreshReference();
+    }, [refreshReference]);
+
+    const initializePayment = usePaystackPayment(config);
 
     const handlePayment = (e) => {
         e.preventDefault();
+        
+        if (isProcessing) return;
+
+        console.log('[DEBUG] handlePayment triggered');
+        
         const isLocal = window.location.hostname === 'localhost';
         const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-        if (!paystackKey || (isLocal && !backendUrl)) {
-            addToast('System configuration incomplete', 'error');
+        if (!paystackKey) {
+            console.error('[DEBUG] Missing VITE_PAYSTACK_PUBLIC_KEY');
+            addToast('Payment system not configured (missing key)', 'error');
             return;
         }
+        
+        if (isLocal && !backendUrl) {
+            console.warn('[DEBUG] Local dev: Missing VITE_BACKEND_URL');
+            addToast('Backend URL not configured for local development', 'error');
+            return;
+        }
+
         if (!email || !amount || !name) {
-            addToast('Missing identity or amount', 'error');
+            console.warn('[DEBUG] Missing form fields:', { email, amount, name });
+            addToast('Please fill all fields', 'error');
             return;
         }
-        initializePayment(onSuccess, () => setIsProcessing(false));
+
+        const parsedAmount = parseFloat(amount);
+        if (isNaN(parsedAmount) || parsedAmount <= 0) {
+            console.warn('[DEBUG] Invalid amount:', amount);
+            addToast('Invalid amount', 'error');
+            return;
+        }
+
+        console.log('[DEBUG] Opening Paystack popup with reference:', reference);
+        try {
+            initializePayment(onSuccess, onClose);
+        } catch (err) {
+            console.error('[DEBUG] initializePayment error:', err);
+            addToast(`Error: ${err.message}`, 'error');
+            refreshReference();
+        }
     };
 
     if (isProcessing) {
@@ -219,7 +271,7 @@ const PaymentPage = () => {
                                 </div>
 
                                 <div className="group relative">
-                                    <label className="text-[9px] font-black textwhite/20 uppercase tracking-[0.4em] block mb-2 group-focus-within:text-[#10b981] transition-all">Email Address</label> 
+                                    <label className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] block mb-2 group-focus-within:text-[#10b981] transition-all">Email Address</label> 
                                     <input 
                                         type="email" 
                                         value={email}
