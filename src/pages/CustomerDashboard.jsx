@@ -6,9 +6,12 @@ import { jsPDF } from 'jspdf';
 
 const CustomerDashboard = () => {
     const getBaseUrl = () => {
+        const envUrl = import.meta.env.VITE_BACKEND_URL;
+        if (envUrl && !envUrl.includes('localhost')) return envUrl.replace(/\/$/, '');
+        
         return window.location.hostname === 'localhost' 
-            ? (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
-            : '';
+            ? 'http://localhost:5000'
+            : ''; // Relative to current domain in production
     };
 
     const [email, setEmail] = useState('');

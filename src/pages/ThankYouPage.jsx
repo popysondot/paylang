@@ -13,10 +13,12 @@ import {
 
 const ThankYouPage = () => {
     const getBaseUrl = () => {
-        if (import.meta.env.VITE_BACKEND_URL) return import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
+        const envUrl = import.meta.env.VITE_BACKEND_URL;
+        if (envUrl && !envUrl.includes('localhost')) return envUrl.replace(/\/$/, '');
+        
         return window.location.hostname === 'localhost' 
             ? 'http://localhost:5000'
-            : '';
+            : ''; // Relative to current domain in production
     };
 
     const location = useLocation();
