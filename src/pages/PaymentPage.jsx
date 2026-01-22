@@ -146,7 +146,7 @@ const PaymentPage = () => {
                         </div>
                         <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-none uppercase break-words">
                             Secure <br />
-                            <span className="text-white/50">Settlement.</span>
+                            <span className="text-white/50">Settlement</span>
                         </h1>
                     </div>
 
@@ -204,7 +204,7 @@ const PaymentPage = () => {
 
                             <button 
                                 type="submit"
-                                className="modern-action-green text-lg md:text-2xl hover:gap-10 w-full justify-center gap-4 py-6 md:py-8"
+                                className="modern-action-green text-lg md:text-2xl hover:gap-10 w-full justify-center gap-4 py-6 md:py-8 underline"
                             >
                                 <span>Initialize Payment</span>
                                 <ArrowRight size={20} className="flex-shrink-0" />
