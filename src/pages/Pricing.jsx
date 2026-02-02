@@ -34,23 +34,23 @@ const Pricing = () => {
                 </p>
 
                 <div className="grid sm:grid-cols-2 gap-12 md:gap-16 py-12 md:py-20 faded-line-y">
-                    <div className="space-y-8 md:space-y-12">
-                        <div className="space-y-4">
-                            <p className="text-[10px] font-black text-[#10b981] uppercase tracking-[0.6em]">Base Protocol</p>
-                            <h3 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase">Tier I</h3>
+                        <div className="space-y-8 md:space-y-12">
+                            <div className="space-y-4">
+                                <p className="text-[10px] font-black text-[#10b981] uppercase tracking-[0.6em]">Base Protocol</p>
+                                <h3 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase">Tier I</h3>
+                            </div>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-6xl md:text-7xl font-black text-white">$15</span>
+                                <span className="text-[10px] text-white/20 font-black uppercase tracking-[0.2em]">/ Unit</span>
+                            </div>
+                            <ul className="space-y-4 md:space-y-6 pt-12 faded-line-t">
+                                {['Standard Processing', 'Technical Verification', 'Automated Receipts', 'L1 Support'].map(item => (
+                                    <li key={item} className="flex items-center gap-4 text-[11px] md:text-[13px] font-black text-white/30 uppercase tracking-tight hover:text-white transition-colors">
+                                        <div className="w-1.5 h-1.5 bg-[#10b981]"></div> {item}
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-6xl md:text-7xl font-black text-white">$15</span>
-                            <span className="text-[10px] text-white/20 font-black uppercase tracking-[0.2em]">/ Unit</span>
-                        </div>
-                        <ul className="space-y-4 md:space-y-6 pt-12 faded-line-t">
-                            {['Standard Processing', 'Technical Verification', 'Automated Receipts', 'L1 Support'].map(item => (
-                                <li key={item} className="flex items-center gap-4 text-[11px] md:text-[13px] font-black text-white/30 uppercase tracking-tight hover:text-white transition-colors">
-                                    <div className="w-1.5 h-1.5 bg-[#10b981]"></div> {item}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
                     
                     <div className="space-y-8 md:space-y-12 sm:faded-line-l sm:pl-12 md:pl-16">
                         <div className="space-y-4">

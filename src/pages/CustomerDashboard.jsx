@@ -251,29 +251,31 @@ const CustomerDashboard = () => {
                         </div>
                         <h1 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter leading-none text-white uppercase">
                             Order <br />
-                            <span className="text-white/20">Tracking.</span>
+                            <span className="text-white/40">Tracking</span>
                         </h1>
-                        <p className="text-lg text-white/40 font-black uppercase tracking-tighter pt-4 max-w-xl">Search transaction ledger by registered digital signature.</p>
+                        <p className="text-xs text-orange-400 font-black uppercase tracking-tighter pt-4 max-w-xl underline">Search transaction ledger by registered digital signature.</p>
                     </div>
 
                     {!searched ? (
                         <div className="relative group max-w-2xl">
                             <form onSubmit={handleSearch} className="relative py-6 flex flex-col md:flex-row gap-8 items-center faded-line-b focus-within:border-[#10b981]/50 transition-colors">
                                 <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="ENTER REGISTERED EMAIL"
-                                    className="flex-1 bg-transparent py-5 outline-none text-2xl md:text-3xl font-black transition-all placeholder:text-white/10 text-white uppercase tracking-tighter"
-                                    required
-                                />
+    type="email"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    placeholder="ENTER REGISTERED EMAIL"
+    className="flex-1 bg-transparent py-5 px-8 border border-white/20 rounded-full outline-none text-xs md:text-xl transition-all placeholder:text-white/60 text-white tracking-tighter focus:border-[#10b981]/50"
+    required
+/>
+
                                 <button
-                                    type="submit"
-                                    className="modern-action-green text-lg whitespace-nowrap"
-                                >
-                                    Execute Query
-                                    <ArrowRight size={20} />
-                                </button>
+    type="submit"
+    className="modern-action-green text-lg whitespace-nowrap rounded-full border border-[#10b981]/30 px-8 py-4 transition-all hover:bg-[#10b981]/5"
+>
+    Execute Query
+    <ArrowRight size={20} />
+</button>
+
                             </form>
                         </div>
                     ) : (
@@ -356,9 +358,9 @@ const CustomerDashboard = () => {
             <footer className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-16 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-white/[0.03] mt-auto relative z-10">
                 <div className="flex items-center gap-6">
                     <ShieldCheck size={18} className="text-[#10b981]" />
-                    <p className="text-[10px] font-black text-white/10 uppercase tracking-[0.5em]">SECURE LEDGER ACCESS PROTOCOL // {new Date().getFullYear()}</p>
+                    <p className="text-[10px] font-black text-orange-400 uppercase tracking-[0.5em]">SECURE LEDGER ACCESS PROTOCOL // {new Date().getFullYear()}</p>
                 </div>
-                <div className="flex items-center gap-10 text-[9px] font-black uppercase tracking-[0.3em] text-white/20">
+                <div className="flex items-center gap-10 text-[9px] font-black uppercase tracking-[0.3em] text-white/50">
                     <Link to="/terms-of-service" className="hover:text-[#10b981] transition-colors">Protocol Terms</Link>
                     <Link to="/privacy-policy" className="hover:text-[#10b981] transition-colors">Data Privacy</Link>
                 </div>

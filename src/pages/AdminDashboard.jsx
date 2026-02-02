@@ -234,24 +234,24 @@ const AdminDashboard = () => {
                     <form onSubmit={handleLogin} className="space-y-16">
                         <div className="space-y-12">
                             <div className="group relative">
-                                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] block mb-4 transition-colors group-focus-within:text-[#10b981]">Identity UID</label>
+                                <label className="text-[10px] font-black text-white uppercase tracking-[0.4em] block mb-4 transition-colors group-focus-within:text-[#10b981]">Identity UID</label>
                                 <input 
                                     type="text"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                     placeholder="ENTER_UID"
-                                    className="w-full bg-transparent border-b border-white/10 py-6 outline-none text-2xl font-black transition-all placeholder:text-white/5 uppercase focus:border-[#10b981] tracking-tighter"
+                                    className="w-full bg-transparent border-b border-white/20 py-6 outline-none text-2xl font-black transition-all placeholder:text-white/5 focus:border-[#10b981] tracking-tighter"
                                     required
                                 />
                             </div>
                             <div className="group relative">
-                                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] block mb-4 transition-colors group-focus-within:text-[#10b981]">Access Key</label>
+                                <label className="text-[10px] font-black text-white uppercase tracking-[0.4em] block mb-4 transition-colors group-focus-within:text-[#10b981]">Access Key</label>
                                 <input 
                                     type="password" 
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="••••••••"
-                                    className="w-full bg-transparent border-b border-white/10 py-6 outline-none text-2xl font-black transition-all placeholder:text-white/5 focus:border-[#10b981] tracking-widest"
+                                    className="w-full bg-transparent border-b border-white/20 py-6 outline-none text-2xl font-black transition-all placeholder:text-white/5 focus:border-[#10b981] tracking-widest"
                                     required
                                 />
                             </div>

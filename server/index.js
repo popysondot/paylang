@@ -10,11 +10,14 @@ import { rateLimit } from 'express-rate-limit';
 import nodemailer from 'nodemailer';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import axios from 'axios';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: path.join(__dirname, '.env') });
+// Load environment variables from both root and server directories
+dotenv.config({ path: path.join(__dirname, '../.env') });
+dotenv.config({ path: path.join(__dirname, '.env'), override: true });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -157,21 +160,52 @@ app.post('/api/verify-payment', async (req, res) => {
   }
 
   try {
-    // Record payment - check if reference already exists to avoid 500
+    // 1. Check if already recorded
     const checkRes = await pool.query('SELECT id FROM payments WHERE reference = $1', [reference]);
     if (checkRes.rows.length > 0) {
-      console.log('Payment with this reference already exists, returning success to allow redirection.');
+      console.log('Payment already recorded.');
       return res.json({ status: 'success', message: 'already_recorded' });
     }
 
-    console.log('Recording payment in database...');
+    // 2. Verify with Paystack
+    console.log('Verifying reference with Paystack:', reference);
+    const secretKey = process.env.PAYSTACK_SECRET_KEY;
+    if (!secretKey) {
+      console.error('PAYSTACK_SECRET_KEY not set in environment');
+      return res.status(500).json({ error: 'Payment gateway configuration error' });
+    }
+
+    const paystackRes = await axios.get(`https://api.paystack.co/transaction/verify/${reference}`, {
+      headers: {
+        Authorization: `Bearer ${secretKey}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const paystackData = paystackRes.data.data;
+    console.log('Paystack verification response status:', paystackData.status);
+
+    if (paystackData.status !== 'success') {
+      console.error('Paystack verification failed. Status:', paystackData.status);
+      return res.status(400).json({ error: `Payment verification failed: ${paystackData.status}` });
+    }
+
+    // 3. Verify Amount (Paystack amount is in subunits, e.g. cents/kobo)
+    const expectedAmountInSubunits = Math.round(numericAmount * 100);
+    if (Math.abs(paystackData.amount - expectedAmountInSubunits) > 1) { // 1 subunit tolerance
+      console.error('Amount mismatch:', { expected: expectedAmountInSubunits, received: paystackData.amount });
+      return res.status(400).json({ error: 'Payment amount mismatch' });
+    }
+
+    // 4. Record payment
+    console.log('Recording verified payment in database...');
     await pool.query(
       'INSERT INTO payments (reference, email, amount, name, status, "createdAt") VALUES ($1, $2, $3, $4, $5, NOW())',
       [reference, email, numericAmount, name, 'success']
     );
     console.log('Payment recorded successfully');
 
-    // Send Confirmation Email - Don't await to avoid blocking response
+    // Send Confirmation Email
     const frontendUrl = process.env.FRONTEND_URL || 'https://paylang.moonderiv.com';
     const mailOptions = {
       from: process.env.EMAIL_USER,

@@ -105,7 +105,7 @@ const ThankYouPage = () => {
         doc.setTextColor(0, 0, 0);
         doc.text(settings.service_name, 25, 120);
         doc.text(`$${Number(amount).toFixed(2)}`, 160, 120);
-        
+
         doc.setDrawColor(228, 228, 231);
         doc.line(20, 140, 190, 140);
         doc.setFontSize(14);
