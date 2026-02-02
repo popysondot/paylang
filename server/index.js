@@ -84,35 +84,17 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Email Transporter
+// Email Transporter - Simplified for Render.com compatibility
 const transporter = nodemailer.createTransport({
   service: 'gmail',
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // Use SSL
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
-  },
-  tls: {
-    rejectUnauthorized: false
-  },
-  connectionTimeout: 10000, // 10 seconds
-  greetingTimeout: 10000,
-  socketTimeout: 10000
+  }
 });
 
-// Verify Transporter
-transporter.verify((error, success) => {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.warn('WARNING: Email credentials (EMAIL_USER/EMAIL_PASS) are not set in environment variables.');
-  }
-  if (error) {
-    console.error('Email Transporter Error:', error);
-  } else {
-    console.log('Email Server Ready');
-  }
-});
+// Skip transporter.verify() on startup as it can cause ETIMEDOUT during Render's boot cycle
+console.log('Email Transporter initialized with service: gmail');
 
 // --- PUBLIC ROUTES ---
 
