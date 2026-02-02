@@ -162,12 +162,13 @@ app.post('/api/verify-payment', async (req, res) => {
   try {
     // 1. Check if already recorded
     const checkRes = await pool.query('SELECT id FROM payments WHERE reference = $1', [reference]);
+    let alreadyRecorded = false;
     if (checkRes.rows.length > 0) {
-      console.log('Payment already recorded.');
-      return res.json({ status: 'success', message: 'already_recorded' });
+      console.log('Payment already recorded in database.');
+      alreadyRecorded = true;
     }
 
-    // 2. Verify with Paystack
+    // 2. Verify with Paystack (Always verify to ensure integrity before sending email)
     console.log('Verifying reference with Paystack:', reference);
     const secretKey = process.env.PAYSTACK_SECRET_KEY;
     if (!secretKey) {
@@ -197,15 +198,17 @@ app.post('/api/verify-payment', async (req, res) => {
       return res.status(400).json({ error: 'Payment amount mismatch' });
     }
 
-    // 4. Record payment
-    console.log('Recording verified payment in database...');
-    await pool.query(
-      'INSERT INTO payments (reference, email, amount, name, status, "createdAt") VALUES ($1, $2, $3, $4, $5, NOW())',
-      [reference, email, numericAmount, name, 'success']
-    );
-    console.log('Payment recorded successfully');
+    // 4. Record payment if not already there
+    if (!alreadyRecorded) {
+      console.log('Recording verified payment in database...');
+      await pool.query(
+        'INSERT INTO payments (reference, email, amount, name, status, "createdAt") VALUES ($1, $2, $3, $4, $5, NOW())',
+        [reference, email, numericAmount, name, 'success']
+      );
+      console.log('Payment recorded successfully');
+    }
 
-    // Send Confirmation Email
+    // 5. Send/Resend Confirmation Email (Only if status is success)
     const frontendUrl = process.env.FRONTEND_URL || 'https://paylang.moonderiv.com';
     const mailOptions = {
       from: process.env.EMAIL_USER,
