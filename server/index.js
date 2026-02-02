@@ -86,16 +86,20 @@ const authenticateToken = (req, res, next) => {
 
 // Email Transporter
 const transporter = nodemailer.createTransport({
+  service: 'gmail',
   host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // Use STARTTLS
+  port: 465,
+  secure: true, // Use SSL
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
   },
   tls: {
     rejectUnauthorized: false
-  }
+  },
+  connectionTimeout: 10000, // 10 seconds
+  greetingTimeout: 10000,
+  socketTimeout: 10000
 });
 
 // Verify Transporter
@@ -209,6 +213,7 @@ app.post('/api/verify-payment', async (req, res) => {
     }
 
     // 5. Send/Resend Confirmation Email (Only if status is success)
+    console.log(`Attempting to send confirmation email to: ${email}`);
     const frontendUrl = process.env.FRONTEND_URL || 'https://paylang.moonderiv.com';
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -258,10 +263,13 @@ app.post('/api/verify-payment', async (req, res) => {
       `
     };
     
-    // Fire and forget email
-    transporter.sendMail(mailOptions)
-      .then(info => console.log('Email sent successfully:', info.messageId))
-      .catch(mailErr => console.error('Email delivery failed:', mailErr));
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Email sent successfully:', info.messageId);
+    } catch (mailErr) {
+      console.error('Email delivery failed:', mailErr);
+      // We don't return error to client because the payment IS recorded
+    }
 
     res.json({ status: 'success' });
   } catch (err) {
