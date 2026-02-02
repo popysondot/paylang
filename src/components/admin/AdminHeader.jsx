@@ -29,32 +29,31 @@ const AdminHeader = ({ activeView, filter, setFilter }) => {
     };
 
     return (
-        <header className="py-8 md:py-12 flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-white/10 mb-8 md:mb-12">
+        <header className="py-12 flex flex-col md:flex-row md:items-end justify-between gap-8 mb-4">
             <div className="space-y-4">
                 <div className="flex items-center gap-4">
                     <div className="w-8 h-[1px] bg-[#10b981]"></div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#10b981]">{getSubtitle()}</p>
+                    <p className="text-[9px] font-black uppercase tracking-[0.5em] text-[#10b981]">{getSubtitle()}</p>
                 </div>
-                <h2 className="text-6xl md:text-8xl font-black text-white tracking-tighter uppercase leading-none">
+                <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase leading-none">
                     {getTitle()}
                 </h2>
             </div>
 
             <div className="w-full md:w-96 group">
-                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] block mb-2 group-focus-within:text-[#10b981] transition-colors">Execute Query</label>
+                <label className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] block mb-2 group-focus-within:text-[#10b981] transition-colors">Registry Search</label>
                 <div className="relative">
                     <SearchIcon 
-                        className={`absolute left-0 top-1/2 -translate-y-1/2 transition-colors duration-500 ${filter ? 'text-[#10b981]' : 'text-white/10'}`} 
-                        size={16} 
+                        className={`absolute left-6 top-1/2 -translate-y-1/2 transition-colors duration-500 ${filter ? 'text-[#10b981]' : 'text-white/10'}`} 
+                        size={18} 
                     />
                     <input 
                         type="text"
-                        placeholder="SEARCH_MANIFEST..."
+                        placeholder="INPUT_IDENTITY..."
                         value={filter}
                         onChange={(e) => setFilter(e.target.value)}
-                        className="w-full bg-transparent border-none py-4 pl-10 outline-none text-xl md:text-2xl font-black transition-all placeholder:text-white/5 uppercase text-white tracking-tight"
+                        className="w-full bg-transparent border border-white/10 rounded-full py-4 pl-16 pr-8 outline-none text-base font-black transition-all placeholder:text-white/5 uppercase text-white tracking-tight focus:border-[#10b981]/50"
                     />
-                    <div className="absolute bottom-0 left-0 w-full h-px bg-white/10 group-focus-within:bg-[#10b981] transition-colors"></div>
                 </div>
             </div>
         </header>
